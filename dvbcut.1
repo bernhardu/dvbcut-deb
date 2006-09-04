@@ -1,0 +1,39 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH DVBCUT 1 "November 27, 2005"
+.SH NAME
+dvbcut \- Qt application for cutting parts out of DVB streams
+.SH SYNOPSIS
+.B dvbcut
+[
+.B \-idx
+.I indexfile
+]
+[
+.I mpegfile
+]
+.br
+.B dvbcut
+.I projectfile
+.br
+.B dvbcut
+.B \-generateidx
+.B \-idx
+.I indexfile
+.I mpegfile
+.SH DESCRIPTION
+DVBCUT is a Qt application that allows you to select certain parts of an MPEG transport stream
+(as received via Digital Video Broadcasting, DVB) and save these parts into a single MPEG output file. It follows a
+``keyhole surgery'' approach where the input video and audio data is mostly kept unchanged, and only very few frames at the beginning and/or end of the selected range are re-encoded in order to obtain a valid MPEG file.
+.br
+DVBCUT needs to create index information on an MPEG file first. Therefore, when loading an MPEG transport stream file, it also asks you for a filename of an index file. If you choose an existing file, it is loaded and used as index if suitable. (That means, that dvbcut performs some sanity checks on the index itself and also checks if the index describes the chosen MPEG file.) If you select a file which does not yet exist, dvbcut creates the necessary index in place.
+.SH OPTIONS
+.TP
+.BI "\-idx" " indexfile"
+Use 
+.I indexfile
+as index.
+.TP
+.B \-generateidx
+Do not show the graphical user interface, only generate an index.
+.SH AUTHOR
+dvbcut was written by Sven Over <svenover@svenover.de>.

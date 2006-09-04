@@ -1,0 +1,20 @@
+DVBCUT INSTALL -- last edited 2005-11-21
+
+In order to compile dvbcut, you need to have the following libraries
+installed:
+
+* Qt, version 3
+* SCons (a modern build utility, replacing automake, autoconf and make)
+* libao (optional, for sound output)
+
+On a Debian system, the following packets should do the job: 
+libqt3-mt-dev qt3-dev-tools scons libao-dev
+
+If you have MPlayer installed on your machine (and it is accessible as
+"mplayer"), you can play the videos inside DVBCUT.
+
+How to compile DVBCUT:
+
+* Unpack the dvbcut source archive and enter the dvbcut directory.
+* Type 'make'. If everything works well, you will find the DVBCUT executable
+  in the bin subdirectory.

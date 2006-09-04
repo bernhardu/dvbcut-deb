@@ -1,0 +1,71 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>progresswindowbase</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>progresswindowbase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>600</width>
+            <height>480</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>dvbcut</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QTextBrowser">
+            <property name="name">
+                <cstring>logbrowser</cstring>
+            </property>
+            <property name="textFormat">
+                <enum>LogText</enum>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout1</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QProgressBar">
+                    <property name="name">
+                        <cstring>progressbar</cstring>
+                    </property>
+                    <property name="totalSteps">
+                        <number>1000</number>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>cancelbutton</cstring>
+                    </property>
+                    <property name="text">
+                        <string>cancel</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<connections>
+    <connection>
+        <sender>cancelbutton</sender>
+        <signal>clicked()</signal>
+        <receiver>progresswindowbase</receiver>
+        <slot>clickedcancel()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>setprogress(int)</slot>
+    <slot>clickedcancel()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
