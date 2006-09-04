@@ -1,0 +1,38 @@
+DVBCUT uses the FFMPEG libraries (libavformat, libavcodec) for decoding and
+encoding of MPEG2 video streams, as well as for decoding audio streams. To ease
+the build process of DVBCUT, a sufficient subset of the FFMPEG sources is now
+included in the DVBCUT archive. You find this in the ffmpeg.src directory.
+
+FFMPEG is licensed under the LGPL, with the exception of liba52 and libpostproc,
+which are licensed under the GPL. Read the details in ffmpeg.src/README and
+ffmpeg.src/COPYING. All credits for FFMPEG go to its authors, which are listed
+in ffmpeg.src/CREDITS.
+
+However, you can still build DVBCUT with the FFMPEG libraries which are
+installed on your system. Type
+
+make FFMPEG=/usr
+
+if the FFMPEG libraries are in /usr/lib and the header files are in
+/usr/include/ffmpeg. This is usually the case if you have FFMPEG packages and
+development packages installed from your distribution. If you build FFMPEG
+yourself, you have to specify the FFMPEG installation prefix to the DVBCUT
+Makefile. E.g.:
+
+(in the FFMPEG directory)
+./configure --prefix=/path/to/my/ffmpeg
+make
+make install
+
+(in the DVBCUT directory)
+make FFMPEG=/path/to/my/ffmpeg
+
+If you do not specify any FFMPEG path, DVBCUT will be linked against static
+FFMPEG libraries built from the sources in ffmpeg.src.
+
+Currently, DVBCUT comes with a CVS snapshot from FFMPEG, taken at September 18th
+2005. The files listed in ffmpeg-patches/cvs20050918.deletefiles were removed
+and the patch ffmpeg-patches/cvs20050918.diff was applied, in order to reduce
+the size of the DVBCUT source archive. The DVBCUT executable is also
+significantly smaller thanks to the patch, which removes unneeded functionality
+from FFMPEG.

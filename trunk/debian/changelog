@@ -1,0 +1,18 @@
+dvbcut (0.5.3) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Sven Over <svenover@svenover.de>  Fri, 16 Dec 2005 20:15:12 +0100
+
+dvbcut (0.5.2) unstable; urgency=low
+
+  * New upstream version.
+  * Downgraded libao-dev build-dependency to work on sarge.
+
+ -- Sven Over <svenover@svenover.de>  Sun, 11 Dec 2005 13:00:12 +0100
+
+dvbcut (0.5.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Sven Over <svenover@svenover.de>  Sun, 27 Nov 2005 17:26:15 +0100

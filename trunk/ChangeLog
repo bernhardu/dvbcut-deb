@@ -1,0 +1,79 @@
+2005-12-16  Sven Over  <svenover@svenover.de>
+
+	* Release 0.5.3.
+
+2005-12-15  Sven Over  <svenover@svenover.de>
+
+	* Important bug fixes in the DVBCUT muxer.
+
+	* Fixed a bug in the audio player function, which caused no audio to
+	be played in certain situations.
+
+	* Fixed a bug in saving the index file, which caused an "Invalid index
+	file" error when loading the index.
+
+	* New items in the "View" menu: "Full size", "Half size" and "Quarter
+	Size". Also added a "-geometry" option with the correct display size
+	to the command line when spawning the embedded MPlayer.
+
+	* The DVBCUT muxer is now available in two variants: apart from the
+	one which creates DVD compliant (well, hopefully) program streams,
+	there is now also one for plain program streams. The latter has no
+	fixed pack size (DVD demands 2048 bytes fixed pack size), and no
+	special placeholder packs for DVD navigation data. (Tech note: audio
+	buffers are as big as 49152 bytes, as opposed to 4096 in the DVBCUT
+	DVD muxer. This is to circumvent problems because of the very big
+	video stream packs.) It creates files that are a few percent smaller
+	than the DVD muxer, as muxing overhead is considerably smaller.
+
+2005-12-11  Sven Over  <svenover@svenover.de>
+
+	* Release 0.5.2.
+
+	* Replaced the menu items for exporting MPEG program stream and MPEG
+	transport stream by one item "Export video". When selected, a new
+	dialog window appears, in which you can choose the output format.
+	Apart from the libavformat-based program stream and transport stream
+	output formats, now also a DVBCUT muxer is available which writes
+	DVD compliant program streams. The muxer is still subject to testing.
+
+	* The "Play" menu now has a submenu "Audio track", in which the user
+	can choose which audio track to play when clicking on "Play audio"
+	or when starting the embedded MPlayer.
+
+	* AC3 support added. Both the transport and the program stream reader
+	can read AC3 streams (tested with DVB and DVD material, respectively).
+	AC3 gets decoded for the "Play Audio" menu items. Writing AC3 has been
+	tested with the libavformat PS and TS muxers as well as with the new
+	DVBCUT muxer.
+
+	* Implemented mmapped reading of input files.
+
+	* Added "Recent files..." submenu to the "File" menu. The information
+	is saved by means of the Qt QSettings mechanism, in a file
+	"~/.qt/dvbcut.sf.netrc".
+
+2005-11-27  Sven Over  <svenover@svenover.de>
+
+	* Release 0.5.1.
+
+	* Numerous small fixes.
+
+	* While indexing an input file, show a progress bar and a cancel
+	button in the status bar of the DVBCUT window.
+
+	* Show busy mouse cursor while decoding video and while loading or
+	indexing video.
+  
+	* Incorporated the sources of the FFMPEG libraries (libavcodec,
+	libavformat, libavutil) into the DVBCUT source directory. This will
+	ease the install procedure significantly for those who do not have
+	these libraries installed or have installed an incompatible version.
+
+	* Introduced SCons as build utility. A Makefile is also provided,
+	which calls SCons.
+
+2005-11-21  Sven Over  <svenover@svenover.de>
+
+	* First public release.
+

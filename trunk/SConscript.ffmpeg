@@ -1,0 +1,66 @@
+import os
+
+Import('debug dtsenabled')
+  
+configureargs=("""
+	--prefix=%s/ffmpeg
+	--enable-gpl
+	--disable-decoders
+	--disable-encoders
+	--disable-ffplay
+	--disable-ffserver
+	--disable-debug
+	--disable-vhook
+	--disable-zlib
+	--disable-network
+	--disable-dv1394
+	--disable-bktr
+	--disable-v4l
+	--disable-audio-beos
+	--disable-audio-oss
+	--enable-codec=mpeg2encoder
+	--enable-codec=mp2_encoder
+        --enable-codec=ac3_decoder
+        --enable-codec=ac3_encoder
+	--enable-a52
+"""%(Dir('.').abspath,)).split()
+
+if (dtsenabled):
+  configureargs.append("--enable-dts")
+
+if ("CC" in os.environ):
+  configureargs.append("--cc=%s" % (os.environ["CC"],))
+
+env=Environment()
+
+if (debug<1):
+  env['ENV']['DVBCUT_NO_DEBUG']="yes"
+
+cmak=File("ffmpeg.src/config.mak")
+ 
+env.Command(
+  target=cmak,
+  source="ffmpeg.src/configure",
+  action=[
+    "cd ffmpeg.src; ./configure %s" % (" ".join(configureargs)),
+    "make -C ffmpeg.src/libavcodec clean; ",
+    "make -C ffmpeg.src/libavformat clean; ",
+    "make -C ffmpeg.src/libavutil clean; "
+  ])
+
+env.Command(
+  target=[
+    'ffmpeg/lib/libavformat.a',
+    'ffmpeg/lib/libavcodec.a',
+    'ffmpeg/lib/libavutil.a',
+    'ffmpeg/include/ffmpeg/avcodec.h',
+    'ffmpeg/include/ffmpeg/avformat.h'
+  ],
+  source=cmak,
+  action=[
+    'make -C ffmpeg.src/libavcodec libavcodec.a',
+    'make -C ffmpeg.src/libavformat libavformat.a',
+    'make -C ffmpeg.src/libavutil libavutil.a',
+    'make -C ffmpeg.src installlib'
+  ])
+  

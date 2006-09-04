@@ -1,0 +1,18 @@
+Source: dvbcut
+Section: graphics
+Priority: optional
+Maintainer: Sven Over <svenover@svenover.de>
+Build-Depends: debhelper (>= 4.0.0), libqt3-mt-dev (>= 3.3.4-3), qt3-dev-tools (>= 3.3.4-3), libao-dev (>= 0.8.6-1), scons (>= 0.96.1-1)
+Standards-Version: 3.6.2
+
+Package: dvbcut
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: mplayer
+Description: Qt application for cutting parts out of DVB streams
+ DVBCUT is a Qt application that allows you to select certain parts of an
+ MPEG transport stream (as received via Digital Video Broadcasting, DVB) and
+ save these parts into a single MPEG output file. It follows a `keyhole
+ surgery'' approach where the input video and audio data is mostly kept
+ unchanged, and only very few frames at the beginning and/or end of the
+ selected range are re-encoded in order to obtain a valid MPEG file.

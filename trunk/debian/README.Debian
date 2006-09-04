@@ -1,0 +1,6 @@
+This Debian package was created by the author of DVBCUT as ``native''
+package. I'm not very experienced in creating packages for Debian, but being
+a Debian user myself, I like to provide a Debian package to my users for
+their convenience. If an official Debian likes to take over maintainership
+over this package, I will gladly pass it on.
+

@@ -1,0 +1,34 @@
+sources="""
+  avframe.cpp
+  buffer.cpp
+  differenceimageprovider.cpp
+  dvbcut.cpp
+  eventlistitem.cpp
+  exportdialog.cpp
+  imageprovider.cpp
+  index.cpp
+  lavfmuxer.cpp
+  logoutput.cpp
+  main.cpp
+  mpegmuxer.cpp
+  mpgfile.cpp
+  playaudio.cpp
+  progressstatusbar.cpp
+  progresswindow.cpp
+  psfile.cpp
+  pts.cpp
+  streamdata.cpp
+  tsfile.cpp
+  dvbcutbase.ui
+  mplayererrorbase.ui
+  progresswindowbase.ui
+  exportdialogbase.ui
+  """.split()
+
+
+Import('env')
+
+env.bin_targets.append(env.Program("../bin/dvbcut",sources))
+
+ 
+ 
