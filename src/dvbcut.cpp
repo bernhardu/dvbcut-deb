@@ -118,8 +118,8 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
   playAudio2Action->setEnabled(false);
   playAudio1Action->removeFrom(playToolbar);
   playAudio2Action->removeFrom(playToolbar);
-  playAudio1Action->removeFrom(Play);
-  playAudio2Action->removeFrom(Play);
+  playAudio1Action->removeFrom(playMenu);
+  playAudio2Action->removeFrom(playMenu);
 #endif // ! HAVE_LIB_AO
 
   audiotrackpopup=new QPopupMenu(this);

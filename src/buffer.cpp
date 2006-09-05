@@ -28,6 +28,10 @@
 #include <stdint.h>
 #include "buffer.h"
 
+#ifndef MAP_FAILED
+#define MAP_FAILED	((void*)-1)
+#endif
+
 buffer::buffer(unsigned int _size):size(_size), readpos(0), writepos(0), wrtot(0)
   {
   if (size > 0)
@@ -171,8 +175,8 @@ inbuffer::inbuffer(inbuffer &b, unsigned int _size, unsigned int _mmapsize) :
     writepos=size;
     if (pos+writepos>filesize)
       writepos=filesize-pos;
-    d=::mmap(0,writepos,PROT_READ|PROT_WRITE,MAP_PRIVATE,fd,pos);
-    if (!d) {
+    d=::mmap(0,writepos,PROT_READ,MAP_SHARED,fd,pos);
+    if (d==MAP_FAILED) {
       size=_size;
       mmapped=false;
       } else
@@ -248,8 +252,8 @@ void inbuffer::setup()
       size=mmapsize;
     if (size>filesize)
       size=filesize;
-    d=::mmap(0,size,PROT_READ|PROT_WRITE,MAP_PRIVATE,fd,0);
-    if (!d) {
+    d=::mmap(0,size,PROT_READ,MAP_SHARED,fd,0);
+    if (d==MAP_FAILED) {
       size=_size;
       mmapped=false;
       } else {
@@ -295,12 +299,13 @@ int inbuffer::providedata(unsigned int amount, long long position)
         pos+=pagesize;
         if (pos<0)
           pos=0;
+        readpos=position-pos;
         }
       writepos=filesize-pos;
 
       }
-    d=::mmap(0,writepos,PROT_READ|PROT_WRITE,MAP_PRIVATE,fd,pos);
-    if (!d) {
+    d=::mmap(0,writepos,PROT_READ,MAP_SHARED,fd,pos);
+    if (d==MAP_FAILED) {
       readpos=writepos=0;
       d=malloc(size);
       mmapped=false;

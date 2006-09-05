@@ -149,6 +149,11 @@ bool mpegmuxer::putpacket(int str, const void *data, int len, pts_t pts, pts_t d
   stream * const s=st[str];
   if (!s)
     return false;
+  if (len == 0) {
+	// I'm not sure why this happens, but it does. --mr
+	fprintf(stderr, "mpegmuxer::putpacket called with zero length, str=%d\n", str);
+	return false;
+  }
   pts+=ptsoffset;
   dts+=ptsoffset;
   au *newau=new au(data,len,pts,dts,flags);
@@ -473,6 +478,16 @@ void mpegmuxer::packetizer(int str,pts_t maxdts)
     //       }
 
 
+    int pes_padding = 0;
+    if (packsize) {
+      int maxpayload = pack::maxpayload(packsize);
+      assert(len <= maxpayload);
+      if (maxpayload - len < 8)
+        pes_padding = maxpayload - len;
+      headerlen += pes_padding;
+      len += pes_padding;
+      }
+
     pack * const p=new pack(packsize,len,muxrate,a->getdts());
     s->packlist.push_back(p);
     ++s->packet;
@@ -541,6 +556,14 @@ void mpegmuxer::packetizer(int str,pts_t maxdts)
         len-=3;
         headerext=false;
         headerlen-=3;
+        }
+      if (pes_padding > 0) {
+        memset(data, 0xff, pes_padding);
+        data += pes_padding;
+        headerlen -= pes_padding;
+        plen -= pes_padding;
+        len -= pes_padding;
+        pes_padding = 0;
         }
       if (isprivatestream) {
         *(data++)=s->id & 0xff;

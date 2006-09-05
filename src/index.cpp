@@ -102,8 +102,11 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   int seqheaderpic=0;
   pts_t referencepts=0; // pts of picture #0 in current sequence
   int maxseqnr=-1; // maximum sequence number in current sequence
-  std::list<std::pair<int,int> > curseqnumbers; // seqnr->picnr relation for current sequence
   pts_t lastpts=1ll<<31;
+  int last_non_b_pic = -1;
+  int last_non_b_seqnr = -1;
+  int last_seqnr = -1;
+  int ptsmod = -1;
 
   while (mpg.streamreader(s)>0) {
     while (sd->getbuffer().inbytes()< (sd->getbuffer().getsize()/2))
@@ -149,6 +152,12 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 
       if (*(uint32_t*)(data+skip)==mbo32(0x000001b3)) // sequence header
         {
+        if (last_non_b_pic >= 0) {
+          p[last_non_b_pic].setsequencenumber(++maxseqnr);
+          last_non_b_pic = -1;
+          }
+	last_seqnr = -1;
+
         waitforfirstsequenceheader=false;
         foundseqheader=true;
         sd->discard(skip);
@@ -166,16 +175,6 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
         inbytes=sd->inbytes();
         skip=0;
 
-        // ensure that sequence numbers are okay in the last sequence
-        if (!curseqnumbers.empty())
-          {
-          curseqnumbers.sort();
-          int n=0;
-          for(std::list<std::pair<int,int> >::iterator it=curseqnumbers.begin();it!=curseqnumbers.end();++it)
-            p[it->second].setsequencenumber(n++);
-          curseqnumbers.clear();
-          }
-
         } else if ((*(uint32_t*)(data+skip)==mbo32(0x00000100))&&!waitforfirstsequenceheader) // picture header
         {
         sd->discard(skip);
@@ -183,8 +182,6 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 
         filepos_t picpos=sd->itemlist().front().fileposition;
         int seqnr=(data[4]<<2)|((data[5]>>6)&3);
-        if (seqnr>maxseqnr)
-          maxseqnr=seqnr;
         int frametype=(data[5]>>3)&7;
         if (frametype>3)
           frametype=0;
@@ -192,6 +189,22 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
         pts_t pts=sd->itemlist().front().headerpts();
         if (pts>=0)
           {
+          int ptsdelta = mpgfile::frameratescr[framerate] / 300;
+          int epsilon = ptsdelta / 100;	/* allow at most 1% deviation */
+          int mod = pts % ptsdelta;
+          if (ptsmod == -1)
+	    ptsmod = mod;
+          else if (mod != ptsmod) {
+	    int error = (mod - ptsmod + ptsdelta) % ptsdelta;
+	    if (error > ptsdelta / 2)
+	      error -= ptsdelta;
+	    if (-epsilon <= error && error <= epsilon) {
+	      fprintf(stderr, "inconsistent video PTS (%+d), correcting\n", error);
+	      pts -= error;
+	      } else {
+	      fprintf(stderr, "inconsistent video PTS (%+d), NOT correcting\n", error);
+	      }
+	    }
           referencepts=pts-(seqnr*mpgfile::frameratescr[framerate])/300;
           sd->discardheader();
           } else
@@ -205,8 +218,44 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
           p=(picture*)realloc((void*)p,size*sizeof(picture));
           }
 
-        curseqnumbers.push_back(std::pair<int,int>(seqnr,pictures));
-        p[pictures++]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,aspectratio,seqnr,frametype,foundseqheader);
+        p[pictures]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,aspectratio,seqnr,frametype,foundseqheader);
+
+        if (frametype == IDX_PICTYPE_B) {
+	  /* check sequence number */
+	  if (seqnr != last_seqnr + 1) {
+	    fprintf(stderr,
+	      "missing frame(s) before B frame %d (%d != %d)\n",
+	      pictures, seqnr, last_seqnr + 1);
+	    if (seqnr == 0) {
+	      fprintf(stderr, "sequence number reset at %d\n", last_seqnr + 1);
+	      }
+	    else if (last_non_b_pic >= 0) {
+	      p[last_non_b_pic].setsequencenumber(++maxseqnr);
+	      last_non_b_pic = -1;
+	      }
+	    }
+	  p[pictures].setsequencenumber(++maxseqnr);
+	  last_seqnr = seqnr;
+	  } else {
+	    /* I and P frames are delayed */
+	    if (last_non_b_pic >= 0) {
+	      /* check sequence number */
+	      if (last_non_b_seqnr != last_seqnr + 1) {
+		fprintf(stderr,
+		  "missing frame(s) before %c frame %d (%d != %d)\n",
+		  p[last_non_b_pic].isiframe() ? 'I' : 'P',
+		  pictures, last_non_b_seqnr, last_seqnr + 1);
+		}
+	      p[last_non_b_pic].setsequencenumber(++maxseqnr);
+	      last_seqnr = last_non_b_seqnr;
+	      }
+	    last_non_b_pic = pictures;
+	    last_non_b_seqnr = seqnr;
+	    if (frametype == IDX_PICTYPE_I)
+	      last_seqnr = -1;
+	  }
+
+	++pictures;
 
         foundseqheader=false;
         sd->discard(8);
@@ -219,13 +268,9 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
     sd->discard(skip);
     }
 
-  // ensure that sequence numbers are okay in the last sequence
-  if (!curseqnumbers.empty()) {
-    curseqnumbers.sort();
-    int n=0;
-    for(std::list<std::pair<int,int> >::iterator it=curseqnumbers.begin();it!=curseqnumbers.end();++it)
-      p[it->second].setsequencenumber(n++);
-    curseqnumbers.clear();
+  if (last_non_b_pic >= 0) {
+    p[last_non_b_pic].setsequencenumber(++maxseqnr);
+    last_non_b_pic = -1;
     }
 
   if (pictures==0) {
@@ -424,12 +469,12 @@ int index::check()
   if (p[firstiframe].getsequencenumber()>0) {
     int fifseqnr=p[firstiframe].getsequencenumber();
 
-    for(int i=sequencebegin;(!p[i].getseqheader()||i==sequencebegin)&&(i<pictures);++i)
+    for(int i=sequencebegin;(i<pictures)&&(!p[i].getseqheader()||i==sequencebegin);++i)
       if (p[i].getsequencenumber()<fifseqnr)
         ++skipfirst;
     }
 
-  realpictures=pictures-skipfirst-1;
+  realpictures=pictures-skipfirst;
   if (realpictures<1)
     return 0;
 
