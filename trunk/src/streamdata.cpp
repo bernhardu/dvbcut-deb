@@ -23,13 +23,10 @@ static const int mpegaudio_rates[]=
     44100,48000,32000,16000
   };
 static const int mpegaudio_bitrate[][16]=
-  { {
-      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    }
-    , // undefined layer
-    {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448}, // layer 1
+  { {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // undefined layer
+    {0,32,40,48, 56, 64, 80, 96,112,128,160,192,224,256,320}, // layer 3
     {0,32,48,56, 64, 80, 96,112,128,160,192,224,256,320,384}, // layer 2
-    {0,32,40,48, 56, 64, 80, 96,112,128,160,192,224,256,320} // layer 3
+    {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448}  // layer 1
   };
 
 static int mpaframe(const void *data, int &pos, int len)
@@ -40,8 +37,8 @@ static int mpaframe(const void *data, int &pos, int len)
   if (pos+2>=len)
     return 0;
 
-  int layer=4-((d[pos+1]>>1)&0x03);
-  int samples=(layer==1)?384:1152;
+  int layer=(d[pos+1]>>1)&0x03;
+  int samples=(layer==4-1)?384:1152;
   int samplingrate=mpegaudio_rates[(d[pos+2]>>2)&0x03];
   int bitratecode=(d[pos+2]>>4)&0x0f;
 
@@ -117,7 +114,7 @@ void streamdata::audio_addpts(uint32_t startbufferpos, bool onepacket)
   itemlisttype::iterator it=items.begin();
 
   while(it!=items.end())
-    if (!(it->data_alignment_indicator()&&it->headerhaspts()))
+    if (!it->headerhaspts())
       it=items.erase(it);
     else
       ++it;
@@ -135,8 +132,8 @@ void streamdata::audio_addpts(uint32_t startbufferpos, bool onepacket)
       needsync=false;
 
       for(;it!=items.end();++it)
-        if (it->headerhaspts() && it->data_alignment_indicator())
-          // header carries PTS and data alignment indicator
+        if (it->headerhaspts())
+          // header carries PTS
           break;
 
       if (it==items.end())
@@ -148,7 +145,7 @@ void streamdata::audio_addpts(uint32_t startbufferpos, bool onepacket)
           } else {
           itemlisttype::iterator n=it;
           for(++n;n!=items.end();++n)
-            if (it->headerhaspts() && it->data_alignment_indicator())
+            if (it->headerhaspts())
               break;
           if (n!=items.end())
             stopbufferpos=n->bufferposition;
@@ -289,6 +286,7 @@ void streamdata::appenditem(filepos_t fp, const std::string &header, const void 
       }
     }
 
+#if 0	// --mr
   if (type==streamtype::mpegaudio) {
     if (s>=2)
       if (data[0]==0xff && (data[1]&0xf0)==0xf0)
@@ -307,6 +305,7 @@ void streamdata::appenditem(filepos_t fp, const std::string &header, const void 
     s-=ac3offset+2;
     flags|=STREAM_ITEM_FLAG_DATA_ALIGNMENT_INDICATOR;
     }
+#endif
 
 
   if (s>0) {

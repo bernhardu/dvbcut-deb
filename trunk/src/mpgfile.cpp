@@ -57,7 +57,7 @@ mpgfile* mpgfile::open(const std::string &filename, std::string *errormessage)
   {
   if (errormessage)
     errormessage->clear();
-  inbuffer buf(64 << 10, 128 << 10);
+  inbuffer buf(64 << 10, -1, false, 128 << 10);
 
   int fd = buf.open(filename.c_str());
   if (fd < 0) {
@@ -123,9 +123,11 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
   int last_cpn=-1;
   bool firstframe=true, firstsequence=true;
 
-  while (pic<stop && (streampic+1)<idx.getrealpictures()) {
-    filepos_t tp=idx[streampic+1].getpos();
-    while (sd->itemlist().empty() || sd->itemlist().back().fileposition<tp)
+  while (pic<stop && streampic<idx.getpictures()) {
+    filepos_t tp(getfilesize(),0);
+    if ((streampic+1)<idx.getpictures())
+      tp=idx[streampic+1].getpos();
+    while (sd->itemlist().empty() || s.fileposition<tp.fileposition())
       if (streamreader(s)<=0)
         break;
 
@@ -184,6 +186,18 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
     ++streampic;
     }
 
+  if (pic < stop) {
+    int frameFinished=0;
+    avcodec_decode_video(S->avcc, avf, &frameFinished, NULL, 0);
+    if (frameFinished) {
+      if (last_cpn!=avf->coded_picture_number) {
+	last_cpn=avf->coded_picture_number;
+	if (pic>=start)
+	  framelist.push_back(new avframe(avf,S->avcc));
+	}
+      }
+    }
+
   avcodec_close(S->avcc);
   }
 
@@ -232,8 +246,8 @@ void mpgfile::initaudiocodeccontext(int aud)
   if (avcodec_open(S->avcc, S->dec))
     return;
 
-  int16_t samples[4096];
-  int frame_size=4096;
+  int16_t samples[6*1536];	// must be enough for 6 AC-3 channels --mr
+  int frame_size=sizeof(samples);
   avcodec_decode_audio(S->avcc,samples,&frame_size,(uint8_t*) sd->getdata(),sd->inbytes());
   avcodec_close(S->avcc);
   }
@@ -264,15 +278,14 @@ void mpgfile::playaudio(int aud, int picture, int ms)
   streamdata *sd=sh.newstream(audiostream(aud),s[audiostream(aud)].type,istransportstream());
 
   while (sd->empty()) {
-    if (sh.fileposition<stopreadpos && streamreader(sh)<=0)
+    if (sh.fileposition > stopreadpos || streamreader(sh)<=0)
       return; // data does not reach the point in time from which we like to start playing
-    while (!sd->empty() &&
-           !(sd->itemlist().begin()->headerhaspts()&&sd->itemlist().begin()->data_alignment_indicator()))
+    while (!sd->empty() && !sd->itemlist().begin()->headerhaspts())
       sd->pop();
     }
 
   for(;;) {
-    if (sh.fileposition<stopreadpos && streamreader(sh)<=0)
+    if (sh.fileposition > stopreadpos || streamreader(sh)<=0)
       return; // data does not reach the point in time from which we like to start playing
     if (sd->empty())
       continue;
@@ -281,7 +294,7 @@ void mpgfile::playaudio(int aud, int picture, int ms)
     int pop=1;
     pts_t pts=AV_NOPTS_VALUE;
     for(++it;it!=sd->itemlist().end();++it,++pop)
-      if (it->headerhaspts()&&it->data_alignment_indicator()) //if (streamdata::headerhaspts(it->header))
+      if (it->headerhaspts()) //if (streamdata::headerhaspts(it->header))
         {
         pts=it->headerpts(startpts);
         break;
@@ -297,7 +310,7 @@ void mpgfile::playaudio(int aud, int picture, int ms)
   while (streamreader(sh)>0) {
     streamdata::itemlisttype::const_reverse_iterator it=sd->itemlist().rbegin();
     while(it!=sd->itemlist().rend())
-      if (it->headerhaspts()&&it->data_alignment_indicator())
+      if (it->headerhaspts())
         break;
       else
         --it;

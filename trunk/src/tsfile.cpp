@@ -38,6 +38,11 @@ tsfile::tsfile(const std::string &filename, inbuffer &b, int initial_offset)
   std::list<std::pair<int,int> > audios;
   for(int i=0;i<inpackets;++i) {
     const tspacket &p=((const tspacket*)buf.data())[i];
+    if (p.transport_error_indicator())
+      continue;	// drop invalid packet --mr
+    int pid=p.pid();
+    if (apid[pid])
+      continue;	// already had this pid --mr
     int sid=p.sid();
     if (sid<0)
       continue;
@@ -48,12 +53,11 @@ tsfile::tsfile(const std::string &filename, inbuffer &b, int initial_offset)
     //         sid=payload[9+payload[8]] | ((sid==0xbd)?0x100:0x200);
     //       }
 
-    int pid=p.pid();
-    if (((sid&0xe0) == 0xc0)&&(apid[pid]==false)) // mpeg audio stream
+    if ((sid&0xe0) == 0xc0) // mpeg audio stream
       {
       audios.push_back(std::pair<int,int>(sid,pid));
       apid[pid]=true;
-      } else if ((sid==0xbd) && (apid[pid]==false)) // private stream 1, possibly AC3 audio stream
+      } else if (sid==0xbd) // private stream 1, possibly AC3 audio stream
       {
       const uint8_t *payload=(const uint8_t*) p.payload();
       //       if (p.payload_length()>9+payload[8])
@@ -154,6 +158,9 @@ int tsfile::streamreader(streamhandle &s)
 
     s.fileposition+=TSPACKETSIZE;
 
+    // Abandon invalid packets --mr
+    if (p->transport_error_indicator())
+      continue;
     // Abandon packets which have no payload or have invalid adaption field length
     if (p->payload_length()<=0)
       continue;
