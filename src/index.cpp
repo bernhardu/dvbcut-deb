@@ -202,7 +202,10 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 	      fprintf(stderr, "inconsistent video PTS (%+d), correcting\n", error);
 	      pts -= error;
 	      } else {
-	      fprintf(stderr, "inconsistent video PTS (%+d), NOT correcting\n", error);
+	      fprintf(stderr, "inconsistent video PTS (%+d) in %c frame, NOT correcting\n",
+		error, frametype["?IPB"]);
+	      if (frametype != IDX_PICTYPE_B)
+		ptsmod = mod;
 	      }
 	    }
           referencepts=pts-(seqnr*mpgfile::frameratescr[framerate])/300;
@@ -226,10 +229,16 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 	    fprintf(stderr,
 	      "missing frame(s) before B frame %d (%d != %d)\n",
 	      pictures, seqnr, last_seqnr + 1);
-	    if (seqnr == 0) {
-	      fprintf(stderr, "sequence number reset at %d\n", last_seqnr + 1);
+	    if (seqnr <= last_seqnr) {
+	      fprintf(stderr, "sequence number reset (%d => %d)\n", last_seqnr + 1, seqnr);
+	      if (last_non_b_pic >= 0 && last_non_b_seqnr > last_seqnr) {
+		fprintf(stderr, "inserting delayed picture (%d)\n", last_non_b_seqnr);
+		p[last_non_b_pic].setsequencenumber(++maxseqnr);
+		last_non_b_pic = -1;
+		}
 	      }
-	    else if (last_non_b_pic >= 0) {
+	    else if (last_non_b_pic >= 0 && last_non_b_seqnr < seqnr) {
+	      fprintf(stderr, "inserting delayed picture (%d)\n", last_non_b_seqnr);
 	      p[last_non_b_pic].setsequencenumber(++maxseqnr);
 	      last_non_b_pic = -1;
 	      }
