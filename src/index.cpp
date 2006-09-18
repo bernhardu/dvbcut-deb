@@ -189,6 +189,8 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
         pts_t pts=sd->itemlist().front().headerpts();
         if (pts>=0)
           {
+          pts=ptsreference(pts,lastpts);
+          lastpts = pts;
           int ptsdelta = mpgfile::frameratescr[framerate] / 300;
           int epsilon = ptsdelta / 100;	/* allow at most 1% deviation */
           int mod = pts % ptsdelta;
@@ -202,18 +204,14 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 	      fprintf(stderr, "inconsistent video PTS (%+d), correcting\n", error);
 	      pts -= error;
 	      } else {
-	      fprintf(stderr, "inconsistent video PTS (%+d) in %c frame, NOT correcting\n",
-		error, frametype["?IPB"]);
-	      if (frametype != IDX_PICTYPE_B)
-		ptsmod = mod;
+	      fprintf(stderr, "inconsistent video PTS (%+d) in %c frame %d, NOT correcting\n",
+		error, frametype["?IPB"], pictures);
 	      }
 	    }
           referencepts=pts-(seqnr*mpgfile::frameratescr[framerate])/300;
           sd->discardheader();
           } else
           pts=referencepts+(seqnr*mpgfile::frameratescr[framerate])/300;
-        pts=ptsreference(pts,lastpts);
-        lastpts=pts;
 
         if (pictures>=size)
           {
