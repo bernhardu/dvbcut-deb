@@ -138,6 +138,9 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
     setviewscalefactor(settings.readNumEntry(DVBCUT_QSETTINGS_PATH "viewscalefactor",1));
     }
 
+  // install event handler
+  linslider->installEventFilter(this);
+
   show();
   }
 
@@ -1360,3 +1363,25 @@ void dvbcut::setviewscalefactor(int factor)
     }
   }
 
+bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
+  if (e->type() == QEvent::Wheel) {
+    QWheelEvent *we = (QWheelEvent*)e;
+    if (watched == linslider) {
+      if (we->state() & AltButton)
+	return dvbcutbase::eventFilter(watched, e);
+      // process event myself
+      int delta = we->delta();
+      bool save = fine;
+      fine = true;
+      if (we->state() & ControlButton)
+	delta *= 25 * 60;
+      else if (we->state() & ShiftButton)
+	delta *= 25;
+      linslider->setValue(curpic - delta / 120);
+      fine = save;
+      return TRUE;
+      }
+    }
+  // propagate to base class
+  return dvbcutbase::eventFilter(watched, e);
+  }

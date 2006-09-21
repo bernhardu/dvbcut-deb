@@ -61,6 +61,9 @@ protected:
   void loadrecentfilesfromsettings();
   void setviewscalefactor(int factor);
 
+  // special event handling
+  bool eventFilter(QObject *watched, QEvent *e);
+
 public:
   ~dvbcut();
   dvbcut(QWidget *parent = 0, const char *name = 0, WFlags fl = WType_TopLevel|WDestructiveClose );
