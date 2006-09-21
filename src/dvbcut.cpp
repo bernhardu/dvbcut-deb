@@ -1372,14 +1372,15 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
       // process event myself
       int delta = we->delta();
       bool save = fine;
-      fine = true;
       if (we->state() & ControlButton)
 	delta *= 25 * 60;
       else if (we->state() & ShiftButton)
 	delta *= 25;
+      else
+	fine = true;
       linslider->setValue(curpic - delta / 120);
       fine = save;
-      return TRUE;
+      return true;
       }
     }
   // propagate to base class
