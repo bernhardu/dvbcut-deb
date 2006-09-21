@@ -62,7 +62,7 @@ tsfile::tsfile(const std::string &filename, inbuffer &b, int initial_offset)
       const uint8_t *payload=(const uint8_t*) p.payload();
       //       if (p.payload_length()>9+payload[8])
       //         sid=payload[9+payload[8]] | ((sid==0xbd)?0x100:0x200);
-      if ((p.payload_length()>=11) && (p.payload_length()>9+payload[8]) &&
+      if ((p.payload_length()>=9) && (p.payload_length()>=11+payload[8]) &&
           (*(uint16_t*)&payload[9+payload[8]]==mbo16(0xb77)) )
         {
         audios.push_back(std::pair<int,int>(sid,pid));
