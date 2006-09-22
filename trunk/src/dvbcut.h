@@ -53,6 +53,13 @@ protected:
   int viewscalefactor;
   int currentaudiotrack;
   std::vector<std::pair<std::string,std::string> > recentfiles;
+  enum {
+    WHEEL_INCR_NORMAL,
+    WHEEL_INCR_SHIFT,
+    WHEEL_INCR_CTRL,
+    WHEEL_INCR_num
+    };
+  int wheel_increments[WHEEL_INCR_num];
 
 protected:
   //   QPixmap getpixmap(int picture, bool allgop=false);
