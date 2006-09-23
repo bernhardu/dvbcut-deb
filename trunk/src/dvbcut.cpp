@@ -142,6 +142,13 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
       settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_incr_shift", 25);
     wheel_increments[WHEEL_INCR_CTRL] =
       settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_incr_ctrl", 1);
+    wheel_increments[WHEEL_INCR_ALT] =
+      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_incr_alt", 15*25*60);
+    wheel_threshold =
+      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_threshold", 24);
+    // Note: delta is a multiple of 120 (see Qt documentation)
+    wheel_delta =
+      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_delta", 120);
     }
 
   // install event handler
@@ -1372,11 +1379,13 @@ void dvbcut::setviewscalefactor(int factor)
 bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
   if (e->type() == QEvent::Wheel) {
     QWheelEvent *we = (QWheelEvent*)e;
-    if (watched == linslider && !(we->state() & AltButton)) {
+    if (watched == linslider) {
       // process event myself
       int delta = we->delta();
       int incr = 0;
-      if (we->state() & ControlButton)
+      if (we->state() & AltButton)
+	incr = wheel_increments[WHEEL_INCR_ALT];
+      else if (we->state() & ControlButton)
 	incr = wheel_increments[WHEEL_INCR_CTRL];
       else if (we->state() & ShiftButton)
 	incr = wheel_increments[WHEEL_INCR_SHIFT];
@@ -1385,9 +1394,9 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
       if (incr != 0) {
 	bool save = fine;
 	// use fine positioning if incr is small
-	fine = (incr < 0 ? -incr : incr) < 24;
+	fine = (incr < 0 ? -incr : incr) < wheel_threshold;
 	// Note: delta is a multiple of 120 (see Qt documentation)
-	linslider->setValue(curpic - (delta * incr) / 120);
+	linslider->setValue(curpic - (delta * incr) / wheel_delta);
 	fine = save;
 	}
       return true;
