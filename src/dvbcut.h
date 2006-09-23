@@ -57,9 +57,12 @@ protected:
     WHEEL_INCR_NORMAL,
     WHEEL_INCR_SHIFT,
     WHEEL_INCR_CTRL,
+    WHEEL_INCR_ALT,
     WHEEL_INCR_num
     };
   int wheel_increments[WHEEL_INCR_num];
+  int wheel_threshold;
+  int wheel_delta;
 
 protected:
   //   QPixmap getpixmap(int picture, bool allgop=false);
@@ -68,7 +71,7 @@ protected:
   void loadrecentfilesfromsettings();
   void setviewscalefactor(int factor);
 
-  // special event handling
+  // special event handling (mouse wheel)
   bool eventFilter(QObject *watched, QEvent *e);
 
 public:
