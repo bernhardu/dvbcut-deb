@@ -63,6 +63,11 @@ protected:
   int wheel_increments[WHEEL_INCR_num];
   int wheel_threshold;
   int wheel_delta;
+  int jog_maximum;
+  int jog_threshold;
+  double jog_offset;
+  int jog_interval;
+  int lin_interval;
 
 protected:
   //   QPixmap getpixmap(int picture, bool allgop=false);
