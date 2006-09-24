@@ -56,6 +56,7 @@
 #include "busyindicator.h"
 #include "progressstatusbar.h"
 #include "exportdialog.h"
+#include "settings.h"
 
 // **************************************************************************
 // ***  busy cursor helpers
@@ -132,43 +133,7 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
   connect( recentfilespopup, SIGNAL( activated(int) ), this, SLOT( loadrecentfile(int) ) );
   connect( recentfilespopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshowrecentfiles() ) );
 
-    {
-    QSettings settings;
-    settings.setPath(DVBCUT_QSETTINGS_DOMAIN,DVBCUT_QSETTINGS_PRODUCT);
-    setviewscalefactor(settings.readNumEntry(DVBCUT_QSETTINGS_PATH "viewscalefactor",1));
-    wheel_increments[WHEEL_INCR_NORMAL] =
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_incr_normal", 25*60);
-    wheel_increments[WHEEL_INCR_SHIFT] =
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_incr_shift", 25);
-    wheel_increments[WHEEL_INCR_CTRL] =
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_incr_ctrl", 1);
-    wheel_increments[WHEEL_INCR_ALT] =
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_incr_alt", 15*25*60);
-    wheel_threshold =
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_threshold", 24);
-    // Note: delta is a multiple of 120 (see Qt documentation)
-    wheel_delta =
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_delta", 120);
-    if (wheel_delta == 0)
-      wheel_delta = 1;	// avoid devide by zero
-    jog_maximum =   
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "jog_maximum", 180000);
-    jog_threshold =   
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "jog_threshold", 50);
-    // that's in 1/100 frames! (readDoubleNumEntry does not exist?) 
-    // to increase the "zero frames"-region of the jog-slider
-    jog_offset =   
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "jog_offset", 40)/100.;
-    // sub-intervals of jog_maximum
-    jog_interval =   
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "jog_interval", 1);
-    if (jog_interval < 0)
-      jog_interval = 0;
-    lin_interval =   
-      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "lin_interval", 3600);
-    if (lin_interval < 0)
-      lin_interval = 0;
-    }
+  setviewscalefactor(settings.viewscalefactor);
 
   // install event handler
   linslider->installEventFilter(this);
@@ -212,13 +177,9 @@ void dvbcut::fileOpen()
 
 void dvbcut::fileSaveAs()
   {
-  QSettings settings;
-  settings.setPath(DVBCUT_QSETTINGS_DOMAIN,DVBCUT_QSETTINGS_PRODUCT);
-  settings.beginGroup(DVBCUT_QSETTINGS_PATH);
-
   QString s=QFileDialog::getSaveFileName(
               prjfilen,
-              settings.readEntry("prjfilter",DVBCUT_DEFAULT_PRJFILTER),
+              settings.prjfilter,
               this,
               "Save project as...",
               "Choose the name of the project file" );
@@ -743,11 +704,11 @@ void dvbcut::jogslidervalue(int v)
    than range of 0 and 2 frames as in old function!)
   */ 
   if (v>0) {
-    relpic=int(exp(alpha*v)-jog_offset);
+    relpic=int(exp(alpha*v)-settings.jog_offset);
     if(relpic<0) relpic=0;
   }  
   else if (v<0) {
-    relpic=-int(exp(-alpha*v)-jog_offset);
+    relpic=-int(exp(-alpha*v)-settings.jog_offset);
     if(relpic>0) relpic=0;
   }  
 
@@ -757,10 +718,10 @@ void dvbcut::jogslidervalue(int v)
   else if (newpic>=pictures)
     newpic=pictures-1;
 
-  if (relpic>=jog_threshold) {
+  if (relpic>=settings.jog_threshold) {
     newpic=mpg->nextiframe(newpic);
     fine=false;
-    } else if (relpic<=-jog_threshold) {
+    } else if (relpic<=-settings.jog_threshold) {
     fine=false;
     } else
     fine=true;
@@ -957,19 +918,18 @@ void dvbcut::audiotrackchosen(int id)
 
 void dvbcut::abouttoshowrecentfiles()
   {
-  loadrecentfilesfromsettings();
   recentfilespopup->clear();
   int id=0;
-  for(std::vector<std::pair<std::string,std::string> >::iterator it=recentfiles.begin();
-      it!=recentfiles.end();++it)
+  for(std::vector<std::pair<std::string,std::string> >::iterator it=settings.recentfiles.begin();
+      it!=settings.recentfiles.end();++it)
     recentfilespopup->insertItem(it->first,id++);
   }
 
 void dvbcut::loadrecentfile(int id)
   {
-  if (id<0 || id>=(signed)recentfiles.size())
+  if (id<0 || id>=(signed)settings.recentfiles.size())
     return;
-  open(recentfiles[id].first, recentfiles[id].second);
+  open(settings.recentfiles[id].first, settings.recentfiles[id].second);
   }
 
 // **************************************************************************
@@ -977,14 +937,10 @@ void dvbcut::loadrecentfile(int id)
 
 void dvbcut::open(std::string filename, std::string idxfilename)
   {
-  QSettings settings;
-  settings.setPath(DVBCUT_QSETTINGS_DOMAIN,DVBCUT_QSETTINGS_PRODUCT);
-  settings.beginGroup(DVBCUT_QSETTINGS_PATH);
-
   if (filename.empty()) {
     QString fn=QFileDialog::getOpenFileName(
                  QString::null,
-                 settings.readEntry("loadfilter",DVBCUT_DEFAULT_LOADFILTER),
+                 settings.loadfilter,
                  this,
                  "Open file...",
                  "Choose an MPEG file to open" );
@@ -1032,7 +988,8 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   fileOpenAction->setEnabled(false);
   fileSaveAction->setEnabled(false);
   fileSaveAsAction->setEnabled(false);
-  fileCloseAction->setEnabled(false);
+  // enable closing even if no file was loaded (mr)
+  //fileCloseAction->setEnabled(false);
   fileExportAction->setEnabled(false);
   playPlayAction->setEnabled(false);
   playStopAction->setEnabled(false);
@@ -1132,7 +1089,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   if (idxfilename.empty()) {
     QString s=QFileDialog::getSaveFileName(
                 filename+".idx",
-                settings.readEntry("idxfilter",DVBCUT_DEFAULT_IDXFILTER),
+                settings.idxfilter,
                 this,
                 "Choose index file...",
                 "Choose the name of the index file" );
@@ -1244,14 +1201,14 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   linslider->setMaxValue(pictures-1);
   linslider->setLineStep(int(300*fps));
   linslider->setPageStep(int(900*fps));
-  if (lin_interval > 0)
-    linslider->setTickInterval(int(lin_interval*fps));
+  if (settings.lin_interval > 0)
+    linslider->setTickInterval(int(settings.lin_interval*fps));
 
   //alpha=log(jog_maximum)/double(100000-jog_offset);
   // with alternative function
-  alpha=log(jog_maximum)/100000.;
-  if (jog_interval > 0 && jog_interval <= 100000) 
-    jogslider->setTickInterval(int(100000/jog_interval));
+  alpha=log(settings.jog_maximum)/100000.;
+  if (settings.jog_interval > 0 && settings.jog_interval <= 100000) 
+    jogslider->setTickInterval(int(100000/settings.jog_interval));
 
   imagedisplay->setBackgroundMode(Qt::NoBackground);
   curpic=~0;
@@ -1343,54 +1300,20 @@ void dvbcut::open(std::string filename, std::string idxfilename)
 // **************************************************************************
 // ***  protected functions
 
-void dvbcut::loadrecentfilesfromsettings()
-  {
-  QSettings settings;
-  settings.setPath(DVBCUT_QSETTINGS_DOMAIN,DVBCUT_QSETTINGS_PRODUCT);
-  settings.beginGroup(DVBCUT_QSETTINGS_PATH "recentfiles");
-
-  recentfiles.clear();
-
-  for(int i=0;i<5;++i) {
-    QString filename(settings.readEntry(QString::number(i)));
-    if (filename.isEmpty())
-      continue;
-    QString idxfilename(settings.readEntry(QString::number(i)+"-idx"));
-    recentfiles.push_back(std::pair<std::string,std::string>(filename,
-                          idxfilename.isEmpty()?std::string():std::string((const char *)idxfilename)));
-
-    }
-
-  }
-
 void dvbcut::addtorecentfiles(const std::string &filename, const std::string &idxfilename)
   {
-  loadrecentfilesfromsettings();
 
-  for(std::vector<std::pair<std::string,std::string> >::iterator it=recentfiles.begin();
-      it!=recentfiles.end();)
+  for(std::vector<std::pair<std::string,std::string> >::iterator it=settings.recentfiles.begin();
+      it!=settings.recentfiles.end();)
     if (it->first==filename)
-      it=recentfiles.erase(it);
+      it=settings.recentfiles.erase(it);
     else
       ++it;
 
-  recentfiles.insert(recentfiles.begin(),std::pair<std::string,std::string>(filename,idxfilename));
+  settings.recentfiles.insert(settings.recentfiles.begin(),std::pair<std::string,std::string>(filename,idxfilename));
 
-  while (recentfiles.size()>5)
-    recentfiles.pop_back();
-
-  QSettings settings;
-  settings.setPath(DVBCUT_QSETTINGS_DOMAIN,DVBCUT_QSETTINGS_PRODUCT);
-  settings.beginGroup(DVBCUT_QSETTINGS_PATH "recentfiles");
-
-  for(unsigned int i=0;i<recentfiles.size();++i) {
-    settings.writeEntry(QString::number(i),recentfiles[i].first);
-    settings.writeEntry(QString::number(i)+"-idx",recentfiles[i].second);
-    }
-  for(unsigned int i=recentfiles.size();i<5;++i) {
-    settings.removeEntry(QString::number(i));
-    settings.removeEntry(QString::number(i)+"-idx");
-    }
+  while (settings.recentfiles.size()>settings.recentfiles_max)
+    settings.recentfiles.pop_back();
   }
 
 void dvbcut::setviewscalefactor(int factor)
@@ -1401,11 +1324,7 @@ void dvbcut::setviewscalefactor(int factor)
   viewHalfSizeAction->setOn(factor==2);
   viewQuarterSizeAction->setOn(factor==4);
 
-    {
-    QSettings settings;
-    settings.setPath(DVBCUT_QSETTINGS_DOMAIN,DVBCUT_QSETTINGS_PRODUCT);
-    settings.writeEntry(DVBCUT_QSETTINGS_PATH "viewscalefactor",factor);
-    }
+  settings.viewscalefactor = factor;
 
   if (factor!=viewscalefactor) {
     viewscalefactor=factor;
@@ -1424,19 +1343,19 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
       int delta = we->delta();
       int incr = 0;
       if (we->state() & AltButton)
-	incr = wheel_increments[WHEEL_INCR_ALT];
+	incr = settings.wheel_increments[WHEEL_INCR_ALT];
       else if (we->state() & ControlButton)
-	incr = wheel_increments[WHEEL_INCR_CTRL];
+	incr = settings.wheel_increments[WHEEL_INCR_CTRL];
       else if (we->state() & ShiftButton)
-	incr = wheel_increments[WHEEL_INCR_SHIFT];
+	incr = settings.wheel_increments[WHEEL_INCR_SHIFT];
       else
-	incr = wheel_increments[WHEEL_INCR_NORMAL];
+	incr = settings.wheel_increments[WHEEL_INCR_NORMAL];
       if (incr != 0) {
 	bool save = fine;
 	// use fine positioning if incr is small
-	fine = (incr < 0 ? -incr : incr) < wheel_threshold;
+	fine = (incr < 0 ? -incr : incr) < settings.wheel_threshold;
 	// Note: delta is a multiple of 120 (see Qt documentation)
-	linslider->setValue(curpic - (delta * incr) / wheel_delta);
+	linslider->setValue(curpic - (delta * incr) / settings.wheel_delta);
 	fine = save;
 	}
       return true;

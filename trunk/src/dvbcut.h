@@ -52,28 +52,11 @@ protected:
   int busy;
   int viewscalefactor;
   int currentaudiotrack;
-  std::vector<std::pair<std::string,std::string> > recentfiles;
-  enum {
-    WHEEL_INCR_NORMAL,
-    WHEEL_INCR_SHIFT,
-    WHEEL_INCR_CTRL,
-    WHEEL_INCR_ALT,
-    WHEEL_INCR_num
-    };
-  int wheel_increments[WHEEL_INCR_num];
-  int wheel_threshold;
-  int wheel_delta;
-  int jog_maximum;
-  int jog_threshold;
-  double jog_offset;
-  int jog_interval;
-  int lin_interval;
 
 protected:
   //   QPixmap getpixmap(int picture, bool allgop=false);
   void exportvideo(const char *fmt);
   void addtorecentfiles(const std::string &filename, const std::string &idxfilename=std::string());
-  void loadrecentfilesfromsettings();
   void setviewscalefactor(int factor);
 
   // special event handling (mouse wheel)
