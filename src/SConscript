@@ -17,6 +17,7 @@ sources="""
   progresswindow.cpp
   psfile.cpp
   pts.cpp
+  settings.cpp
   streamdata.cpp
   tsfile.cpp
   dvbcutbase.ui

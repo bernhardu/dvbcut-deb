@@ -1,5 +1,9 @@
 2006-09-24  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* Moved global settings to a separate class.
+
+	* Changed jog_offset to type double. The default is now 0.4.
+
 	* Updated ChangeLog ;-)
 
 	* Added configurable jog slider patch from Ralph Glasstetter.
