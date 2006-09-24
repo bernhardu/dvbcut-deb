@@ -1,3 +1,35 @@
+2006-09-24  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Updated ChangeLog ;-)
+
+	* Added configurable jog slider patch from Ralph Glasstetter.
+
+2006-09-23  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Added more configuration settings.
+
+2006-09-22  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Made mouse wheel resolution configurable.
+
+2006-09-21  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Added selectable resolutions for the mouse wheel (via
+	modifier keys).
+
+2006-09-18  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Fixed yesterday's patch. The messages should be gone now.
+
+2006-09-17  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Modified the indexer to suppress most "inconsistent video
+	PTS (-1696)" message.
+
+2006-09-05  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Added all existing bug fixes from http://www.mr511.de/dvbcut.
+
 2005-12-16  Sven Over  <svenover@svenover.de>
 
 	* Release 0.5.3.

@@ -149,6 +149,25 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
     // Note: delta is a multiple of 120 (see Qt documentation)
     wheel_delta =
       settings.readNumEntry(DVBCUT_QSETTINGS_PATH "wheel_delta", 120);
+    if (wheel_delta == 0)
+      wheel_delta = 1;	// avoid devide by zero
+    jog_maximum =   
+      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "jog_maximum", 180000);
+    jog_threshold =   
+      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "jog_threshold", 50);
+    // that's in 1/100 frames! (readDoubleNumEntry does not exist?) 
+    // to increase the "zero frames"-region of the jog-slider
+    jog_offset =   
+      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "jog_offset", 40)/100.;
+    // sub-intervals of jog_maximum
+    jog_interval =   
+      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "jog_interval", 1);
+    if (jog_interval < 0)
+      jog_interval = 0;
+    lin_interval =   
+      settings.readNumEntry(DVBCUT_QSETTINGS_PATH "lin_interval", 3600);
+    if (lin_interval < 0)
+      lin_interval = 0;
     }
 
   // install event handler
@@ -711,10 +730,26 @@ void dvbcut::jogslidervalue(int v)
 
   int relpic=0;
 
-  if (v>=4000)
-    relpic=int(exp(alpha*(v-4000))+.5);
-  else if (v<=-4000)
-    relpic=-int(exp(alpha*(-v-4000))+.5);
+  /*
+  if (v>jog_offset)
+    relpic=int(exp(alpha*(v-jog_offset))+.5);
+  else if (v<-jog_offset)
+    relpic=-int(exp(alpha*(-v-jog_offset))+.5);
+  */
+  /*
+  alternative function 
+  (fits better to external tick interval setting, because jog_offset 
+   only affects scale at small numbers AND range of 1 frame is NOT smaller 
+   than range of 0 and 2 frames as in old function!)
+  */ 
+  if (v>0) {
+    relpic=int(exp(alpha*v)-jog_offset);
+    if(relpic<0) relpic=0;
+  }  
+  else if (v<0) {
+    relpic=-int(exp(-alpha*v)-jog_offset);
+    if(relpic>0) relpic=0;
+  }  
 
   int newpic=jogmiddlepic+relpic;
   if (newpic<0)
@@ -722,10 +757,10 @@ void dvbcut::jogslidervalue(int v)
   else if (newpic>=pictures)
     newpic=pictures-1;
 
-  if (relpic>50) {
+  if (relpic>=jog_threshold) {
     newpic=mpg->nextiframe(newpic);
     fine=false;
-    } else if (relpic<-50) {
+    } else if (relpic<=-jog_threshold) {
     fine=false;
     } else
     fine=true;
@@ -1209,9 +1244,14 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   linslider->setMaxValue(pictures-1);
   linslider->setLineStep(int(300*fps));
   linslider->setPageStep(int(900*fps));
-  linslider->setTickInterval(int(3600*fps));
+  if (lin_interval > 0)
+    linslider->setTickInterval(int(lin_interval*fps));
 
-  alpha=log(180000)/96000.;
+  //alpha=log(jog_maximum)/double(100000-jog_offset);
+  // with alternative function
+  alpha=log(jog_maximum)/100000.;
+  if (jog_interval > 0 && jog_interval <= 100000) 
+    jogslider->setTickInterval(int(100000/jog_interval));
 
   imagedisplay->setBackgroundMode(Qt::NoBackground);
   curpic=~0;
