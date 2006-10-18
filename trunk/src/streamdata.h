@@ -194,6 +194,11 @@ public:
       it->bufferposition=offset;
       }
     curpos=items.front().fileposition;
+    if (offset & (1ul<<31)) {
+      for(std::list<item>::iterator it=items.begin();it!=items.end();++it)
+	it->bufferposition-=offset;
+      offset=0;
+      }
     }
   void append(const void *d, int s)
     {
