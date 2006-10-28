@@ -107,6 +107,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   int last_non_b_seqnr = -1;
   int last_seqnr = -1;
   int ptsmod = -1;
+  int errcnt = 0;
 
   while (mpg.streamreader(s)>0) {
     while (sd->getbuffer().inbytes()< (sd->getbuffer().getsize()/2))
@@ -201,7 +202,10 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 	    if (error > ptsdelta / 2)
 	      error -= ptsdelta;
 	    if (-epsilon <= error && error <= epsilon) {
-	      fprintf(stderr, "inconsistent video PTS (%+d), correcting\n", error);
+	      if (error != 1 || ++errcnt <= 5)
+		fprintf(stderr, "inconsistent video PTS (%+d), correcting\n", error);
+	      else if (errcnt == 6)
+		fprintf(stderr, "more inconsistent video PTS (+1) following\n");
 	      pts -= error;
 	      } else {
 	      fprintf(stderr, "inconsistent video PTS (%+d) in %c frame %d, NOT correcting\n",
