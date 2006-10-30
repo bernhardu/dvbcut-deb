@@ -108,6 +108,8 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   int last_seqnr = -1;
   int ptsmod = -1;
   int errcnt = 0;
+  int err1cnt = 0;
+  int lasterr = 0;
 
   while (mpg.streamreader(s)>0) {
     while (sd->getbuffer().inbytes()< (sd->getbuffer().getsize()/2))
@@ -201,15 +203,26 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 	    int error = (mod - ptsmod + ptsdelta) % ptsdelta;
 	    if (error > ptsdelta / 2)
 	      error -= ptsdelta;
+	    bool complain = false;
+	    if (lasterr != error) {
+	      if (err1cnt > 0) {
+		fprintf(stderr, "last video PTS error repeated %d times\n", err1cnt);
+		err1cnt = 0;
+		}
+	      complain = true;
+	      lasterr = error;
+	      }
+	    else
+	      ++err1cnt;
+	    ++errcnt;
 	    if (-epsilon <= error && error <= epsilon) {
-	      if (error != 1 || ++errcnt <= 5)
+	      if (complain)
 		fprintf(stderr, "inconsistent video PTS (%+d), correcting\n", error);
-	      else if (errcnt == 6)
-		fprintf(stderr, "more inconsistent video PTS (+1) following\n");
 	      pts -= error;
 	      } else {
-	      fprintf(stderr, "inconsistent video PTS (%+d) in %c frame %d, NOT correcting\n",
-		error, frametype["?IPB"], pictures);
+	      if (complain)
+		fprintf(stderr, "inconsistent video PTS (%+d) in %c frame %d, NOT correcting\n",
+		  error, frametype["?IPB"], pictures);
 	      }
 	    }
           referencepts=pts-(seqnr*mpgfile::frameratescr[framerate])/300;
@@ -278,6 +291,11 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
       }
     sd->discard(skip);
     }
+
+  if (err1cnt > 0)
+    fprintf(stderr, "last video PTS error repeated %d times\n", err1cnt);
+  if (errcnt > 0)
+    fprintf(stderr, "found %d video PTS errors\n", errcnt);
 
   if (last_non_b_pic >= 0) {
     p[last_non_b_pic].setsequencenumber(++maxseqnr);
