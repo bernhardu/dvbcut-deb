@@ -29,10 +29,18 @@ static const int mpegaudio_bitrate[][16]=
     {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448}  // layer 1
   };
 
+static inline int is_mpa(const unsigned char *header)
+{
+  return header[0] == 0xff		/* sync word */
+      && (header[1] & 0xe6) > 0xe0	/* sync word & layer */
+      && (header[2] & 0xf0) != 0xf0	/* bitrate code */
+      && (header[2] & 0x0c) != 0x0c;	/* sampling rate code */
+}
+
 static int mpaframe(const void *data, int &pos, int len)
   {
   const unsigned char *d=(const unsigned char *)data;
-  while ((pos+2)<len && (d[pos]!=0xff || (d[pos+1]&0xf0!=0xf0)))
+  while ((pos+2)<len && !is_mpa(&d[pos]))
     ++pos;
   if (pos+2>=len)
     return 0;
@@ -48,7 +56,7 @@ static int mpaframe(const void *data, int &pos, int len)
   else
     pos+=3;
 
-  while ((pos+2)<len && (d[pos]!=0xff || (d[pos+1]&0xf0!=0xf0)))
+  while ((pos+2)<len && !is_mpa(&d[pos]))
     ++pos;
   return samples*90000/samplingrate; // Duration of MPEG audio frame in 90000Hz units
   }
