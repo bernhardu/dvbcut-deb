@@ -94,12 +94,12 @@ void dvbcut::setbusy(bool b)
   {
   if (b) {
     if (busy==0)
-      setCursor(QCursor(Qt::WaitCursor));
+     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     ++busy;
     } else if (busy>0) {
     --busy;
     if (busy==0)
-      unsetCursor();
+      QApplication::restoreOverrideCursor();
     }
   }
 
@@ -591,12 +591,16 @@ void dvbcut::playPlay()
 
   mplayer_process=new QProcess(QString("mplayer"));
   mplayer_process->addArgument("-noconsolecontrols");
+#ifdef __WIN32__
+  mplayer_process->addArgument("-vo");
+  mplayer_process->addArgument("directx:noaccel");
+#endif
   mplayer_process->addArgument("-wid");
   mplayer_process->addArgument(QString().sprintf("0x%x",int(imagedisplay->winId())));
-  mplayer_process->addArgument("-geometry");
-  mplayer_process->addArgument(QString().sprintf("%dx%d",int(imagedisplay->width()),int(imagedisplay->height())));
   mplayer_process->addArgument("-sb");
   mplayer_process->addArgument(QString::number(offset));
+  mplayer_process->addArgument("-geometry");
+  mplayer_process->addArgument(QString().sprintf("%dx%d+0+0",int(imagedisplay->width()),int(imagedisplay->height())));
 
   if (currentaudiotrack>=0 && currentaudiotrack<mpg->getaudiostreams()) {
     mplayer_process->addArgument("-aid");
