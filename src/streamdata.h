@@ -22,6 +22,8 @@
 #include <string>
 #include <list>
 #include <ffmpeg/avformat.h>
+
+#include "port.h"
 #include "tsfile.h"
 #include "psfile.h"
 #include "buffer.h"
@@ -106,7 +108,7 @@ protected:
   filepos_t curpos;
   const streamtype::type type;
   bool transportstream;
-  off_t nextfilepos;
+  dvbcut_off_t nextfilepos;
 
 public:
   streamdata(streamtype::type t, bool transport_stream, uint32_t buffersize=256<<10) :

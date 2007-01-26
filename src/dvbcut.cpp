@@ -43,6 +43,7 @@
 #include <qmenubar.h>
 #include <qsettings.h>
 
+#include "port.h"
 #include "dvbcut.h"
 #include "mpgfile.h"
 #include "avframe.h"
@@ -585,7 +586,7 @@ void dvbcut::playPlay()
 
   fine=true;
   linslider->setValue(mpg->lastiframe(curpic));
-  off_t offset=(*mpg)[curpic].getpos().packetposition();
+  dvbcut_off_t offset=(*mpg)[curpic].getpos().packetposition();
   mplayer_curpts=(*mpg)[curpic].getpts();
 
   mplayer_process=new QProcess(QString("mplayer"));

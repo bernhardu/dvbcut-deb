@@ -25,6 +25,10 @@
 #include <assert.h>
 #include "mpegmuxer.h"
 
+#ifndef O_BINARY
+#define O_BINARY    0
+#endif /* O_BINARY */
+
 /// video bitrate in bit/s
 #define VIDEOBITRATE (9500000)
 /// vbv buffer size in units of 1024 bytes
@@ -126,7 +130,7 @@ mpegmuxer::mpegmuxer(uint32_t audiostreammask, mpgfile &mpg, const char *filenam
   allbuffers*=1.05; // 5% assumed muxing overhead
   ptsoffset=pts_t(90000.*(allbuffers/50./muxrate))+90;
 
-  fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC,0666);
+  fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY,0666);
   }
 
 mpegmuxer::~mpegmuxer()
