@@ -25,11 +25,17 @@
 #include <string.h>
 #include <list>
 #include <utility>
+
+#include "port.h"
 #include "index.h"
 #include "mpgfile.h"
 #include "streamhandle.h"
 #include "types.h"
 #include "logoutput.h"
+
+#ifndef O_BINARY
+#define O_BINARY    0
+#endif /* O_BINARY */
 
 static inline ssize_t writer(int fd, const void *buf, size_t count)
   {
@@ -59,7 +65,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   int fd=-1;
   bool usestdout=false;
   int pictureswritten=0;
-  off_t filesize;
+  dvbcut_off_t filesize;
 
   if (savefilename && savefilename[0]) {
     if (savefilename[0]=='-' && savefilename[1]==0) // use stdout
@@ -67,7 +73,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
       fd=STDOUT_FILENO;
       usestdout=true;
       } else
-      if ((fd=::open(savefilename,O_WRONLY|O_CREAT|O_TRUNC,0666))<0) {
+      if ((fd=::open(savefilename,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY,0666))<0) {
         if (errorstring)
           *errorstring+=std::string("Open (")+savefilename+"): "+strerror(errno)+"\n";
         return fd;
@@ -337,7 +343,7 @@ int index::save(const char *filename, std::string *errorstring)
     fd=STDOUT_FILENO;
     usestdout=true;
     } else
-    if ((fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC,0666))<0) {
+    if ((fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY,0666))<0) {
       if (errorstring)
         *errorstring+=std::string("Open (")+filename+"): "+strerror(errno)+"\n";
       return fd;
@@ -361,7 +367,7 @@ int index::save(const char *filename, std::string *errorstring)
 
 int index::load(const char *filename, std::string *errorstring)
   {
-  int fd=::open(filename,O_RDONLY,0666);
+  int fd=::open(filename,O_RDONLY|O_BINARY,0666);
   if (fd<0) {
     if (errorstring) {
       int serrno=errno;

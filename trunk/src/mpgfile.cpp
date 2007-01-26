@@ -25,6 +25,7 @@
 #include <list>
 #include <utility>
 
+#include "port.h"
 #include "mpgfile.h"
 #include "tsfile.h"
 #include "psfile.h"
@@ -272,7 +273,7 @@ void mpgfile::playaudio(int aud, int picture, int ms)
   int stopreadpic=idx.indexnr(picture);
   while (stopreadpic<pictures-1 && idx[stopreadpic].getpts()<stoppts+180000)
     ++stopreadpic;
-  off_t stopreadpos=idx[stopreadpic].getpos().packetposition();
+  dvbcut_off_t stopreadpos=idx[stopreadpic].getpos().packetposition();
 
   streamhandle sh(idx[seekpic].getpos().packetposition());
   streamdata *sd=sh.newstream(audiostream(aud),s[audiostream(aud)].type,istransportstream());
@@ -386,7 +387,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
   while (seekpic>0 && idx[seekpic].getpts()>=videostartpts-180000)
     --seekpic;
 
-  off_t tpos;
+  dvbcut_off_t tpos;
     {
     int stoppic=idx.indexnr(start);
     while (stoppic<pictures &&

@@ -26,7 +26,13 @@
 #include <stdlib.h>
 // #include <stdio.h>
 #include <stdint.h>
+
+#include "port.h"
 #include "buffer.h"
+
+#ifndef O_BINARY
+#define O_BINARY    0
+#endif /* O_BINARY */
 
 #ifndef MAP_FAILED
 #define MAP_FAILED	((void*)-1)
@@ -231,7 +237,7 @@ int inbuffer::open(const char* filename)
 
   close=true;
   needseek=0;
-  fd=::open(filename,O_RDONLY);
+  fd=::open(filename,O_RDONLY|O_BINARY);
   if (fd<0)
     return fd;
 
@@ -240,14 +246,27 @@ int inbuffer::open(const char* filename)
   return fd;
   }
 
+bool inbuffer::statfilesize(dvbcut_off_t& _size) const
+  {
+#ifdef __WIN32__
+  struct _stati64 st;
+  if ((::_fstati64(fd,&st)==0)&&(S_ISREG(st.st_mode))) {
+#else /* __WIN32__ */
+  struct stat st;
+  if ((::fstat(fd,&st)==0)&&(S_ISREG(st.st_mode))) {
+#endif /* __WIN32__ */
+	_size=st.st_size;
+	return true;
+	}
+  return false;
+  }
+
 void inbuffer::setup()
   {
   unsigned int _size=size;
-  struct stat st;
 
-  if ((::fstat(fd,&st)==0)&&(S_ISREG(st.st_mode))) {
+  if (statfilesize(filesize)) {
     filesizechecked=true;
-    filesize=st.st_size;
     if (mmapsize>0)
       size=mmapsize;
     if (size>filesize)
@@ -373,7 +392,7 @@ outbuffer::~outbuffer()
 int outbuffer::open(const char* filename)
   {
   close=true;
-  return fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC);
+  return fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
   }
 
 int outbuffer::putdata(const void *data, unsigned int len, bool autoresize)

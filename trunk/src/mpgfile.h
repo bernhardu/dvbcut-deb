@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 #include <list>
+
+#include "port.h"
 #include "buffer.h"
 #include "types.h"
 #include "index.h"
@@ -151,11 +153,11 @@ public:
   void recodevideo(muxer &mux, int start, int stop, pts_t offset,
                    int progresspics=0, int progresstotal=0, logoutput *log=0);
 
-  off_t getfilesize()
+  dvbcut_off_t getfilesize()
     {
     return buf.getfilesize();
     }
-  off_t getfilepos() const
+  dvbcut_off_t getfilepos() const
     {
     return buf.getfilepos();
     }

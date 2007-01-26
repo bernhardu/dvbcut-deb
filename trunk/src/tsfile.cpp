@@ -16,6 +16,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#include "port.h"
 #include "tsfile.h"
 #include "streamhandle.h"
 #include <list>
@@ -115,7 +116,7 @@ int tsfile::streamreader(streamhandle &s)
   bool lostsync(false);
 
   for(;;) {
-    off_t packetpos=s.fileposition;
+    dvbcut_off_t packetpos=s.fileposition;
       {
       int pd=buf.providedata(TSPACKETSIZE,packetpos);
       if (pd<0)
