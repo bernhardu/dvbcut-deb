@@ -407,26 +407,56 @@ void dvbcut::fileExport()
 
   mux.reset();
 
-  prgwin.printheading("Saved %d pictures (%02d:%02d:%02d.%03d)\n",savedpic,
+  prgwin.printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
                       int(savedtime/(3600*90000)),
                       int(savedtime/(60*90000))%60,
                       int(savedtime/90000)%60,
                       int(savedtime/90)%1000	);
 
+  std::string chapterstring;
   if (!chapterlist.empty()) {
-    prgwin.printheading("Chapterlist:");
+    int nchar=0;
+    char chapter[16];
+    prgwin.printheading("\nChapterlist:");
     pts_t lastch=-1;
     for(std::list<pts_t>::const_iterator it=chapterlist.begin();
         it!=chapterlist.end();++it)
       if (*it != lastch) {
         lastch=*it;
-        prgwin.print("%02d:%02d:%02d.%03d",
+        // formatting the chapter string
+        if(nchar>0) {
+          nchar++; 
+	  chapterstring+=",";
+	}  
+        nchar+=sprintf(chapter,"%02d:%02d:%02d.%03d",
                      int(lastch/(3600*90000)),
                      int(lastch/(60*90000))%60,
                      int(lastch/90000)%60,
                      int(lastch/90)%1000	);
+        // normal output as before
+        prgwin.print(chapter);
+        // append chapter marks to a comma separated list for dvdauthor xml-file         
+        chapterstring+=chapter;
         }
     }
+  // simple dvdauthor xml file with chapter marks
+  std::string filename,destname;
+  if(expfilen.rfind("/")<expfilen.length()) 
+    filename=expfilen.substr(expfilen.rfind("/")+1);
+  else 
+    filename=expfilen;
+  destname=filename.substr(0,filename.rfind("."));
+  prgwin.printheading("\nSimple XML-file for dvdauthor with chapter marks:");
+  prgwin.print("<dvdauthor dest=\"%s\">",destname.c_str());
+  prgwin.print("  <vmgm />");
+  prgwin.print("  <titleset>");
+  prgwin.print("    <titles>");
+  prgwin.print("      <pgc>");
+  prgwin.print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
+  prgwin.print("      </pgc>");
+  prgwin.print("    </titles>");
+  prgwin.print("  </titleset>");
+  prgwin.print("</dvdauthor>");
 
   prgwin.finish();
   }
