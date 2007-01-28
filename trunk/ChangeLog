@@ -5,6 +5,10 @@
 
 	* Fixed 2 compiler warnings in mpegmuxer.cpp.
 
+	* Christian Marillat reported build problems on alpha, where the
+	__bswap_constant_xx macros seem not to be available. Changed defines
+	in defines.h not to use them anymore.
+
 2006-09-24  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Moved global settings to a separate class.
