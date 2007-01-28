@@ -182,8 +182,8 @@ bool mpegmuxer::putpacket(int str, const void *data, int len, pts_t pts, pts_t d
             } else if (d[3]==0xb3) // sequence header
             {
             d[8]=(VIDEOBITRATE/400) >> 10;
-            d[9]=(VIDEOBITRATE/400) >> 2;
-            d[10]=((VIDEOBITRATE/400) << 6)|0x20|(((VBVBUFFERSIZE/2)>>5)&0x1f);
+            d[9]=((VIDEOBITRATE/400) >> 2) & 0xff;
+            d[10]=(((VIDEOBITRATE/400) << 6)&0xc0)|0x20|(((VBVBUFFERSIZE/2)>>5)&0x1f);
             d[11]=(d[11]&0x07)|((VBVBUFFERSIZE/2)<<3);
             j+=12;
             } else if (d[3]==0xb5) // extension

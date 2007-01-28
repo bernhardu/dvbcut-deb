@@ -1,3 +1,10 @@
+2007-01-28  Sven Over  <svenover@svenover.de>
+
+	* Applied patch for SConstruct file by Ingo Saitz, as forwarded to me
+	by Christian Marillat.
+
+	* Fixed 2 compiler warnings in mpegmuxer.cpp.
+
 2006-09-24  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Moved global settings to a separate class.
