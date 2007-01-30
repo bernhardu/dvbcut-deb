@@ -1,3 +1,9 @@
+2007-01-30	Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Added workaround for div/0 bug in ffmpeg.
+
+	* Added missing ChangeLog entry. :-)
+
 2007-01-28  Sven Over  <svenover@svenover.de>
 
 	* Applied patch for SConstruct file by Ingo Saitz, as forwarded to me
@@ -8,6 +14,12 @@
 	* Christian Marillat reported build problems on alpha, where the
 	__bswap_constant_xx macros seem not to be available. Changed defines
 	in defines.h not to use them anymore.
+
+2007-01-26	Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Integrated Windows port by Olivier Raoul.
+
+	* Added XML generation feature by Ralph Glasstetter.
 
 2006-09-24  Michael Riepe  <too-tired@users.sourceforge.net>
 
