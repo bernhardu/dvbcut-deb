@@ -484,6 +484,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
           isfirstseq=false;
         isfirstpic=false;
 
+        int seqoff=0;
         if (!isfirstseq || idx[streampic].getsequencenumber()>=firstseqnr) {
           if (isfirstseq && firstseqnr>0) // need to subtract offset from picture sequence number
             {
@@ -503,7 +504,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
                   } else
                   ++j;
               }
-
+            seqoff=firstseqnr;
             }
           pts_t vidpts=idx[streampic].getpts()-videooffset;
           pts_t viddts=vidpts;
@@ -511,6 +512,13 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
             viddts=mux.getdts(VIDEOSTREAM);
             mux.setdts(VIDEOSTREAM,vidpts);
             }
+	  if (idx[streampic].getseqheader()) {
+	    int tcpic=streampic;
+	    while (tcpic < copystop && idx[tcpic].getsequencenumber() != seqoff)
+	      ++tcpic;
+	    pts_t tcpts=idx[tcpic].getpts()-videooffset;
+	    fixtimecode((uint8_t*)vsd->getdata(),picsize,tcpts);
+	    }
           if (!mux.putpacket(VIDEOSTREAM,vsd->getdata(),picsize,vidpts,viddts,
                              idx[streampic].isiframe() ? MUXER_FLAG_KEY:0  ))
             if (log)
@@ -685,6 +693,7 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
     pts_t vidpts=idx[idx.indexnr(outpicture)].getpts()-offset;
     pts_t viddts=mux.getdts(VIDEOSTREAM);
     mux.setdts(VIDEOSTREAM,vidpts);
+    fixtimecode(buf,out,vidpts);
     mux.putpacket(VIDEOSTREAM,buf,out,vidpts,viddts,
                   (avcc->coded_frame && avcc->coded_frame->key_frame)?MUXER_FLAG_KEY:0 );
     ++outpicture;
@@ -698,3 +707,42 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
   avcodec_close(avcc);
   }
 
+void mpgfile::fixtimecode(uint8_t *buf, int len, pts_t pts) {
+  int frc=-1;
+  int i=0;
+  for (;;) {
+    if (i+8>len)
+      return;
+    else if (buf[i+2]&0xfe)
+      i+=3;
+    else if (buf[i]!=0 || buf[i+1]!=0 || buf[i+2]!=1)
+      i+=1;
+    else if (buf[i+3]==0xb3) {	// sequence header
+      frc=buf[i+7]&0x0f;
+      i+=12;
+      }
+    else if (buf[i+3]==0xb8)	// GOP header
+      break;
+    else
+      i+=4;
+    }
+  buf+=i;
+  buf[4]=0x00;
+  buf[5]=0x00;
+  buf[6]=0x08;
+  buf[7]&=0x7f;
+  if (frc==-1)
+    return;
+  if (frc==1 || frc==4 || frc==7)
+    ++frc;	// use nearest integer
+  int framerate=27000000/frameratescr[frc];
+  int ss=pts/90000;
+  int mm=ss/60; ss %= 60;
+  int hh=mm/60; mm %= 60;
+  int pp=pts%90000;
+  pp=(pp*framerate)/90000;
+  buf[4] = (hh<<2) & 0x7c | (mm>>4) & 0x03;
+  buf[5] = (mm<<4) & 0xf0 | (ss>>3) & 0x07 | 0x08;
+  buf[6] = (ss<<5) & 0xe0 | (pp>>1) & 0x1f;
+  buf[7] |= (pp<<7) & 0x80;
+  }

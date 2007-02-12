@@ -152,6 +152,7 @@ public:
                int progresstotal=0, logoutput *log=0);
   void recodevideo(muxer &mux, int start, int stop, pts_t offset,
                    int progresspics=0, int progresstotal=0, logoutput *log=0);
+  void fixtimecode(uint8_t *buf, int len, pts_t pts);
 
   dvbcut_off_t getfilesize()
     {
