@@ -116,6 +116,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   int errcnt = 0;
   int err1cnt = 0;
   int lasterr = 0;
+  int lastiframe = -1;
 
   while (mpg.streamreader(s)>0) {
     while (sd->getbuffer().inbytes()< (sd->getbuffer().getsize()/2))
@@ -243,6 +244,18 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
           }
 
         p[pictures]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,aspectratio,seqnr,frametype,foundseqheader);
+
+        if (frametype == IDX_PICTYPE_I) {
+	  if (lastiframe >= 0) {
+	    int framepts = mpgfile::frameratescr[framerate] / 300;
+	    pts_t ptsdelta = pts - p[lastiframe].getpts();
+	    int pdelta = pictures - lastiframe;
+	    if (pdelta * framepts < ptsdelta)
+	      fprintf(stderr, "missing frames in GOP (%d, %d): %d\n",
+		lastiframe, pictures, ptsdelta / framepts - pdelta);
+	    }
+	  lastiframe = pictures;
+	  }
 
         if (frametype == IDX_PICTYPE_B) {
 	  /* check sequence number */
