@@ -1,3 +1,9 @@
+dvbcut (0.5.4) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Sven Over <svenover@svenover.de>  Fri, 13 Apr 2007 19:43:07 +0100
+
 dvbcut (0.5.3) unstable; urgency=low
 
   * New upstream version.
