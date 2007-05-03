@@ -384,6 +384,18 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
     }
   pts_t shift=0;
 
+  {
+    dvbcut_off_t start_pos = idx[idx.indexnr(start)].getpos().fileposition();
+    dvbcut_off_t stop_pos = idx[idx.indexnr(stop)].getpos().fileposition();
+    dvbcut_off_t bytes = stop_pos - start_pos;
+    pts_t delta_pts = videostoppts - videostartpts;
+    double mux_rate = (double)bytes * 9e4 / (double)delta_pts;
+    if (log)
+      log->print("Estimated mux rate: %.2f MBps",mux_rate*1e-6);
+    else
+      fprintf(stderr,"Estimated mux rate: %.2f MBps",mux_rate*1e-6);
+  }
+
   while (seekpic>0 && idx[seekpic].getpts()>=videostartpts-180000)
     --seekpic;
 
