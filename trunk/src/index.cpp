@@ -264,15 +264,15 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 	      "missing frame(s) before B frame %d (%d != %d)\n",
 	      pictures, seqnr, last_seqnr + 1);
 	    if (seqnr <= last_seqnr) {
-	      fprintf(stderr, "sequence number reset (%d => %d)\n", last_seqnr + 1, seqnr);
+	      fprintf(stderr, "=> sequence number reset (%d => %d)\n", last_seqnr + 1, seqnr);
 	      if (last_non_b_pic >= 0 && last_non_b_seqnr > last_seqnr) {
-		fprintf(stderr, "inserting delayed picture (%d)\n", last_non_b_seqnr);
+		fprintf(stderr, "=> inserting delayed picture (%d)\n", last_non_b_seqnr);
 		p[last_non_b_pic].setsequencenumber(++maxseqnr);
 		last_non_b_pic = -1;
 		}
 	      }
 	    else if (last_non_b_pic >= 0 && last_non_b_seqnr < seqnr) {
-	      fprintf(stderr, "inserting delayed picture (%d)\n", last_non_b_seqnr);
+	      fprintf(stderr, "=> inserting delayed picture (%d)\n", last_non_b_seqnr);
 	      p[last_non_b_pic].setsequencenumber(++maxseqnr);
 	      last_non_b_pic = -1;
 	      }
