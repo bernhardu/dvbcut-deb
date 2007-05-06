@@ -54,6 +54,7 @@ public:
   double jog_offset;
   int jog_interval;
   int lin_interval;
+  int export_format;
 
 };
 

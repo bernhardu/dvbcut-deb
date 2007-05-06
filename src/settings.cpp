@@ -61,6 +61,7 @@ dvbcut_settings::load_settings() {
   idxfilter = readEntry("/idxfilter", DVBCUT_DEFAULT_IDXFILTER);
   prjfilter = readEntry("/prjfilter", DVBCUT_DEFAULT_PRJFILTER);
   loadfilter = readEntry("/loadfilter", DVBCUT_DEFAULT_LOADFILTER);
+  export_format = readNumEntry("/export_format", 0);
   beginGroup("/recentfiles");
     recentfiles_max = readNumEntry("/max", 5);
     recentfiles.clear();
@@ -93,6 +94,7 @@ dvbcut_settings::save_settings() {
   writeEntry("/idxfilter", idxfilter);
   writeEntry("/prjfilter", prjfilter);
   writeEntry("/loadfilter", loadfilter);
+  writeEntry("/export_format", export_format);
   beginGroup("/recentfiles");
     writeEntry("/max", int(recentfiles_max));
     for (unsigned int i = 0; i < recentfiles_max; ++i) {

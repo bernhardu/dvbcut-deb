@@ -1,3 +1,7 @@
+2005-05-06	Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* remember last used export format.
+
 2007-05-03	Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/mpgfile.cpp: print estimated data rate.
