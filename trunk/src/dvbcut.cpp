@@ -282,6 +282,11 @@ void dvbcut::fileExport()
   expd->muxercombo->insertItem("MPEG program stream/DVD (libavformat)");
   expd->muxercombo->insertItem("MPEG transport stream (libavformat)");
 
+  if (settings.export_format < 0
+   || settings.export_format >= expd->muxercombo->count())
+    settings.export_format = 0;
+  expd->muxercombo->setCurrentItem(settings.export_format);
+
   for(int a=0;a<mpg->getaudiostreams();++a) {
     expd->audiolist->insertItem(mpg->getstreaminfo(audiostream(a)).c_str());
     expd->audiolist->setSelected(a,true);
@@ -290,6 +295,9 @@ void dvbcut::fileExport()
   expd->show();
   if (!expd->exec())
     return;
+
+  settings.export_format = expd->muxercombo->currentItem();
+
   expfilen=(const char *)(expd->filenameline->text());
   if (expfilen.empty())
     return;
@@ -316,7 +324,7 @@ void dvbcut::fileExport()
     if (expd->audiolist->isSelected(a))
       audiostreammask|=1u<<a;
 
-  switch(expd->muxercombo->currentItem()) {
+  switch(settings.export_format) {
       case 1:
       mux=std::auto_ptr<muxer>(new mpegmuxer(audiostreammask,*mpg,expfilen.c_str(),false,0));
       break;
