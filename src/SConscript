@@ -4,6 +4,7 @@ sources="""
   differenceimageprovider.cpp
   dvbcut.cpp
   eventlistitem.cpp
+  exception.cpp
   exportdialog.cpp
   imageprovider.cpp
   index.cpp

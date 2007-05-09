@@ -58,63 +58,64 @@
 #include "progressstatusbar.h"
 #include "exportdialog.h"
 #include "settings.h"
+#include "exception.h"
 
 // **************************************************************************
 // ***  busy cursor helpers
 
 class dvbcutbusy : public busyindicator
-  {
-protected:
-  dvbcut *d;
-  int bsy;
-public:
-  dvbcutbusy(dvbcut *_d) : busyindicator(), d(_d), bsy(0)
+{
+  protected:
+    dvbcut *d;
+    int bsy;
+  public:
+    dvbcutbusy(dvbcut *_d) : busyindicator(), d(_d), bsy(0)
     {}
-  ~dvbcutbusy()
+    ~dvbcutbusy()
     {
-    while (bsy>0)
-      setbusy(false);
-    while (bsy<0)
-      setbusy(true);
+      while (bsy>0)
+        setbusy(false);
+      while (bsy<0)
+        setbusy(true);
     }
-  virtual void setbusy(bool busy=true)
+    virtual void setbusy(bool busy=true)
     {
-    if (busy)
-      ++bsy;
-    else {
-      if (bsy<=0)
-        return;
-      --bsy;
+      if (busy)
+        ++bsy;
+      else {
+        if (bsy<=0)
+          return;
+        --bsy;
       }
-    d->setbusy(busy);
+      d->setbusy(busy);
     }
-  };
+};
 
 void dvbcut::setbusy(bool b)
-  {
+{
   if (b) {
     if (busy==0)
-     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     ++busy;
-    } else if (busy>0) {
+  } else if (busy>0) {
     --busy;
     if (busy==0)
       QApplication::restoreOverrideCursor();
-    }
   }
+}
 
 // **************************************************************************
 // ***  dvbcut::dvbcut (private constructor)
 
 dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
-    :dvbcutbase(parent, name, fl),
+  :dvbcutbase(parent, name, fl),
     audiotrackpopup(0), recentfilespopup(0), audiotrackmenuid(-1),
     mpg(0), pictures(0),
     curpic(~0), showimage(true), fine(false),
     jogsliding(false), jogmiddlepic(0),
     mplayer_process(0), imgp(0), busy(0),
     viewscalefactor(1)
-  {
+{
 #ifndef HAVE_LIB_AO
   playAudio1Action->setEnabled(false);
   playAudio2Action->setEnabled(false);
@@ -140,17 +141,17 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
   linslider->installEventFilter(this);
 
   show();
-  }
+}
 
 // **************************************************************************
 // ***  dvbcut::~dvbcut (destructor)
 
 dvbcut::~dvbcut()
-  {
+{
   if (mplayer_process) {
     mplayer_process->tryTerminate();
     delete mplayer_process;
-    }
+  }
 
   if (audiotrackpopup)
     delete audiotrackpopup;
@@ -161,29 +162,29 @@ dvbcut::~dvbcut()
     delete imgp;
   if (mpg)
     delete mpg;
-  }
+}
 
 // **************************************************************************
 // ***  slots (actions)
 
 void dvbcut::fileNew()
-  {
+{
   new dvbcut;
-  }
+}
 
 void dvbcut::fileOpen()
-  {
+{
   open();
-  }
+}
 
 void dvbcut::fileSaveAs()
-  {
+{
   QString s=QFileDialog::getSaveFileName(
-              prjfilen,
-              settings.prjfilter,
-              this,
-              "Save project as...",
-              "Choose the name of the project file" );
+      prjfilen,
+  settings.prjfilter,
+  this,
+  "Save project as...",
+  "Choose the name of the project file" );
 
   if (!s)
     return;
@@ -191,34 +192,34 @@ void dvbcut::fileSaveAs()
   if (QFileInfo(s).exists() && QMessageBox::question(this,
       "File exists - dvbcut",
       s+"\nalready exists. "
-      "Overwrite?",
+          "Overwrite?",
       QMessageBox::Yes,
       QMessageBox::No |
-      QMessageBox::Default |
-      QMessageBox::Escape) !=
+          QMessageBox::Default |
+          QMessageBox::Escape) !=
       QMessageBox::Yes)
     return;
 
   prjfilen=(const char*)s;
   if (!prjfilen.empty())
     fileSave();
-  }
+}
 
 void dvbcut::fileSave()
-  {
+{
   if (prjfilen.empty()) {
     fileSaveAs();
     return;
-    }
+  }
 
   QFile outfile(prjfilen);
   if (!outfile.open(IO_WriteOnly)) {
     QMessageBox::critical(this,"Failed to write project file - dvbcut",QString(prjfilen)+
-                          ":\nCould not open file",
-                          QMessageBox::Abort,
-                          QMessageBox::NoButton);
+        ":\nCould not open file",
+        QMessageBox::Abort,
+        QMessageBox::NoButton);
     return;
-    }
+  }
 
   QDomDocument doc("dvbcut");
   QDomElement root=doc.createElement("dvbcut");
@@ -229,33 +230,33 @@ void dvbcut::fileSave()
 
   for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
     if (item->rtti()==EventListItem::RTTI()) {
-      QString elemname;
-      EventListItem *eli=(EventListItem*)item;
-      EventListItem::eventtype evt=eli->geteventtype();
+    QString elemname;
+    EventListItem *eli=(EventListItem*)item;
+    EventListItem::eventtype evt=eli->geteventtype();
 
-      if (evt==EventListItem::start)
-        elemname="start";
-      else if (evt==EventListItem::stop)
-        elemname="stop";
-      else if (evt==EventListItem::chapter)
-        elemname="chapter";
-      else if (evt==EventListItem::bookmark)
-        elemname="bookmark";
-      else
-        continue;
+    if (evt==EventListItem::start)
+      elemname="start";
+    else if (evt==EventListItem::stop)
+      elemname="stop";
+    else if (evt==EventListItem::chapter)
+      elemname="chapter";
+    else if (evt==EventListItem::bookmark)
+      elemname="bookmark";
+    else
+      continue;
 
-      QDomElement elem=doc.createElement(elemname);
-      elem.setAttribute("picture",eli->getpicture());
-      root.appendChild(elem);
-      }
+    QDomElement elem=doc.createElement(elemname);
+    elem.setAttribute("picture",eli->getpicture());
+    root.appendChild(elem);
+    }
 
-  QTextStream stream(&outfile);
-  stream <<  doc.toString();
-  outfile.close();
-  }
+    QTextStream stream(&outfile);
+    stream <<  doc.toString();
+    outfile.close();
+}
 
 void dvbcut::fileExport()
-  {
+{
   if (expfilen.empty()) {
     std::string newexpfilen;
 
@@ -273,8 +274,8 @@ void dvbcut::fileExport()
       int nr=0;
       while (QFileInfo(QString(expfilen)).exists())
         expfilen=newexpfilen+"_"+((const char*)QString::number(++nr))+".mpg";
-      }
     }
+  }
 
   std::auto_ptr<exportdialog> expd(new exportdialog(expfilen,this));
   expd->muxercombo->insertItem("DVD (DVBCUT multiplexer)");
@@ -283,14 +284,14 @@ void dvbcut::fileExport()
   expd->muxercombo->insertItem("MPEG transport stream (libavformat)");
 
   if (settings.export_format < 0
-   || settings.export_format >= expd->muxercombo->count())
+      || settings.export_format >= expd->muxercombo->count())
     settings.export_format = 0;
   expd->muxercombo->setCurrentItem(settings.export_format);
 
   for(int a=0;a<mpg->getaudiostreams();++a) {
     expd->audiolist->insertItem(mpg->getstreaminfo(audiostream(a)).c_str());
     expd->audiolist->setSelected(a,true);
-    }
+  }
 
   expd->show();
   if (!expd->exec())
@@ -306,11 +307,11 @@ void dvbcut::fileExport()
   if (QFileInfo(expfilen).exists() && QMessageBox::question(this,
       "File exists - dvbcut",
       expfilen+"\nalready exists. "
-      "Overwrite?",
+          "Overwrite?",
       QMessageBox::Yes,
       QMessageBox::No |
-      QMessageBox::Default |
-      QMessageBox::Escape) !=
+          QMessageBox::Default |
+          QMessageBox::Escape) !=
       QMessageBox::Yes)
     return;
 
@@ -325,70 +326,70 @@ void dvbcut::fileExport()
       audiostreammask|=1u<<a;
 
   switch(settings.export_format) {
-      case 1:
+    case 1:
       mux=std::auto_ptr<muxer>(new mpegmuxer(audiostreammask,*mpg,expfilen.c_str(),false,0));
       break;
-      case 2:
+    case 2:
       mux=std::auto_ptr<muxer>(new lavfmuxer("dvd",audiostreammask,*mpg,expfilen.c_str()));
       break;
-      case 3:
+    case 3:
       mux=std::auto_ptr<muxer>(new lavfmuxer("mpegts",audiostreammask,*mpg,expfilen.c_str()));
       break;
-      case 0:
-      default:
+    case 0:
+    default:
       mux=std::auto_ptr<muxer>(new mpegmuxer(audiostreammask,*mpg,expfilen.c_str()));
       break;
-    }
+  }
 
   if (!mux->ready()) {
     prgwin.printerror("Unable to set up muxer!");
     prgwin.finish();
     return;
-    }
+  }
 
   int startpic=-1;
   int totalpics=0;
 
   for(QListBoxItem *lbi=eventlist->firstItem();lbi;lbi=lbi->next())
     if (lbi->rtti()==EventListItem::RTTI()) {
-      EventListItem &eli=(EventListItem&)*lbi;
-      switch (eli.geteventtype()) {
-          case EventListItem::start:
-          if (startpic<0) {
-            startpic=eli.getpicture();
-            }
-          break;
-          case EventListItem::stop:
-          if (startpic>=0) {
-            int stoppic=eli.getpicture();
-            totalpics+=stoppic-startpic;
-            startpic=-1;
-            }
-          break;
-          default:
-          break;
+    EventListItem &eli=(EventListItem&)*lbi;
+    switch (eli.geteventtype()) {
+      case EventListItem::start:
+        if (startpic<0) {
+          startpic=eli.getpicture();
         }
-      }
+        break;
+      case EventListItem::stop:
+        if (startpic>=0) {
+          int stoppic=eli.getpicture();
+          totalpics+=stoppic-startpic;
+          startpic=-1;
+        }
+        break;
+      default:
+        break;
+    }
+    }
 
-  int savedpic=0;
-  long long savedtime=0;
-  pts_t startpts=0;
-  std::list<pts_t> chapterlist;
-  chapterlist.push_back(0);
-  startpic=-1;
+    int savedpic=0;
+    long long savedtime=0;
+    pts_t startpts=0;
+    std::list<pts_t> chapterlist;
+    chapterlist.push_back(0);
+    startpic=-1;
 
-  for(QListBoxItem *lbi=eventlist->firstItem();lbi && !prgwin.cancelled();lbi=lbi->next())
-    if (lbi->rtti()==EventListItem::RTTI()) {
+    for(QListBoxItem *lbi=eventlist->firstItem();lbi && !prgwin.cancelled();lbi=lbi->next())
+      if (lbi->rtti()==EventListItem::RTTI()) {
       EventListItem &eli=(EventListItem&)*lbi;
 
       switch (eli.geteventtype()) {
-          case EventListItem::start:
+        case EventListItem::start:
           if (startpic<0) {
             startpic=eli.getpicture();
             startpts=(*mpg)[startpic].getpts();
-            }
+          }
           break;
-          case EventListItem::stop:
+        case EventListItem::stop:
           if (startpic>=0) {
             int stoppic=eli.getpicture();
             pts_t stoppts=(*mpg)[stoppic].getpts();
@@ -398,84 +399,84 @@ void dvbcut::fileExport()
             savedpic+=stoppic-startpic;
             savedtime+=stoppts-startpts;
             startpic=-1;
-            }
+          }
           break;
-          case EventListItem::chapter:
+        case EventListItem::chapter:
           if (startpic==-1)
             chapterlist.push_back(savedtime);
           else
             chapterlist.push_back((*mpg)[eli.getpicture()].getpts()-startpts+savedtime);
           break;
-          case EventListItem::none:
-          case EventListItem::bookmark:
+        case EventListItem::none:
+        case EventListItem::bookmark:
           break;
-        }
+      }
 
       }
 
-  mux.reset();
+      mux.reset();
 
-  prgwin.printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
-                      int(savedtime/(3600*90000)),
-                      int(savedtime/(60*90000))%60,
-                      int(savedtime/90000)%60,
-                      int(savedtime/90)%1000	);
+      prgwin.printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
+                          int(savedtime/(3600*90000)),
+                          int(savedtime/(60*90000))%60,
+                          int(savedtime/90000)%60,
+                          int(savedtime/90)%1000	);
 
-  std::string chapterstring;
-  if (!chapterlist.empty()) {
-    int nchar=0;
-    char chapter[16];
-    prgwin.printheading("\nChapterlist:");
-    pts_t lastch=-1;
-    for(std::list<pts_t>::const_iterator it=chapterlist.begin();
-        it!=chapterlist.end();++it)
-      if (*it != lastch) {
-        lastch=*it;
+      std::string chapterstring;
+      if (!chapterlist.empty()) {
+        int nchar=0;
+        char chapter[16];
+        prgwin.printheading("\nChapterlist:");
+        pts_t lastch=-1;
+        for(std::list<pts_t>::const_iterator it=chapterlist.begin();
+            it!=chapterlist.end();++it)
+          if (*it != lastch) {
+          lastch=*it;
         // formatting the chapter string
-        if(nchar>0) {
-          nchar++; 
-	  chapterstring+=",";
-	}  
-        nchar+=sprintf(chapter,"%02d:%02d:%02d.%03d",
-                     int(lastch/(3600*90000)),
-                     int(lastch/(60*90000))%60,
-                     int(lastch/90000)%60,
-                     int(lastch/90)%1000	);
+          if(nchar>0) {
+            nchar++; 
+            chapterstring+=",";
+          }  
+          nchar+=sprintf(chapter,"%02d:%02d:%02d.%03d",
+                         int(lastch/(3600*90000)),
+                         int(lastch/(60*90000))%60,
+                         int(lastch/90000)%60,
+                         int(lastch/90)%1000	);
         // normal output as before
-        prgwin.print(chapter);
+          prgwin.print(chapter);
         // append chapter marks to a comma separated list for dvdauthor xml-file         
-        chapterstring+=chapter;
-        }
-    }
+          chapterstring+=chapter;
+          }
+      }
   // simple dvdauthor xml file with chapter marks
-  std::string filename,destname;
-  if(expfilen.rfind("/")<expfilen.length()) 
-    filename=expfilen.substr(expfilen.rfind("/")+1);
-  else 
-    filename=expfilen;
-  destname=filename.substr(0,filename.rfind("."));
-  prgwin.printheading("\nSimple XML-file for dvdauthor with chapter marks:");
-  prgwin.print("<dvdauthor dest=\"%s\">",destname.c_str());
-  prgwin.print("  <vmgm />");
-  prgwin.print("  <titleset>");
-  prgwin.print("    <titles>");
-  prgwin.print("      <pgc>");
-  prgwin.print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
-  prgwin.print("      </pgc>");
-  prgwin.print("    </titles>");
-  prgwin.print("  </titleset>");
-  prgwin.print("</dvdauthor>");
+      std::string filename,destname;
+      if(expfilen.rfind("/")<expfilen.length()) 
+        filename=expfilen.substr(expfilen.rfind("/")+1);
+      else 
+        filename=expfilen;
+      destname=filename.substr(0,filename.rfind("."));
+      prgwin.printheading("\nSimple XML-file for dvdauthor with chapter marks:");
+      prgwin.print("<dvdauthor dest=\"%s\">",destname.c_str());
+      prgwin.print("  <vmgm />");
+      prgwin.print("  <titleset>");
+      prgwin.print("    <titles>");
+      prgwin.print("      <pgc>");
+      prgwin.print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
+      prgwin.print("      </pgc>");
+      prgwin.print("    </titles>");
+      prgwin.print("  </titleset>");
+      prgwin.print("</dvdauthor>");
 
-  prgwin.finish();
-  }
+      prgwin.finish();
+}
 
 void dvbcut::fileClose()
-  {
+{
   close();
-  }
+}
 
 void dvbcut::editBookmark()
-  {
+{
   QPixmap p;
   if (imgp && imgp->rtti()==IMAGEPROVIDER_STANDARD)
     p=imgp->getimage(curpic);
@@ -488,11 +489,11 @@ void dvbcut::editBookmark()
                     (*mpg)[curpic].getpts()-firstpts);
 
 
-  }
+}
 
 
 void dvbcut::editChapter()
-  {
+{
   QPixmap p;
   if (imgp && imgp->rtti()==IMAGEPROVIDER_STANDARD)
     p=imgp->getimage(curpic);
@@ -503,11 +504,11 @@ void dvbcut::editChapter()
                     EventListItem::chapter,
                     curpic,(*mpg)[curpic].getpicturetype(),
                     (*mpg)[curpic].getpts()-firstpts);
-  }
+}
 
 
 void dvbcut::editStop()
-  {
+{
   QPixmap p;
   if (imgp && imgp->rtti()==IMAGEPROVIDER_STANDARD)
     p=imgp->getimage(curpic);
@@ -518,11 +519,11 @@ void dvbcut::editStop()
                     EventListItem::stop,
                     curpic,(*mpg)[curpic].getpicturetype(),
                     (*mpg)[curpic].getpts()-firstpts);
-  }
+}
 
 
 void dvbcut::editStart()
-  {
+{
   QPixmap p;
   if (imgp && imgp->rtti()==IMAGEPROVIDER_STANDARD)
     p=imgp->getimage(curpic);
@@ -533,10 +534,10 @@ void dvbcut::editStart()
                     EventListItem::start,
                     curpic,(*mpg)[curpic].getpicturetype(),
                     (*mpg)[curpic].getpts()-firstpts);
-  }
+}
 
 void dvbcut::viewDifference()
-  {
+{
   viewNormalAction->setOn(false);
   viewUnscaledAction->setOn(false);
   viewDifferenceAction->setOn(true);
@@ -545,11 +546,11 @@ void dvbcut::viewDifference()
     delete imgp;
   imgp=new differenceimageprovider(*mpg,curpic, new dvbcutbusy(this), false, viewscalefactor);
   updateimagedisplay();
-  }
+}
 
 
 void dvbcut::viewUnscaled()
-  {
+{
   viewNormalAction->setOn(false);
   viewUnscaledAction->setOn(true);
   viewDifferenceAction->setOn(false);
@@ -559,12 +560,12 @@ void dvbcut::viewUnscaled()
       delete imgp;
     imgp=new imageprovider(*mpg,new dvbcutbusy(this),true,viewscalefactor);
     updateimagedisplay();
-    }
   }
+}
 
 
 void dvbcut::viewNormal()
-  {
+{
   viewNormalAction->setOn(true);
   viewUnscaledAction->setOn(false);
   viewDifferenceAction->setOn(false);
@@ -574,26 +575,26 @@ void dvbcut::viewNormal()
       delete imgp;
     imgp=new imageprovider(*mpg,new dvbcutbusy(this),false,viewscalefactor);
     updateimagedisplay();
-    }
   }
+}
 
 void dvbcut::viewFullSize()
-  {
+{
   setviewscalefactor(1);
-  }
+}
 
 void dvbcut::viewHalfSize()
-  {
+{
   setviewscalefactor(2);
-  }
+}
 
 void dvbcut::viewQuarterSize()
-  {
+{
   setviewscalefactor(4);
-  }
+}
 
 void dvbcut::playPlay()
-  {
+{
   if (mplayer_process)
     return;
 
@@ -643,7 +644,7 @@ void dvbcut::playPlay()
   if (currentaudiotrack>=0 && currentaudiotrack<mpg->getaudiostreams()) {
     mplayer_process->addArgument("-aid");
     mplayer_process->addArgument(QString().sprintf("0x%x",int(mpg->mplayeraudioid(currentaudiotrack))));
-    }
+  }
 
   mplayer_process->addArgument(QString(mpgfilen));
 
@@ -659,38 +660,50 @@ void dvbcut::playPlay()
     mplayer_process=0;
     mplayer_exited();
     return;
-    }
   }
+}
 
 void dvbcut::playStop()
-  {
+{
   if (mplayer_process)
     mplayer_process->tryTerminate();
-  }
+}
 
 void dvbcut::playAudio1()
-  {
+{
 #ifdef HAVE_LIB_AO
   qApp->processEvents();
-  mpg->playaudio(currentaudiotrack,curpic,-2000);
-#endif // HAVE_LIB_AO
-
+  try
+  {
+    mpg->playaudio(currentaudiotrack,curpic,-2000);
   }
+  catch (const dvbcut_exception &ex)
+  {
+    ex.show();
+  }
+#endif // HAVE_LIB_AO
+}
 
 void dvbcut::playAudio2()
-  {
+{
 #ifdef HAVE_LIB_AO
   qApp->processEvents();
-  mpg->playaudio(currentaudiotrack,curpic,2000);
-#endif // HAVE_LIB_AO
-
+  try
+  {
+    mpg->playaudio(currentaudiotrack,curpic,2000);
   }
+  catch (const dvbcut_exception &ex)
+  {
+    ex.show();
+  }
+#endif // HAVE_LIB_AO
+}
 
 // **************************************************************************
 // ***  slots
 
 void dvbcut::linslidervalue(int newpic)
-  {
+{
   if (!mpg || newpic==curpic)
     return;
   if (!fine)
@@ -708,26 +721,26 @@ void dvbcut::linslidervalue(int newpic)
   picnrlabel->setText(QString::number(curpic)+" "+IDX_PICTYPE[idx.getpicturetype()]);
   pts_t pts=idx.getpts()-firstpts;
   pictimelabel->setText(QString().sprintf("%02d:%02d:%02d.%03d",
-                                          int(pts/(3600*90000)),
-                                          int(pts/(60*90000))%60,
-                                          int(pts/90000)%60,
-                                          int(pts/90)%1000
+                        int(pts/(3600*90000)),
+                        int(pts/(60*90000))%60,
+                        int(pts/90000)%60,
+                        int(pts/90)%1000
                                          ));
 
   updateimagedisplay();
 
-  }
+}
 
 void dvbcut::jogsliderreleased()
-  {
+{
   jogsliding=false;
   jogmiddlepic=curpic;
   jogslider->setValue(0);
-  }
+}
 
 
 void dvbcut::jogslidervalue(int v)
-  {
+{
   if (!mpg || (v==0 && curpic==jogmiddlepic))
     return;
   jogsliding=true;
@@ -736,15 +749,15 @@ void dvbcut::jogslidervalue(int v)
 
   /*
   if (v>jog_offset)
-    relpic=int(exp(alpha*(v-jog_offset))+.5);
+  relpic=int(exp(alpha*(v-jog_offset))+.5);
   else if (v<-jog_offset)
-    relpic=-int(exp(alpha*(-v-jog_offset))+.5);
+  relpic=-int(exp(alpha*(-v-jog_offset))+.5);
   */
   /*
   alternative function 
   (fits better to external tick interval setting, because jog_offset 
-   only affects scale at small numbers AND range of 1 frame is NOT smaller 
-   than range of 0 and 2 frames as in old function!)
+  only affects scale at small numbers AND range of 1 frame is NOT smaller 
+  than range of 0 and 2 frames as in old function!)
   */ 
   if (v>0) {
     relpic=int(exp(alpha*v)-settings.jog_offset);
@@ -764,30 +777,30 @@ void dvbcut::jogslidervalue(int v)
   if (relpic>=settings.jog_threshold) {
     newpic=mpg->nextiframe(newpic);
     fine=false;
-    } else if (relpic<=-settings.jog_threshold) {
+  } else if (relpic<=-settings.jog_threshold) {
     fine=false;
-    } else
+  } else
     fine=true;
 
-  if (curpic!=newpic)
-    linslider->setValue(newpic);
+    if (curpic!=newpic)
+      linslider->setValue(newpic);
 
-  fine=false;
-  }
+    fine=false;
+}
 
 
 void dvbcut::doubleclickedeventlist(QListBoxItem *lbi)
-  {
+{
   if (lbi->rtti()!=EventListItem::RTTI())
     return;
 
   fine=true;
   linslider->setValue(((EventListItem*)lbi)->getpicture());
   fine=false;
-  }
+}
 
 void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
-  {
+{
   if (!lbi)
     return;
   if (lbi->rtti()!=EventListItem::RTTI())
@@ -799,17 +812,17 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
   popup.insertItem("Display difference from this picture",3);
 
   switch (popup.exec(point)) {
-      case 1:
+    case 1:
       fine=true;
       linslider->setValue(((EventListItem*)lbi)->getpicture());
       fine=false;
       break;
 
-      case 2:
+    case 2:
       delete lbi;
       break;
 
-      case 3:
+    case 3:
       if (imgp)
         delete imgp;
       imgp=new differenceimageprovider(*mpg,((EventListItem*)lbi)->getpicture(),new dvbcutbusy(this),false,viewscalefactor);
@@ -818,12 +831,12 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
       viewUnscaledAction->setOn(false);
       viewDifferenceAction->setOn(true);
       break;
-    }
-
   }
 
+}
+
 void dvbcut::clickedgo()
-  {
+{
   QString text=goinput->text();
   text.stripWhiteSpace();
   bool okay=false;
@@ -832,25 +845,25 @@ void dvbcut::clickedgo()
     fine=true;
     linslider->setValue(n);
     fine=false;
-    }
+  }
   goinput->clear();
 
-  }
+}
 
 void dvbcut::mplayer_exited()
-  {
+{
   if (mplayer_process) {
     if (!mplayer_success)// && !mplayer_process->normalExit())
-      {
+    {
       mplayererrorbase *meb=new mplayererrorbase(this,0,false,WDestructiveClose);
       meb->textbrowser->setText(mplayer_out);
       meb->show();
-      }
+    }
 
 
     delete mplayer_process;
     mplayer_process=0;
-    }
+  }
 
   eventlist->setEnabled(true);
   linslider->setEnabled(true);
@@ -883,10 +896,10 @@ void dvbcut::mplayer_exited()
   linslidervalue(cp);
   linslider->setValue(cp);
   fine=false;
-  }
+}
 
 void dvbcut::mplayer_readstdout()
-  {
+{
   if (!mplayer_process)
     return;
 
@@ -918,7 +931,7 @@ void dvbcut::mplayer_readstdout()
   if (!mplayer_success) {
     mplayer_success=true;
     mplayer_out.truncate(0);
-    }
+  }
   pts_t pts=mplayer_ptsreference(pts_t(d*90000.),mplayer_curpts);
 
 
@@ -930,16 +943,16 @@ void dvbcut::mplayer_readstdout()
   if (pts>mplayer_curpts) {
     while (cp+1<pictures && pts>mplayer_curpts)
       mplayer_curpts=(*mpg)[++cp].getpts();
-    } else if (pts<mplayer_curpts-18000) {
+  } else if (pts<mplayer_curpts-18000) {
     while (cp>1 && mplayer_curpts>pts)
       mplayer_curpts=(*mpg)[--cp].getpts();
-    }
-
-  linslider->setValue(cp);
   }
 
+  linslider->setValue(cp);
+}
+
 void dvbcut::updateimagedisplay()
-  {
+{
   if (showimage) {
     if (!imgp)
       imgp=new imageprovider(*mpg,new dvbcutbusy(this),false,viewscalefactor);
@@ -947,50 +960,50 @@ void dvbcut::updateimagedisplay()
     imagedisplay->setMinimumSize(px.size());
     imagedisplay->setPixmap(px);
     qApp->processEvents();
-    }
   }
+}
 
 void dvbcut::audiotrackchosen(int id)
-  {
+{
   if (id<0 || id>mpg->getaudiostreams())
     return;
   currentaudiotrack=id;
   for(int a=0;a<mpg->getaudiostreams();++a)
     audiotrackpopup->setItemChecked(a,a==id);
-  }
+}
 
 void dvbcut::abouttoshowrecentfiles()
-  {
+{
   recentfilespopup->clear();
   int id=0;
   for(std::vector<std::pair<std::string,std::string> >::iterator it=settings.recentfiles.begin();
       it!=settings.recentfiles.end();++it)
     recentfilespopup->insertItem(it->first,id++);
-  }
+}
 
 void dvbcut::loadrecentfile(int id)
-  {
+{
   if (id<0 || id>=(signed)settings.recentfiles.size())
     return;
   open(settings.recentfiles[id].first, settings.recentfiles[id].second);
-  }
+}
 
 // **************************************************************************
 // ***  public functions
 
 void dvbcut::open(std::string filename, std::string idxfilename)
-  {
+{
   if (filename.empty()) {
     QString fn=QFileDialog::getOpenFileName(
-                 QString::null,
-                 settings.loadfilter,
-                 this,
-                 "Open file...",
-                 "Choose an MPEG file to open" );
+        QString::null,
+    settings.loadfilter,
+    this,
+    "Open file...",
+    "Choose an MPEG file to open" );
     if (!fn)
       return;
     filename=(const char*)fn;
-    }
+  }
 
   if (filename.empty())
     return;
@@ -1000,7 +1013,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
     char *rp=realpath(filename.c_str(),resolved_path);
     if (rp)
       filename=rp;
-    }
+  }
 
   // a valid file name has been entered
 
@@ -1008,13 +1021,13 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   if (mpg) {
     delete mpg;
     mpg=0;
-    }
+  }
 
   curpic=~0;
   if (imgp) {
     delete imgp;
     imgp=0;
-    }
+  }
   eventlist->clear();
   imagedisplay->setBackgroundMode(Qt::PaletteBackground);
   imagedisplay->setMinimumSize(QSize(0,0));
@@ -1064,7 +1077,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
 
   std::string prjfilename;
   QDomDocument domdoc;
-    {
+  {
     QFile infile(filename);
     if (infile.open(IO_ReadOnly)) {
       QString line;
@@ -1072,7 +1085,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
         if (infile.readLine(line,512)<=0)
           break;
         line=line.stripWhiteSpace();
-        }
+      }
       if (line.startsWith(QString("<!DOCTYPE dvbcut"))) {
         infile.at(0);
         QString errormsg;
@@ -1080,23 +1093,23 @@ void dvbcut::open(std::string filename, std::string idxfilename)
           QDomElement docelem = domdoc.documentElement();
           if (docelem.tagName() != "dvbcut") {
             QMessageBox::critical(this,"Failed to read project file - dvbcut",QString(filename)+
-                                  ":\nNot a valid dvbcut project file",
-                                  QMessageBox::Abort,
-                                  QMessageBox::NoButton);
+                ":\nNot a valid dvbcut project file",
+                QMessageBox::Abort,
+                QMessageBox::NoButton);
             fileOpenAction->setEnabled(true);
             return;
-            }
+          }
 
           QString mpgfilename=docelem.attribute("mpgfile");
           if (mpgfilename.isEmpty()) {
             QMessageBox::critical(this,"Failed to read project file - dvbcut",QString(filename)+
-                                  ":\nNo mpeg filename "
-                                  "given in project file",
-                                  QMessageBox::Abort,
-                                  QMessageBox::NoButton);
+                ":\nNo mpeg filename "
+                    "given in project file",
+                QMessageBox::Abort,
+                QMessageBox::NoButton);
             fileOpenAction->setEnabled(true);
             return;
-            }
+          }
 
           prjfilename=filename;
           filename=(const char *)mpgfilename;
@@ -1105,15 +1118,15 @@ void dvbcut::open(std::string filename, std::string idxfilename)
             idxfilename.clear();
           else
             idxfilename=(const char *)qidxfilename;
-          } else {
+        } else {
           QMessageBox::critical(this,"Failed to read project file - dvbcut",QString(filename)+":\n"+errormsg, QMessageBox::Abort,
                                 QMessageBox::NoButton);
           fileOpenAction->setEnabled(true);
           return;
-          }
         }
       }
     }
+  }
 
   dvbcutbusy busy(this);
   busy.setbusy(true);
@@ -1127,15 +1140,15 @@ void dvbcut::open(std::string filename, std::string idxfilename)
                           QMessageBox::NoButton);
     fileOpenAction->setEnabled(true);
     return;
-    }
+  }
 
   if (idxfilename.empty()) {
     QString s=QFileDialog::getSaveFileName(
-                filename+".idx",
-                settings.idxfilter,
-                this,
-                "Choose index file...",
-                "Choose the name of the index file" );
+        filename+".idx",
+    settings.idxfilter,
+    this,
+    "Choose index file...",
+    "Choose the name of the index file" );
     if (s)
       idxfilename=(const char*)s;
     else {
@@ -1143,14 +1156,14 @@ void dvbcut::open(std::string filename, std::string idxfilename)
       mpg=0;
       fileOpenAction->setEnabled(true);
       return;
-      }
+    }
 
-    } else if (idxfilename[0]!='/') {
+  } else if (idxfilename[0]!='/') {
     char resolved_path[PATH_MAX];
     char *rp=realpath(idxfilename.c_str(),resolved_path);
     if (rp)
       idxfilename=rp;
-    }
+  }
 
   pictures=-1;
 
@@ -1167,7 +1180,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
                             QMessageBox::NoButton);
       fileOpenAction->setEnabled(true);
       return;
-      }
+    }
     if (pictures==-2) {
       delete mpg;
       mpg=0;
@@ -1176,7 +1189,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
                             QMessageBox::Abort,QMessageBox::NoButton);
       fileOpenAction->setEnabled(true);
       return;
-      }
+    }
     if (pictures<=-3) {
       delete mpg;
       mpg=0;
@@ -1185,8 +1198,8 @@ void dvbcut::open(std::string filename, std::string idxfilename)
                             QMessageBox::Abort,QMessageBox::NoButton);
       fileOpenAction->setEnabled(true);
       return;
-      }
     }
+  }
 
   if (pictures<0) {
     progressstatusbar psb(statusBar());
@@ -1202,7 +1215,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
       mpg=0;
       fileOpenAction->setEnabled(true);
       return;
-      }
+    }
 
     if (pictures<0) {
       delete mpg;
@@ -1212,12 +1225,12 @@ void dvbcut::open(std::string filename, std::string idxfilename)
                             QMessageBox::Abort,QMessageBox::NoButton);
       fileOpenAction->setEnabled(true);
       return;
-      } else if (!errorstring.empty()) {
+    } else if (!errorstring.empty()) {
       QMessageBox::critical(0,"Error saving index file - dvbcut",
                             QString(errorstring),
                             QMessageBox::Abort,QMessageBox::NoButton);
-      }
     }
+  }
 
   if (pictures<1) {
     delete mpg;
@@ -1227,7 +1240,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
                           QMessageBox::Abort,QMessageBox::NoButton);
     fileOpenAction->setEnabled(true);
     return;
-    }
+  }
 
   mpgfilen=filename;
   idxfilen=idxfilename;
@@ -1265,35 +1278,35 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   linslider->setValue(0);
   jogslider->setValue(0);
 
-    {
+  {
     EventListItem *eli=new EventListItem(0,imgp->getimage(0),EventListItem::start,9999999,2,0);
     eventlist->setMinimumWidth(eli->width(eventlist)+24);
     delete eli;
-    }
+  }
 
   if (!domdoc.isNull()) {
     QDomElement e;
     for (QDomNode n=domdoc.documentElement().firstChild();!n.isNull();n=n.nextSibling())
       if (!(e=n.toElement()).isNull()) {
-        EventListItem::eventtype evt;
-        if (e.tagName()=="start")
-          evt=EventListItem::start;
-        else if (e.tagName()=="stop")
-          evt=EventListItem::stop;
-        else if (e.tagName()=="chapter")
-          evt=EventListItem::chapter;
-        else if (e.tagName()=="bookmark")
-          evt=EventListItem::bookmark;
-        else
-          continue;
-        bool okay=false;
-        int picnum=e.attribute("picture","-1").toInt(&okay,0);
-        if (okay && picnum>=0 && picnum<pictures) {
-          new EventListItem(eventlist,imgp->getimage(picnum),evt,picnum,(*mpg)[picnum].getpicturetype(),(*mpg)[picnum].getpts()-firstpts);
-          qApp->processEvents();
-          }
-        }
-    }
+      EventListItem::eventtype evt;
+      if (e.tagName()=="start")
+        evt=EventListItem::start;
+      else if (e.tagName()=="stop")
+        evt=EventListItem::stop;
+      else if (e.tagName()=="chapter")
+        evt=EventListItem::chapter;
+      else if (e.tagName()=="bookmark")
+        evt=EventListItem::bookmark;
+      else
+        continue;
+      bool okay=false;
+      int picnum=e.attribute("picture","-1").toInt(&okay,0);
+      if (okay && picnum>=0 && picnum<pictures) {
+        new EventListItem(eventlist,imgp->getimage(picnum),evt,picnum,(*mpg)[picnum].getpicturetype(),(*mpg)[picnum].getpts()-firstpts);
+        qApp->processEvents();
+      }
+      }
+  }
 
   fileOpenAction->setEnabled(true);
   fileSaveAction->setEnabled(true);
@@ -1316,7 +1329,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   if (mpg->getaudiostreams()) {
     playAudio1Action->setEnabled(true);
     playAudio2Action->setEnabled(true);
-    }
+  }
 #endif // HAVE_LIB_AO
 
   eventlist->setEnabled(true);
@@ -1332,35 +1345,35 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   for(int a=0;a<mpg->getaudiostreams();++a) {
     //     audiotrackmenuids.push_back(audiotrackpopup->insertItem(QString(mpg->getstreaminfo(audiostream(a)))));
     audiotrackpopup->insertItem(QString(mpg->getstreaminfo(audiostream(a))),a);
-    }
+  }
   if (mpg->getaudiostreams()>0) {
     audiotrackpopup->setItemChecked(0,true);
     currentaudiotrack=0;
-    } else
+  } else
     currentaudiotrack=-1;
-  }
+}
 
 // **************************************************************************
 // ***  protected functions
 
 void dvbcut::addtorecentfiles(const std::string &filename, const std::string &idxfilename)
-  {
+{
 
   for(std::vector<std::pair<std::string,std::string> >::iterator it=settings.recentfiles.begin();
       it!=settings.recentfiles.end();)
     if (it->first==filename)
       it=settings.recentfiles.erase(it);
-    else
-      ++it;
+  else
+    ++it;
 
   settings.recentfiles.insert(settings.recentfiles.begin(),std::pair<std::string,std::string>(filename,idxfilename));
 
   while (settings.recentfiles.size()>settings.recentfiles_max)
     settings.recentfiles.pop_back();
-  }
+}
 
 void dvbcut::setviewscalefactor(int factor)
-  {
+{
   if (factor!=1 && factor!=2 && factor!=4)
     factor=1;
   viewFullSizeAction->setOn(factor==1);
@@ -1374,9 +1387,9 @@ void dvbcut::setviewscalefactor(int factor)
     if (imgp) {
       imgp->setviewscalefactor(factor);
       updateimagedisplay();
-      }
     }
   }
+}
 
 bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
   if (e->type() == QEvent::Wheel) {
@@ -1386,24 +1399,24 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
       int delta = we->delta();
       int incr = 0;
       if (we->state() & AltButton)
-	incr = settings.wheel_increments[WHEEL_INCR_ALT];
+        incr = settings.wheel_increments[WHEEL_INCR_ALT];
       else if (we->state() & ControlButton)
-	incr = settings.wheel_increments[WHEEL_INCR_CTRL];
+        incr = settings.wheel_increments[WHEEL_INCR_CTRL];
       else if (we->state() & ShiftButton)
-	incr = settings.wheel_increments[WHEEL_INCR_SHIFT];
+        incr = settings.wheel_increments[WHEEL_INCR_SHIFT];
       else
-	incr = settings.wheel_increments[WHEEL_INCR_NORMAL];
+        incr = settings.wheel_increments[WHEEL_INCR_NORMAL];
       if (incr != 0) {
-	bool save = fine;
+        bool save = fine;
 	// use fine positioning if incr is small
-	fine = (incr < 0 ? -incr : incr) < settings.wheel_threshold;
+        fine = (incr < 0 ? -incr : incr) < settings.wheel_threshold;
 	// Note: delta is a multiple of 120 (see Qt documentation)
-	linslider->setValue(curpic - (delta * incr) / settings.wheel_delta);
-	fine = save;
-	}
-      return true;
+        linslider->setValue(curpic - (delta * incr) / settings.wheel_delta);
+        fine = save;
       }
+      return true;
     }
+  }
   // propagate to base class
   return dvbcutbase::eventFilter(watched, e);
-  }
+}

@@ -47,3 +47,7 @@ exportdialog.h
 exportdialog.cpp
 src/exportdialog.h
 src/exportdialog.cpp
+/exception.h
+/exception.cpp
+src/exception.h
+src/exception.cpp

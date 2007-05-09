@@ -64,13 +64,35 @@ if (not env.GetOption('clean')):
   if (conf.TryAction('pkg-config --exists ao')[0]):
     conf.env.Append(CPPDEFINES="HAVE_LIB_AO")
     conf.env.ParseConfig('pkg-config --cflags --libs ao')
-    print "Checking for libao... found"
+    print "Checking for C library ao... yes"
   elif (conf.CheckLibWithHeader('ao', 'ao/ao.h', 'C')):
     conf.env.Append(CPPDEFINES="HAVE_LIB_AO")
-    conf.env.Append(LIBS=['ao'])
-    print "Checking for libao... found"
   else:
-    print "Checking for libao... not found"
+    print "Checking for C library ao... no"
+
+### LIBMAD
+
+if (not env.GetOption('clean')):
+  if (conf.TryAction('pkg-config --exists mad')[0]):
+    conf.env.Append(CPPDEFINES="HAVE_LIB_MAD")
+    conf.env.ParseConfig('pkg-config --cflags --libs mad')
+    print "Checking for C library mad... yes"
+  elif (conf.CheckLibWithHeader('mad', 'mad.h', 'C')):
+    conf.env.Append(CPPDEFINES="HAVE_LIB_MAD")
+  else:
+    print "Checking for C library mad... no"
+
+### LIBA52
+
+if (not env.GetOption('clean')):
+  if (conf.TryAction('pkg-config --exists a52')[0]):
+    conf.env.Append(CPPDEFINES="HAVE_LIB_A52")
+    conf.env.ParseConfig('pkg-config --cflags --libs a52')
+    print "Checking for C library a52... yes"
+  elif (conf.CheckLibWithHeader('a52', ['stdint.h','a52dec/a52.h'], 'C')):
+    conf.env.Append(CPPDEFINES="HAVE_LIB_A52")
+  else:
+    print "Checking for C library a52... no"
   
 ### FINISH
     

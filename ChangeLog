@@ -1,4 +1,11 @@
-2005-05-06	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-05-09  Sven Over  <svenover@svenover.de>
+
+	* Added generic dvbcut_exception class.
+
+	* Got rid of libavcodec usage in playaudio.cpp. Instead, libmad and
+	liba52 are now used. SCons files changed accordingly.
+
+2007-05-06	Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* remember last used export format.
 

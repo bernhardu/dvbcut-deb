@@ -1,5 +1,5 @@
 /*  dvbcut
-    Copyright (c) 2005 Sven Over <svenover@svenover.de>
+    Copyright (c) 2007 Sven Over <svenover@svenover.de>
  
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,11 +16,28 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef _DVBCUT_PLAYAUDIO_H
-#define _DVBCUT_PLAYAUDIO_H
+#ifndef _DVBCUT_EXCEPTION_H
+#define _DVBCUT_EXCEPTION_H
 
-#include <stdint.h>
-void playaudio_ac3(const void *data, uint32_t len);
-void playaudio_mp2(const void *data, uint32_t len);
+#include <exception>
+#include <string>
 
-#endif
+class dvbcut_exception : public std::exception
+{
+protected:
+  std::string _M_msg;
+  std::string _M_extype;
+public:
+  explicit dvbcut_exception(const std::string &__arg);
+  explicit dvbcut_exception(const char* __arg);
+  virtual ~dvbcut_exception() throw();
+  
+  virtual const char *what() const throw();
+  
+  const std::string &msg() const throw() { return _M_msg; }
+  const std::string &type() const throw() { return _M_extype; }
+  
+  void show() const;
+};
+
+#endif // ifndef _DVBCUT_EXCEPTION_H
