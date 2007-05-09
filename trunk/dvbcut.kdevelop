@@ -6,12 +6,11 @@
     <version>$VERSION$</version>
     <projectmanagement>KDevCustomProject</projectmanagement>
     <primarylanguage>C++</primarylanguage>
-    <ignoreparts>
-      <part>kdevrbdebugger</part>
-    </ignoreparts>
+    <ignoreparts/>
     <projectdirectory>.</projectdirectory>
     <absoluteprojectpath>false</absoluteprojectpath>
     <description/>
+    <versioncontrol/>
   </general>
   <kdevcustomproject>
     <run>
@@ -38,9 +37,7 @@
       <selectedenvironment>default</selectedenvironment>
       <environments>
         <default>
-          <envvar value="g++-3.3" name="CXX" />
           <envvar value="1" name="DEBUG" />
-          <envvar value="g++-3.3" name="LINK" />
         </default>
       </environments>
     </make>
@@ -165,6 +162,11 @@
         <implementation class="exportdialog" path="../dvbcut-0.5.2pre1/src/exportdialogbase.ui" implementationpath="../dvbcut-0.5.2pre1/exportdialog.h" />
       </qtdesigner>
     </designerintegration>
+    <qt>
+      <used>false</used>
+      <version>3</version>
+      <root/>
+    </qt>
   </kdevcppsupport>
   <cppsupportpart>
     <filetemplates>
@@ -181,4 +183,11 @@
     <graphicFilter>-f0</graphicFilter>
     <scaling>-1</scaling>
   </kdevvisualadvance>
+  <kdevdocumentation>
+    <projectdoc>
+      <docsystem/>
+      <docurl/>
+      <usermanualurl/>
+    </projectdoc>
+  </kdevdocumentation>
 </kdevelop>

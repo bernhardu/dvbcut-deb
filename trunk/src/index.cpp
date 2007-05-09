@@ -251,7 +251,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 	    pts_t ptsdelta = pts - p[lastiframe].getpts();
 	    int pdelta = pictures - lastiframe;
 	    if (pdelta * framepts < ptsdelta)
-	      fprintf(stderr, "missing frames in GOP (%d, %d): %d\n",
+	      fprintf(stderr, "missing frames in GOP (%d, %d): %lld\n",
 		lastiframe, pictures, ptsdelta / framepts - pdelta);
 	    }
 	  lastiframe = pictures;

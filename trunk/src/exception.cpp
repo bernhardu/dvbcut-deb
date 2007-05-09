@@ -1,5 +1,5 @@
 /*  dvbcut
-    Copyright (c) 2005 Sven Over <svenover@svenover.de>
+    Copyright (c) 2007 Sven Over <svenover@svenover.de>
  
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,11 +16,33 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef _DVBCUT_PLAYAUDIO_H
-#define _DVBCUT_PLAYAUDIO_H
+#include "exception.h"
+#include <qstring.h>
+#include <qmessagebox.h>
 
-#include <stdint.h>
-void playaudio_ac3(const void *data, uint32_t len);
-void playaudio_mp2(const void *data, uint32_t len);
+dvbcut_exception::dvbcut_exception(const std::string &__arg) : _M_msg(__arg), _M_extype()
+{
+}
 
-#endif
+dvbcut_exception::dvbcut_exception(const char* __arg) : _M_msg(__arg), _M_extype()
+{
+}
+
+dvbcut_exception::~dvbcut_exception() throw()
+{
+}
+
+const char *dvbcut_exception::what() const throw()
+{
+  return _M_msg.c_str();
+}
+
+void dvbcut_exception::show() const
+{
+  std::string extype(type());
+
+  if (extype.empty())  
+    extype="DVBCUT error";
+
+  QMessageBox::critical(NULL,extype,what(),QMessageBox::Abort,QMessageBox::NoButton);
+}

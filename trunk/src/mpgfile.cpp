@@ -48,30 +48,32 @@ mpgfile::mpgfile(const std::string &filename, inbuffer &b, int initial_offset) :
     buf(b,8<<20,128<<20),
     videostreams(0),audiostreams(0),
     initialoffset(initial_offset),idx(*this),pictures(0)
-  {}
+{}
 
 mpgfile::~mpgfile()
-  {}
+{}
 
 /// Factory function
 mpgfile* mpgfile::open(const std::string &filename, std::string *errormessage)
-  {
+{
   if (errormessage)
     errormessage->clear();
   inbuffer buf(64 << 10, -1, false, 128 << 10);
 
   int fd = buf.open(filename.c_str());
-  if (fd < 0) {
+  if (fd < 0)
+  {
     if (errormessage)
       *errormessage = std::string("open '") + filename + "': " + strerror(errno);
     return 0;
-    }
+  }
 
-  if (buf.providedata(64 << 10) < (64 << 10)) {
+  if (buf.providedata(64 << 10) < (64 << 10))
+  {
     if (errormessage)
       *errormessage = std::string("File '") + filename + "' too short";
     return 0;
-    }
+  }
 
   int initialoffset;
   if ((initialoffset=tsfile::probe(buf))>=0) // is this an mpeg transport stream?
@@ -82,10 +84,10 @@ mpgfile* mpgfile::open(const std::string &filename, std::string *errormessage)
   if (errormessage)
     *errormessage="Unknown file type";
   return 0;
-  }
+}
 
 void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
-  {
+{
   stream *S=&s[videostream()];
   if (!S->avcc)
     return;
@@ -108,23 +110,27 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
   streamhandle s(idx[streampic].getpos().packetposition());
   streamdata *sd=s.newstream(VIDEOSTREAM,streamtype::mpeg2video,istransportstream());
 
-  if (idx[streampic].getpos().packetoffset()>0) {
-    while( sd->inbytes()<idx[streampic].getpos().packetoffset() ) {
+  if (idx[streampic].getpos().packetoffset()>0)
+  {
+    while( sd->inbytes()<idx[streampic].getpos().packetoffset() )
+    {
       if (streamreader(s)<=0)
         return;
-      }
-    sd->discard(idx[streampic].getpos().packetoffset());
     }
+    sd->discard(idx[streampic].getpos().packetoffset());
+  }
 
-  if (int rv=avcodec_open(S->avcc, S->dec)) {
+  if (int rv=avcodec_open(S->avcc, S->dec))
+  {
     fprintf(stderr,"avcodec_open returned %d\n",rv);
     return;
-    }
+  }
   avframe avf;
   int last_cpn=-1;
   bool firstframe=true, firstsequence=true;
 
-  while (pic<stop && streampic<idx.getpictures()) {
+  while (pic<stop && streampic<idx.getpictures())
+  {
     filepos_t tp(getfilesize(),0);
     if ((streampic+1)<idx.getpictures())
       tp=idx[streampic+1].getpos();
@@ -135,114 +141,130 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
     int bytes=sd->inbytes();
 
     for(streamdata::itemlisttype::const_iterator it=sd->itemlist().begin();it!=sd->itemlist().end();++it)
-      if (it->fileposition.packetposition()==tp.packetposition()) {
+      if (it->fileposition.packetposition()==tp.packetposition())
+      {
         bytes=it->bufferposition-sd->getoffset()+tp.packetoffset()-it->fileposition.packetoffset();
         break;
-        } else
-        if (it->fileposition.packetposition()>tp.packetposition()) {
+      }
+      else
+        if (it->fileposition.packetposition()>tp.packetposition())
+        {
           bytes=it->bufferposition-sd->getoffset();
           break;
-          }
+        }
 
     if (!firstframe && idx[streampic].getseqheader())
       firstsequence=false;
     firstframe=false;
 
-    if (!firstsequence || idx[streampic].getsequencenumber()>=seqnr) {
+    if (!firstsequence || idx[streampic].getsequencenumber()>=seqnr)
+    {
       const uint8_t *data=(const uint8_t*)sd->getdata();
       int frameFinished=0;
 
       int decodebytes=bytes;
-      while (decodebytes>0) {
+      while (decodebytes>0)
+      {
         frameFinished=0;
         int bytesDecoded=avcodec_decode_video(S->avcc, avf, &frameFinished,
                                               (uint8_t*) data, decodebytes);
-        if (bytesDecoded<0) {
+        if (bytesDecoded<0)
+        {
           fprintf(stderr,"libavcodec error while decoding frame #%d\n",pic);
           avcodec_close(S->avcc);
           return;
-          }
+        }
 
         data+=bytesDecoded;
         decodebytes-=bytesDecoded;
 
-        if (frameFinished) {
-          if (last_cpn!=avf->coded_picture_number) {
+        if (frameFinished)
+        {
+          if (last_cpn!=avf->coded_picture_number)
+          {
             last_cpn=avf->coded_picture_number;
             if (pic>=start)
               framelist.push_back(new avframe(avf,S->avcc));
             ++pic;
-            if (pic>=stop) {
+            if (pic>=stop)
+            {
               frameFinished=0;
               decodebytes=0;
               break;
-              }
-            } else
-            frameFinished=0;
+            }
           }
+          else
+            frameFinished=0;
         }
       }
+    }
 
     sd->discard(bytes);
     ++streampic;
-    }
-
-  if (pic < stop) {
-    int frameFinished=0;
-    avcodec_decode_video(S->avcc, avf, &frameFinished, NULL, 0);
-    if (frameFinished) {
-      if (last_cpn!=avf->coded_picture_number) {
-	last_cpn=avf->coded_picture_number;
-	if (pic>=start)
-	  framelist.push_back(new avframe(avf,S->avcc));
-	}
-      }
-    }
-
-  avcodec_close(S->avcc);
   }
 
-void mpgfile::initaudiocodeccontext(int aud)
+  if (pic < stop)
   {
+    int frameFinished=0;
+    avcodec_decode_video(S->avcc, avf, &frameFinished, NULL, 0);
+    if (frameFinished)
+    {
+      if (last_cpn!=avf->coded_picture_number)
+      {
+        last_cpn=avf->coded_picture_number;
+        if (pic>=start)
+          framelist.push_back(new avframe(avf,S->avcc));
+      }
+    }
+  }
+
+  avcodec_close(S->avcc);
+}
+
+void mpgfile::initaudiocodeccontext(int aud)
+{
   stream *S=&s[audiostream(aud)];
   S->infostring="Audio ";
 
-    {
+  {
     char number[16];
     snprintf(number,16,"%d",aud);
     S->infostring+=number;
-    }
+  }
 
-  if (!S->avcc) {
+  if (!S->avcc)
+  {
     S->allocavcc();
     S->avcc->codec_type=CODEC_TYPE_AUDIO;
     S->avcc->codec_id=(S->type==streamtype::ac3audio)?CODEC_ID_AC3:CODEC_ID_MP2;
-    }
+  }
 
-  switch (S->type) {
-      case streamtype::mpegaudio:
-      S->infostring+=" (MPEG)";
-      break;
-      case streamtype::ac3audio:
-      S->infostring+=" (AC3)";
-      break;
-      default:
-      S->infostring+=" (unknown)";
-      break;
-    }
+  switch (S->type)
+  {
+  case streamtype::mpegaudio:
+    S->infostring+=" (MPEG)";
+    break;
+  case streamtype::ac3audio:
+    S->infostring+=" (AC3)";
+    break;
+  default:
+    S->infostring+=" (unknown)";
+    break;
+  }
 
 
   streamhandle sh(initialoffset);
   streamdata *sd=sh.newstream(audiostream(aud),s[audiostream(aud)].type,istransportstream());
 
-  while (sh.fileposition < (initialoffset+4<<20)) {
+  while (sh.fileposition < (initialoffset+4<<20))
+  {
     if (streamreader(sh)<=0)
       return;
 
     if (!sd->empty() && (++sd->itemlist().begin())!=sd->itemlist().end())
       // we have more than one entry in sd->itemlist()
       break;
-    }
+  }
 
   if (avcodec_open(S->avcc, S->dec))
     return;
@@ -251,11 +273,11 @@ void mpgfile::initaudiocodeccontext(int aud)
   int frame_size=sizeof(samples);
   avcodec_decode_audio(S->avcc,samples,&frame_size,(uint8_t*) sd->getdata(),sd->inbytes());
   avcodec_close(S->avcc);
-  }
+}
 
 #ifdef HAVE_LIB_AO
 void mpgfile::playaudio(int aud, int picture, int ms)
-  {
+{
   if (aud>=audiostreams || ms==0)
     return;
 
@@ -278,14 +300,16 @@ void mpgfile::playaudio(int aud, int picture, int ms)
   streamhandle sh(idx[seekpic].getpos().packetposition());
   streamdata *sd=sh.newstream(audiostream(aud),s[audiostream(aud)].type,istransportstream());
 
-  while (sd->empty()) {
+  while (sd->empty())
+  {
     if (sh.fileposition > stopreadpos || streamreader(sh)<=0)
       return; // data does not reach the point in time from which we like to start playing
     while (!sd->empty() && !sd->itemlist().begin()->headerhaspts())
       sd->pop();
-    }
+  }
 
-  for(;;) {
+  for(;;)
+  {
     if (sh.fileposition > stopreadpos || streamreader(sh)<=0)
       return; // data does not reach the point in time from which we like to start playing
     if (sd->empty())
@@ -296,19 +320,20 @@ void mpgfile::playaudio(int aud, int picture, int ms)
     pts_t pts=AV_NOPTS_VALUE;
     for(++it;it!=sd->itemlist().end();++it,++pop)
       if (it->headerhaspts()) //if (streamdata::headerhaspts(it->header))
-        {
+      {
         pts=it->headerpts(startpts);
         break;
-        }
+      }
     if (pts==(pts_t)AV_NOPTS_VALUE)
       continue;
     if (pts<=startpts)
       sd->pop(pop);
     if (pts>=startpts)
       break;
-    }
+  }
 
-  while (streamreader(sh)>0) {
+  while (streamreader(sh)>0)
+  {
     streamdata::itemlisttype::const_reverse_iterator it=sd->itemlist().rbegin();
     while(it!=sd->itemlist().rend())
       if (it->headerhaspts())
@@ -321,30 +346,31 @@ void mpgfile::playaudio(int aud, int picture, int ms)
 
     if (it->headerpts(stoppts)>stoppts)
       break;
-    }
+  }
 
   sd->audio_addpts();
 
   uint32_t startbufferpos=sd->closestptsbufferpos(startpts);
   uint32_t stopbufferpos=sd->closestptsbufferpos(stoppts);
 
-  if (stopbufferpos>startbufferpos) {
-    stream *S=&s[audiostream(aud)];
-    if (!S->avcc) {
-      S->allocavcc();
-      S->avcc->codec_type=CODEC_TYPE_AUDIO;
-      S->avcc->codec_id=(S->type==streamtype::ac3audio)?CODEC_ID_AC3:CODEC_ID_MP2;
-      }
-    ::playaudio(sd->getdata(startbufferpos),stopbufferpos-startbufferpos,S->avcc,S->dec);
-    }
+  if (stopbufferpos>startbufferpos)
+  {
+    const stream &S=s[audiostream(aud)];
+
+    if (S.type==streamtype::ac3audio)
+      playaudio_ac3(sd->getdata(startbufferpos),stopbufferpos-startbufferpos);
+    else
+      playaudio_mp2(sd->getdata(startbufferpos),stopbufferpos-startbufferpos);
   }
+}
 #else // HAVE_LIB_AO
 void mpgfile::playaudio(int, int, int)
-  {}
+{
+}
 #endif // HAVE_LIB_AO
 
 void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepics, logoutput *log)
-  {
+{
   if (start<0)
     start=0;
   if (start>pictures)
@@ -355,22 +381,24 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
     stop=pictures;
   if (start==stop)
     return;
-  if (stop<start) {
+  if (stop<start)
+  {
     int x=start;
     start=stop;
     stop=x;
-    }
+  }
 
   int seekpic=idx.indexnr(start);
   bool fixedstart=true;
 
-  if (mux.isempty()) {
+  if (mux.isempty())
+  {
     fixedstart=false;
     mux.unsetempty();
     pts_t startpts=mpgfile::frameratescr[idx[seekpic].getframerate()]/300;
     for (int i=0;i<MAXAVSTREAMS;++i)
       mux.setpts(i,startpts);
-    }
+  }
 
   pts_t videostartpts=idx[seekpic].getpts();
   pts_t videostoppts=idx[idx.indexnr(stop)].getpts();
@@ -378,10 +406,11 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
   pts_t audiopts[MAXAUDIOSTREAMS];
   pts_t audiostartpts[MAXAUDIOSTREAMS];
   pts_t audiooffset[MAXAUDIOSTREAMS];
-  for(int a=0;a<MAXAUDIOSTREAMS;++a) {
+  for(int a=0;a<MAXAUDIOSTREAMS;++a)
+  {
     audiooffset[a]=videooffset;
     audiostartpts[a]=audiopts[a]=videostartpts;
-    }
+  }
   pts_t shift=0;
 
   {
@@ -400,13 +429,13 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
     --seekpic;
 
   dvbcut_off_t tpos;
-    {
+  {
     int stoppic=idx.indexnr(start);
     while (stoppic<pictures &&
            (idx[stoppic].getpts()<videostartpts+180000 || !idx[stoppic].getseqheader()))
       ++stoppic;
     tpos=idx[stoppic].getpos().packetposition();
-    }
+  }
 
   streamhandle sh(idx[seekpic].getpos().packetposition());
   streamdata *vsd=sh.newstream(VIDEOSTREAM,s[VIDEOSTREAM].type,istransportstream());
@@ -419,7 +448,8 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
       break;
 
   for (int a=0;a<MAXAUDIOSTREAMS;++a)
-    if (streamdata *sd=sh.stream[audiostream(a)]) {
+    if (streamdata *sd=sh.stream[audiostream(a)])
+    {
       pts_t tpts=videostartpts-mux.getpts(VIDEOSTREAM)+mux.getpts(audiostream(a));
       sd->audio_addpts();
       uint32_t startbufferpos=sd->ptsbufferpos(tpts);
@@ -432,37 +462,40 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
 
       pts_t apts=sd->itemlist().front().headerpts(tpts);
       audiostartpts[a]=apts;
-      if (apts>=0) {
+      if (apts>=0)
+      {
         if (fixedstart)
           audiooffset[a]=videooffset-tpts+apts;
         else if (tpts-apts>shift)
           shift=tpts-apts;
-        }
-
       }
 
-  if (!fixedstart) {
+    }
+
+  if (!fixedstart)
+  {
     videooffset-=shift;
     for(int a=0;a<MAXAUDIOSTREAMS;++a)
       audiooffset[a]=videooffset;
-    }
+  }
 
   pts_t audiostoppts[MAXAUDIOSTREAMS];
   for(int a=0;a<MAXAUDIOSTREAMS;++a)
     audiostoppts[a]=videostoppts-videooffset+audiooffset[a];
 
   int firstseqhdr=nextseqheader(start);
-    {
+  {
     filepos_t copystart=idx[idx.indexnr(firstseqhdr)].getpos();
     vsd->discard(vsd->fileposbufferpos(copystart)-vsd->getoffset());
-    }
+  }
   bool isfirstpic=true, isfirstseq=true;
   int firstseqnr=idx[idx.indexnr(firstseqhdr)].getsequencenumber();
 
-  if (firstseqhdr>start) {
+  if (firstseqhdr>start)
+  {
     recodevideo(mux,start,firstseqhdr,videooffset,savedpics,savepics,log);
     savedpics+=firstseqhdr-start;
-    }
+  }
 
   int copystop=stop; // first picture not to write to stream
   while (copystop<pictures && idx[idx.indexnr(copystop)].isbframe())
@@ -471,7 +504,8 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
 
   int streampic=idx.indexnr(firstseqhdr);
 
-  while (!log || !log->cancelled()) {
+  while (!log || !log->cancelled())
+  {
     int packetsread;
     for (packetsread=0;packetsread<20;++packetsread)
       if (streamreader(sh)<=0)
@@ -481,12 +515,14 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
 
     // copy video
     if (vsd)
-      for(;;) {
-        if (streampic>=copystop) {
+      for(;;)
+      {
+        if (streampic>=copystop)
+        {
           vsd=0;
           sh.delstream(VIDEOSTREAM);
           break;
-          }
+        }
 
         uint32_t picsize=vsd->fileposbufferpos(idx[streampic+1].getpos())-vsd->getoffset();
         if (picsize>=vsd->inbytes())
@@ -497,70 +533,78 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
         isfirstpic=false;
 
         int seqoff=0;
-        if (!isfirstseq || idx[streampic].getsequencenumber()>=firstseqnr) {
+        if (!isfirstseq || idx[streampic].getsequencenumber()>=firstseqnr)
+        {
           if (isfirstseq && firstseqnr>0) // need to subtract offset from picture sequence number
-            {
+          {
             uint8_t *d=(uint8_t*) vsd->getdata();
 
             for (unsigned int j=0;j+5<picsize;)
-              {
+            {
               if (d[2]&0xfe)
                 j+=3;
               else
-                if (*(u_int32_t*)&d[j]==mbo32(0x00000100)) {
+                if (*(u_int32_t*)&d[j]==mbo32(0x00000100))
+                {
                   int seqpic=(d[j+4]<<2)|((d[j+5]>>6)&0x03);
                   seqpic-=firstseqnr;
                   d[j+4]=seqpic>>2;
                   d[j+5]=(d[j+5]&0x3f)|((seqpic<<6)&0xc0);
                   break;
-                  } else
+                }
+                else
                   ++j;
-              }
-            seqoff=firstseqnr;
             }
+            seqoff=firstseqnr;
+          }
           pts_t vidpts=idx[streampic].getpts()-videooffset;
           pts_t viddts=vidpts;
-          if (!idx[streampic].isbframe()) {
+          if (!idx[streampic].isbframe())
+          {
             viddts=mux.getdts(VIDEOSTREAM);
             mux.setdts(VIDEOSTREAM,vidpts);
-            }
-	  if (idx[streampic].getseqheader()) {
-	    int tcpic=streampic;
-	    while (tcpic < copystop && idx[tcpic].getsequencenumber() != seqoff)
-	      ++tcpic;
-	    pts_t tcpts=idx[tcpic].getpts()-videooffset;
-	    fixtimecode((uint8_t*)vsd->getdata(),picsize,tcpts);
-	    }
+          }
+          if (idx[streampic].getseqheader())
+          {
+            int tcpic=streampic;
+            while (tcpic < copystop && idx[tcpic].getsequencenumber() != seqoff)
+              ++tcpic;
+            pts_t tcpts=idx[tcpic].getpts()-videooffset;
+            fixtimecode((uint8_t*)vsd->getdata(),picsize,tcpts);
+          }
           if (!mux.putpacket(VIDEOSTREAM,vsd->getdata(),picsize,vidpts,viddts,
                              idx[streampic].isiframe() ? MUXER_FLAG_KEY:0  ))
             if (log)
               log->printwarning("putpacket(streampic=%d) returned false",streampic);
             else
               fprintf(stderr,"WARN: putpacket(streampic=%d) returned false\n",streampic);
-          }
+        }
 
         vsd->discard(picsize);
         ++streampic;
 
         if (log && savepics>0)
           log->setprogress(++savedpics*1000/savepics);
-        }
+      }
 
     bool haveaudio=false;
 
     for (int a=0;a<MAXAUDIOSTREAMS;++a)
-      if (streamdata * const sd=sh.stream[audiostream(a)]) {
+      if (streamdata * const sd=sh.stream[audiostream(a)])
+      {
         bool stopped=false;
         sd->audio_addpts();
         streamdata::itemlisttype::const_iterator nx,it=sd->itemlist().begin();
 
-        while(!stopped) {
+        while(!stopped)
+        {
           audiopts[a]=it->headerpts(audiopts[a]);
-          if (audiopts[a]>=audiostoppts[a]) {
+          if (audiopts[a]>=audiostoppts[a])
+          {
             audiostoppts[a]=audiopts[a];
             stopped=true;
             break;
-            }
+          }
           nx=it;
           ++nx;
           while (nx!=sd->itemlist().end() && !nx->headerhaspts())
@@ -570,16 +614,20 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
           uint32_t bytes=nx->bufferposition-it->bufferposition;
           pts_t nxheaderpts=nx->headerpts(audiopts[a]);
 
-          if (nxheaderpts>=audiostoppts[a]) {
-            if (nxheaderpts-audiostoppts[a]>audiostoppts[a]-audiopts[a]) {
+          if (nxheaderpts>=audiostoppts[a])
+          {
+            if (nxheaderpts-audiostoppts[a]>audiostoppts[a]-audiopts[a])
+            {
               bytes=0;
               audiostoppts[a]=audiopts[a];
-              } else
+            }
+            else
               audiostoppts[a]=nxheaderpts;
             stopped=true;
-            }
+          }
 
-          if (nx->bufferposition<it->bufferposition) {
+          if (nx->bufferposition<it->bufferposition)
+          {
 
             for(it=sd->itemlist().begin();it!=sd->itemlist().end();++it)
               fprintf(stderr," fileposition:%lld/%d bufferposition:%d flags:%x pts:%s\n",
@@ -595,40 +643,42 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
                         i,(sh.stream[i]==sd)?"*":"",sh.stream[i]->itemlist().size());
 
             abort();
-            }
+          }
 
-          if (bytes>0) {
+          if (bytes>0)
+          {
             pts_t pts=audiopts[a]-audiooffset[a];
             mux.putpacket(audiostream(a),sd->getdata(),bytes,pts,pts,MUXER_FLAG_KEY);
 
             sd->discard(bytes);
-            }
-          it=nx;
           }
+          it=nx;
+        }
 
         if (stopped)
           sh.delstream(audiostream(a));
         else
           haveaudio=true;
-        }
+      }
 
     if (!vsd &&!haveaudio)
       break;
-    }
+  }
 
   if ((stop>nextseqheader(start)) && idx[idx.indexnr(stop-1)].isbframe())
     // we didn't catch the last picture(s) yet
-    {
+  {
     int startrecode=stop-1;
     while (startrecode>0 && idx[idx.indexnr(startrecode-1)].isbframe())
       --startrecode;
     recodevideo(mux,startrecode,stop,videooffset,savedpics,savepics,log);
-    }
+  }
 
   // output info on audio stream timings
   if (log)
     for (int a=0;a<MAXAUDIOSTREAMS;++a)
-      if (mux.streampresent(audiostream(a))) {
+      if (mux.streampresent(audiostream(a)))
+      {
         float starts=float(audiostartpts[a]-videostartpts)/90.;
         float stops=float(audiostoppts[a]-videostoppts)/90.;
         float shift=float(audiooffset[a]-videooffset)/90.;
@@ -638,15 +688,15 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
                        a+1,fabsf(starts-shift), (starts>=shift) ? "after":"before",
                        a+1,fabsf(stops-shift), (stops>=shift) ? "after":"before",
                        a+1,shift);
-        }
+      }
 
   mux.setpts(VIDEOSTREAM, videostoppts-videooffset);
   for(int a=0;a<MAXAUDIOSTREAMS;++a)
     mux.setpts(audiostream(a), audiostoppts[a]-audiooffset[a]);
-  }
+}
 
 void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int savedpics,int savepics, logoutput *log)
-  {
+{
   if (log)
     log->print("Recoding %d pictures",stop-start);
   else
@@ -660,22 +710,25 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
     return;
   s[VIDEOSTREAM].setvideoencodingparameters();
 
-  if (int rv=avcodec_open(avcc, s[VIDEOSTREAM].enc)) {
+  if (int rv=avcodec_open(avcc, s[VIDEOSTREAM].enc))
+  {
     if (log)
       log->printerror("avcodec_open(mpeg2video_encoder) returned %d",rv);
     return ;
-    }
+  }
 
   buffer m2v(4<<20);
 
   int p=0;
   int outpicture=start;
   pts_t startpts=idx[idx.indexnr(start)].getpts();
-  while (outpicture<stop) {
+  while (outpicture<stop)
+  {
     u_int8_t *buf=(u_int8_t*)m2v.writeptr();
     int out;
 
-    if (!framelist.empty()) {
+    if (!framelist.empty())
+    {
       avframe &f=*framelist.front();
 
       f->pts=idx[idx.indexnr(start+p)].getpts()-startpts;
@@ -692,7 +745,9 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
 
       if (out<=0)
         continue;
-      } else {
+    }
+    else
+    {
       fprintf(stderr,"trying to call avcodec_encode_video with frame=0\n");
       out = avcodec_encode_video(avcc, buf,
                                  m2v.getsize(), 0);
@@ -700,7 +755,7 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
 
       if (out<=0)
         break;
-      }
+    }
 
     pts_t vidpts=idx[idx.indexnr(outpicture)].getpts()-offset;
     pts_t viddts=mux.getdts(VIDEOSTREAM);
@@ -712,32 +767,35 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
 
     if (log && savepics>0)
       log->setprogress(++savedpics*1000/savepics);
-    }
+  }
 
   for(std::list<avframe*>::iterator fit=framelist.begin();fit!=framelist.end();++fit)
     delete *fit;
   avcodec_close(avcc);
-  }
+}
 
-void mpgfile::fixtimecode(uint8_t *buf, int len, pts_t pts) {
+void mpgfile::fixtimecode(uint8_t *buf, int len, pts_t pts)
+{
   int frc=-1;
   int i=0;
-  for (;;) {
+  for (;;)
+  {
     if (i+8>len)
       return;
     else if (buf[i+2]&0xfe)
       i+=3;
     else if (buf[i]!=0 || buf[i+1]!=0 || buf[i+2]!=1)
       i+=1;
-    else if (buf[i+3]==0xb3) {	// sequence header
+    else if (buf[i+3]==0xb3)
+    {	// sequence header
       frc=buf[i+7]&0x0f;
       i+=12;
-      }
+    }
     else if (buf[i+3]==0xb8)	// GOP header
       break;
     else
       i+=4;
-    }
+  }
   buf+=i;
   buf[4]=0x00;
   buf[5]=0x00;
@@ -757,4 +815,4 @@ void mpgfile::fixtimecode(uint8_t *buf, int len, pts_t pts) {
   buf[5] = (mm<<4) & 0xf0 | (ss>>3) & 0x07 | 0x08;
   buf[6] = (ss<<5) & 0xe0 | (pp>>1) & 0x1f;
   buf[7] |= (pp<<7) & 0x80;
-  }
+}
