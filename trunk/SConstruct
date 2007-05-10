@@ -67,8 +67,6 @@ if (not env.GetOption('clean')):
     print "Checking for C library ao... yes"
   elif (conf.CheckLibWithHeader('ao', 'ao/ao.h', 'C')):
     conf.env.Append(CPPDEFINES="HAVE_LIB_AO")
-  else:
-    print "Checking for C library ao... no"
 
 ### LIBMAD
 
@@ -79,8 +77,6 @@ if (not env.GetOption('clean')):
     print "Checking for C library mad... yes"
   elif (conf.CheckLibWithHeader('mad', 'mad.h', 'C')):
     conf.env.Append(CPPDEFINES="HAVE_LIB_MAD")
-  else:
-    print "Checking for C library mad... no"
 
 ### LIBA52
 
@@ -91,8 +87,6 @@ if (not env.GetOption('clean')):
     print "Checking for C library a52... yes"
   elif (conf.CheckLibWithHeader('a52', ['stdint.h','a52dec/a52.h'], 'C')):
     conf.env.Append(CPPDEFINES="HAVE_LIB_A52")
-  else:
-    print "Checking for C library a52... no"
   
 ### FINISH
     

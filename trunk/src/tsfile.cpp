@@ -78,12 +78,12 @@ tsfile::tsfile(const std::string &filename, inbuffer &b, int initial_offset)
     stream *S=&s[audiostream(audiostreams++)];
     S->id=it->second;
     if (it->first==0xbd) {
-      S->dec=&ac3_decoder;
-      S->enc=&ac3_encoder;
+//       S->dec=&ac3_decoder;
+//       S->enc=&ac3_encoder;
       S->type=streamtype::ac3audio;
       } else {
-      S->dec=&mp2_decoder;
-      S->enc=&mp2_encoder;
+//       S->dec=&mp2_decoder;
+//       S->enc=&mp2_encoder;
       S->type=streamtype::mpegaudio;
       }
     if (audiostreams>=MAXAUDIOSTREAMS)
