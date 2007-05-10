@@ -2,7 +2,7 @@ Source: dvbcut
 Section: graphics
 Priority: optional
 Maintainer: Sven Over <svenover@svenover.de>
-Build-Depends: debhelper (>= 4.0.0), libqt3-mt-dev (>= 3.3.4-3), qt3-dev-tools (>= 3.3.4-3), libao-dev (>= 0.8.6-1), scons (>= 0.96.1-1)
+Build-Depends: debhelper (>= 4.0.0), libqt3-mt-dev (>= 3.3.4-3), qt3-dev-tools (>= 3.3.4-3), libao-dev (>= 0.8.6-1), libmad0-dev (>= 0.15.1b-2.1), liba52-0.7.4-dev (>= 0.7.4-11), scons (>= 0.96.93-2)
 Standards-Version: 3.6.2
 
 Package: dvbcut

@@ -16,15 +16,16 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifdef HAVE_LIB_AO
 #include <stdint.h>
 #include <algorithm>
 #include <string>
 #include <sstream>
-#include <ao/ao.h>
 
 #include "playaudio.h"
 #include "exception.h"
+
+#ifdef HAVE_LIB_AO
+#include <ao/ao.h>
 
 /// Simple class for audio output through libao
 class audioout
@@ -33,7 +34,7 @@ protected:
   ao_device *m_device;
   int m_channels, m_samplerate;
 public:
-  audioout() : m_device(NULL) {}
+  audioout() : m_device(NULL), m_channels(0), m_samplerate(0) {}
   ~audioout()
   {
     if (m_device)

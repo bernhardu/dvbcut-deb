@@ -90,7 +90,7 @@ psfile::psfile(const std::string &filename, inbuffer &b, int initial_offset)
       streamnumber[sid]=audiostream(audiostreams);
       stream *S=&s[audiostream(audiostreams++)];
       S->id=sid;
-      S->dec=&mp2_decoder;
+//       S->dec=&mp2_decoder;
       S->type=streamtype::mpegaudio;
       if (audiostreams>=MAXAUDIOSTREAMS)
         break;
@@ -100,7 +100,7 @@ psfile::psfile(const std::string &filename, inbuffer &b, int initial_offset)
       streamnumber[sid]=audiostream(audiostreams);
       stream *S=&s[audiostream(audiostreams++)];
       S->id=sid;
-      S->dec=&ac3_decoder;
+//       S->dec=&ac3_decoder;
       S->type=streamtype::ac3audio;
       if (audiostreams>=MAXAUDIOSTREAMS)
         break;
