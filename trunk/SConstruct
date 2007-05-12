@@ -43,6 +43,7 @@ debug=int(env['DEBUG'])
 
 if (debug>0):
   env.Append(CCFLAGS=['-g3','-Wall'])
+  env.Append(LINKFLAGS=['-g3'])
 else:
   env.Append(CCFLAGS=['-O3','-Wall'])
 
