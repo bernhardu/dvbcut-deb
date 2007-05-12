@@ -223,56 +223,27 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
 
 void mpgfile::initaudiocodeccontext(int aud)
 {
-  stream *S=&s[audiostream(aud)];
-  S->infostring="Audio ";
+  stream &S=s[audiostream(aud)];
+  S.infostring="Audio ";
 
   {
     char number[16];
     snprintf(number,16,"%d",aud);
-    S->infostring+=number;
+    S.infostring+=number;
   }
 
-  if (!S->avcc)
-  {
-    S->allocavcc();
-    S->avcc->codec_type=CODEC_TYPE_AUDIO;
-    S->avcc->codec_id=(S->type==streamtype::ac3audio)?CODEC_ID_AC3:CODEC_ID_MP2;
-  }
-
-  switch (S->type)
+  switch (S.type)
   {
   case streamtype::mpegaudio:
-    S->infostring+=" (MPEG)";
+    S.infostring+=" (MPEG)";
     break;
   case streamtype::ac3audio:
-    S->infostring+=" (AC3)";
+    S.infostring+=" (AC3)";
     break;
   default:
-    S->infostring+=" (unknown)";
+    S.infostring+=" (unknown)";
     break;
   }
-
-
-  streamhandle sh(initialoffset);
-  streamdata *sd=sh.newstream(audiostream(aud),s[audiostream(aud)].type,istransportstream());
-
-  while (sh.fileposition < (initialoffset+4<<20))
-  {
-    if (streamreader(sh)<=0)
-      return;
-
-    if (!sd->empty() && (++sd->itemlist().begin())!=sd->itemlist().end())
-      // we have more than one entry in sd->itemlist()
-      break;
-  }
-
-  if (avcodec_open(S->avcc, S->dec))
-    return;
-
-  int16_t samples[6*1536];	// must be enough for 6 AC-3 channels --mr
-  int frame_size=sizeof(samples);
-  avcodec_decode_audio(S->avcc,samples,&frame_size,(uint8_t*) sd->getdata(),sd->inbytes());
-  avcodec_close(S->avcc);
 }
 
 #ifdef HAVE_LIB_AO
