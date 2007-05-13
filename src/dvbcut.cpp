@@ -1411,7 +1411,12 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
 	// use fine positioning if incr is small
         fine = (incr < 0 ? -incr : incr) < settings.wheel_threshold;
 	// Note: delta is a multiple of 120 (see Qt documentation)
-        linslider->setValue(curpic - (delta * incr) / settings.wheel_delta);
+        int newpos = curpic - (delta * incr) / settings.wheel_delta;
+        if (newpos < 0)
+	  newpos = 0;
+	else if (newpos >= pictures)
+	  newpos = pictures - 1;
+        linslider->setValue(newpos);
         fine = save;
       }
       return true;
