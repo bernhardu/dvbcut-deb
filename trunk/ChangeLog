@@ -1,5 +1,7 @@
 2007-05-13	Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* lavfmuxer.cpp: include patch from Wolfram Gloger.
+
 	* when using the mouse wheel, limit position to [0...pictures-1].
 
 2007-05-09  Sven Over  <svenover@svenover.de>
