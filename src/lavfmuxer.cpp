@@ -17,13 +17,19 @@
 */
 
 #include <ffmpeg/avformat.h>
+#include <ffmpeg/avcodec.h>
 #include <string.h>
 #include <utility>
 #include <list>
 #include "avframe.h"
+#include "streamhandle.h"
 #include "lavfmuxer.h"
 
 #include <stdio.h>
+
+#if LIBAVCODEC_VERSION_INT < (51 << 16)
+#define liba52_decoder ac3_decoder
+#endif
 
 lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg, const char *filename)
     : muxer(), avfc(0), fileopened(false)
@@ -62,8 +68,36 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
       strpres[astr]=true;
       if (s->codec)
         av_free(s->codec);
-      s->codec=mpg.getavcc(astr);
+      s->codec = avcodec_alloc_context();
+      avcodec_get_context_defaults(s->codec);
+      s->codec->codec_type=CODEC_TYPE_AUDIO;
+      s->codec->codec_id = (mpg.getstreamtype(astr)==streamtype::ac3audio) ?
+	CODEC_ID_AC3 : CODEC_ID_MP2;
+      s->codec->rc_buffer_size = 224*1024*8;
+
+      // Must read some packets to get codec parameters
+      streamhandle sh(mpg.getinitialoffset());
+      streamdata *sd=sh.newstream(astr,mpg.getstreamtype(astr),mpg.istransportstream());
+
+      while (sh.fileposition < (mpg.getinitialoffset()+4<<20)) {
+	if (mpg.streamreader(sh)<=0)
+	  break;
+
+	if (sd->getitemlistsize() > 1) {
+	  if (!avcodec_open(s->codec,
+			    (mpg.getstreamtype(astr)==streamtype::ac3audio) ?
+			    &liba52_decoder : &mp2_decoder)) {
+	    int16_t samples[6*1536]; // must be enough for 6 AC-3 channels --mr
+	    int frame_size=sizeof(samples);
+	    //fprintf(stderr, "** decode audio size=%d\n", sd->inbytes());
+	    avcodec_decode_audio(s->codec,samples,&frame_size,
+				 (uint8_t*) sd->getdata(),sd->inbytes());
+	    avcodec_close(s->codec);
+	  }
+	  break;
+	}
       }
+    }
 
   if ((av_set_parameters(avfc, NULL) < 0) || (!(fmt->flags & AVFMT_NOFILE)&&(url_fopen(&avfc->pb, filename, URL_WRONLY) < 0))) {
     av_free(avfc);
@@ -73,7 +107,6 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   avfc->preload= (int)(.5*AV_TIME_BASE);
   avfc->max_delay= (int)(.7*AV_TIME_BASE);
   avfc->mux_rate=10080000;
-  s->codec->rc_buffer_size = 224*1024*8;
 
 
   dump_format(avfc, 0, filename, 1);
