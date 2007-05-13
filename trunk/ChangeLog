@@ -1,3 +1,7 @@
+2007-05-13	Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* when using the mouse wheel, limit position to [0...pictures-1].
+
 2007-05-09  Sven Over  <svenover@svenover.de>
 
 	* Added generic dvbcut_exception class.
