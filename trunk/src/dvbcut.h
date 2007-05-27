@@ -52,6 +52,7 @@ protected:
   int busy;
   int viewscalefactor;
   int currentaudiotrack;
+  bool nogui;
 
 protected:
   //   QPixmap getpixmap(int picture, bool allgop=false);
@@ -62,11 +63,16 @@ protected:
   // special event handling (mouse wheel)
   bool eventFilter(QObject *watched, QEvent *e);
 
+  // QMessagebox interface
+  int question(const QString & caption, const QString & text);
+  int critical(const QString & caption, const QString & text);
+
 public:
   ~dvbcut();
   dvbcut(QWidget *parent = 0, const char *name = 0, WFlags fl = WType_TopLevel|WDestructiveClose );
   void open(std::string filename=std::string(), std::string idxfilename=std::string());
   void setbusy(bool b=true);
+  void batchmode(bool b=true) { nogui = b; }
   // static dvbcut *New(std::string filename=std::string(), std::string idxfilename=std::string());
 
 public slots:
