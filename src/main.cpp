@@ -38,7 +38,10 @@ static char *argv0;
 
 void usage_exit(int rv=1)
   {
-  fprintf(stderr,"Usage:\n  %s -generateidx [-idx <indexfilename>] <mpgfilename>\n",argv0);
+  fprintf(stderr,"Usage:\n"
+    "  %s -generateidx [-idx <indexfilename>] <mpgfilename>\n"
+    "  %s -batch <prjfilename>\n",
+    argv0, argv0);
   exit(rv);
   }
 
@@ -46,6 +49,7 @@ int main(int argc, char *argv[])
   {
   argv0=argv[0];
   bool generateidx=false;
+  bool batchmode=false;
 
   for(int i=1;i<argc;++i)
     if (!strcmp(argv[i],"-generateidx"))
@@ -116,6 +120,8 @@ int main(int argc, char *argv[])
       {
       if (!strcmp(argv[i]+1,"idx") && (i+1)<argc)
         idxfilename=argv[++i];
+      else if (!strcmp(argv[i]+1,"batch"))
+	batchmode=true;
       else
         usage_exit();
       } else if (filename.empty())
@@ -126,14 +132,26 @@ int main(int argc, char *argv[])
 
   int rv=1;
   dvbcut *main=new dvbcut;
+  main->batchmode(batchmode);
 
-  if (!filename.empty())
-    main->open(filename,idxfilename);
+  if (batchmode) {
+      if (filename.empty())
+	usage_exit();
+      main->open(filename,idxfilename);
+      main->fileExport();
+      rv = 0;
+    }
+  else {
+    main->show();
+
+    if (!filename.empty())
+      main->open(filename,idxfilename);
 
 
-  if (main) {
-    a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
-    rv = a.exec();
+    if (main) {
+      a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
+      rv = a.exec();
+      }
     }
 
 #ifdef HAVE_LIB_AO

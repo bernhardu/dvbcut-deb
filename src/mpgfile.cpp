@@ -393,7 +393,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
     if (log)
       log->print("Estimated mux rate: %.2f MBps",mux_rate*1e-6);
     else
-      fprintf(stderr,"Estimated mux rate: %.2f MBps",mux_rate*1e-6);
+      fprintf(stderr,"Estimated mux rate: %.2f MBps\n",mux_rate*1e-6);
   }
 
   while (seekpic>0 && idx[seekpic].getpts()>=videostartpts-180000)

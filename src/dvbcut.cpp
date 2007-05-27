@@ -114,7 +114,8 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
     curpic(~0), showimage(true), fine(false),
     jogsliding(false), jogmiddlepic(0),
     mplayer_process(0), imgp(0), busy(0),
-    viewscalefactor(1)
+    viewscalefactor(1),
+    nogui(false)
 {
 #ifndef HAVE_LIB_AO
   playAudio1Action->setEnabled(false);
@@ -139,8 +140,6 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
 
   // install event handler
   linslider->installEventFilter(this);
-
-  show();
 }
 
 // **************************************************************************
@@ -169,7 +168,8 @@ dvbcut::~dvbcut()
 
 void dvbcut::fileNew()
 {
-  new dvbcut;
+  dvbcut *d = new dvbcut;
+  d->show();
 }
 
 void dvbcut::fileOpen()
@@ -189,14 +189,10 @@ void dvbcut::fileSaveAs()
   if (!s)
     return;
 
-  if (QFileInfo(s).exists() && QMessageBox::question(this,
+  if (QFileInfo(s).exists() && question(
       "File exists - dvbcut",
       s+"\nalready exists. "
-          "Overwrite?",
-      QMessageBox::Yes,
-      QMessageBox::No |
-          QMessageBox::Default |
-          QMessageBox::Escape) !=
+          "Overwrite?") !=
       QMessageBox::Yes)
     return;
 
@@ -214,10 +210,8 @@ void dvbcut::fileSave()
 
   QFile outfile(prjfilen);
   if (!outfile.open(IO_WriteOnly)) {
-    QMessageBox::critical(this,"Failed to write project file - dvbcut",QString(prjfilen)+
-        ":\nCould not open file",
-        QMessageBox::Abort,
-        QMessageBox::NoButton);
+    critical("Failed to write project file - dvbcut",QString(prjfilen)+
+        ":\nCould not open file");
     return;
   }
 
@@ -293,29 +287,30 @@ void dvbcut::fileExport()
     expd->audiolist->setSelected(a,true);
   }
 
-  expd->show();
-  if (!expd->exec())
-    return;
+  if (!nogui) {
+    expd->show();
+    if (!expd->exec())
+      return;
 
-  settings.export_format = expd->muxercombo->currentItem();
+    settings.export_format = expd->muxercombo->currentItem();
 
-  expfilen=(const char *)(expd->filenameline->text());
-  if (expfilen.empty())
-    return;
-  expd->hide();
+    expfilen=(const char *)(expd->filenameline->text());
+    if (expfilen.empty())
+      return;
+    expd->hide();
+    }
 
-  if (QFileInfo(expfilen).exists() && QMessageBox::question(this,
+  if (QFileInfo(expfilen).exists() && question(
       "File exists - dvbcut",
       expfilen+"\nalready exists. "
-          "Overwrite?",
-      QMessageBox::Yes,
-      QMessageBox::No |
-          QMessageBox::Default |
-          QMessageBox::Escape) !=
+          "Overwrite?") !=
       QMessageBox::Yes)
     return;
 
-  progresswindow prgwin(this);
+  progresswindow *prgwin = 0;
+  if (!nogui)
+    prgwin = new progresswindow(this);
+
   //   lavfmuxer mux(fmt,*mpg,outfilename);
 
   std::auto_ptr<muxer> mux;
@@ -341,9 +336,10 @@ void dvbcut::fileExport()
       break;
   }
 
-  if (!mux->ready()) {
-    prgwin.printerror("Unable to set up muxer!");
-    prgwin.finish();
+  if (!nogui && !mux->ready()) {
+    prgwin->printerror("Unable to set up muxer!");
+    prgwin->finish();
+    delete prgwin;
     return;
   }
 
@@ -378,7 +374,7 @@ void dvbcut::fileExport()
     chapterlist.push_back(0);
     startpic=-1;
 
-    for(QListBoxItem *lbi=eventlist->firstItem();lbi && !prgwin.cancelled();lbi=lbi->next())
+    for(QListBoxItem *lbi=eventlist->firstItem();lbi && (nogui || !prgwin->cancelled());lbi=lbi->next())
       if (lbi->rtti()==EventListItem::RTTI()) {
       EventListItem &eli=(EventListItem&)*lbi;
 
@@ -393,9 +389,10 @@ void dvbcut::fileExport()
           if (startpic>=0) {
             int stoppic=eli.getpicture();
             pts_t stoppts=(*mpg)[stoppic].getpts();
-            prgwin.printheading("Exporting %d pictures: %s .. %s",
-                                stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
-            mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,&prgwin);
+            if (!nogui)
+	      prgwin->printheading("Exporting %d pictures: %s .. %s",
+				  stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
+            mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,prgwin);
             savedpic+=stoppic-startpic;
             savedtime+=stoppts-startpts;
             startpic=-1;
@@ -416,7 +413,8 @@ void dvbcut::fileExport()
 
       mux.reset();
 
-      prgwin.printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
+      if (!nogui)
+	prgwin->printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
                           int(savedtime/(3600*90000)),
                           int(savedtime/(60*90000))%60,
                           int(savedtime/90000)%60,
@@ -426,7 +424,8 @@ void dvbcut::fileExport()
       if (!chapterlist.empty()) {
         int nchar=0;
         char chapter[16];
-        prgwin.printheading("\nChapterlist:");
+        if (!nogui)
+	  prgwin->printheading("\nChapterlist:");
         pts_t lastch=-1;
         for(std::list<pts_t>::const_iterator it=chapterlist.begin();
             it!=chapterlist.end();++it)
@@ -443,7 +442,8 @@ void dvbcut::fileExport()
                          int(lastch/90000)%60,
                          int(lastch/90)%1000	);
         // normal output as before
-          prgwin.print(chapter);
+          if (!nogui)
+	    prgwin->print(chapter);
         // append chapter marks to a comma separated list for dvdauthor xml-file         
           chapterstring+=chapter;
           }
@@ -455,19 +455,23 @@ void dvbcut::fileExport()
       else 
         filename=expfilen;
       destname=filename.substr(0,filename.rfind("."));
-      prgwin.printheading("\nSimple XML-file for dvdauthor with chapter marks:");
-      prgwin.print("<dvdauthor dest=\"%s\">",destname.c_str());
-      prgwin.print("  <vmgm />");
-      prgwin.print("  <titleset>");
-      prgwin.print("    <titles>");
-      prgwin.print("      <pgc>");
-      prgwin.print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
-      prgwin.print("      </pgc>");
-      prgwin.print("    </titles>");
-      prgwin.print("  </titleset>");
-      prgwin.print("</dvdauthor>");
+      if (!nogui) {
+	prgwin->printheading("\nSimple XML-file for dvdauthor with chapter marks:");
+	prgwin->print("<dvdauthor dest=\"%s\">",destname.c_str());
+	prgwin->print("  <vmgm />");
+	prgwin->print("  <titleset>");
+	prgwin->print("    <titles>");
+	prgwin->print("      <pgc>");
+	prgwin->print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
+	prgwin->print("      </pgc>");
+	prgwin->print("    </titles>");
+	prgwin->print("  </titleset>");
+	prgwin->print("</dvdauthor>");
 
-      prgwin.finish();
+	prgwin->finish();
+      }
+  if (!nogui)
+    delete prgwin;
 }
 
 void dvbcut::fileClose()
@@ -1092,21 +1096,17 @@ void dvbcut::open(std::string filename, std::string idxfilename)
         if (domdoc.setContent(&infile,false,&errormsg)) {
           QDomElement docelem = domdoc.documentElement();
           if (docelem.tagName() != "dvbcut") {
-            QMessageBox::critical(this,"Failed to read project file - dvbcut",QString(filename)+
-                ":\nNot a valid dvbcut project file",
-                QMessageBox::Abort,
-                QMessageBox::NoButton);
+            critical("Failed to read project file - dvbcut",QString(filename)+
+                ":\nNot a valid dvbcut project file");
             fileOpenAction->setEnabled(true);
             return;
           }
 
           QString mpgfilename=docelem.attribute("mpgfile");
           if (mpgfilename.isEmpty()) {
-            QMessageBox::critical(this,"Failed to read project file - dvbcut",QString(filename)+
+            critical("Failed to read project file - dvbcut",QString(filename)+
                 ":\nNo mpeg filename "
-                    "given in project file",
-                QMessageBox::Abort,
-                QMessageBox::NoButton);
+                    "given in project file");
             fileOpenAction->setEnabled(true);
             return;
           }
@@ -1119,8 +1119,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
           else
             idxfilename=(const char *)qidxfilename;
         } else {
-          QMessageBox::critical(this,"Failed to read project file - dvbcut",QString(filename)+":\n"+errormsg, QMessageBox::Abort,
-                                QMessageBox::NoButton);
+          critical("Failed to read project file - dvbcut",QString(filename)+":\n"+errormsg);
           fileOpenAction->setEnabled(true);
           return;
         }
@@ -1136,11 +1135,13 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   busy.setbusy(false);
 
   if (!mpg) {
-    QMessageBox::critical(this,"Failed to open file - dvbcut",QString(filename)+":\n"+errormessage, QMessageBox::Abort,
-                          QMessageBox::NoButton);
+    critical("Failed to open file - dvbcut",QString(filename)+":\n"+errormessage);
     fileOpenAction->setEnabled(true);
     return;
   }
+
+  if (nogui && idxfilename.empty())
+    idxfilename = filename + ".idx";
 
   if (idxfilename.empty()) {
     QString s=QFileDialog::getSaveFileName(
@@ -1176,26 +1177,21 @@ void dvbcut::open(std::string filename, std::string idxfilename)
     if (pictures==-1 && serrno!=ENOENT) {
       delete mpg;
       mpg=0;
-      QMessageBox::critical(0,"Failed to open file - dvbcut",errorstring, QMessageBox::Abort,
-                            QMessageBox::NoButton);
+      critical("Failed to open file - dvbcut",errorstring);
       fileOpenAction->setEnabled(true);
       return;
     }
     if (pictures==-2) {
       delete mpg;
       mpg=0;
-      QMessageBox::critical(0,"Invalid index file - dvbcut",
-                            errorstring,
-                            QMessageBox::Abort,QMessageBox::NoButton);
+      critical("Invalid index file - dvbcut", errorstring);
       fileOpenAction->setEnabled(true);
       return;
     }
     if (pictures<=-3) {
       delete mpg;
       mpg=0;
-      QMessageBox::critical(0,"Index file mismatch - dvbcut",
-                            errorstring,
-                            QMessageBox::Abort,QMessageBox::NoButton);
+      critical("Index file mismatch - dvbcut", errorstring);
       fileOpenAction->setEnabled(true);
       return;
     }
@@ -1220,24 +1216,20 @@ void dvbcut::open(std::string filename, std::string idxfilename)
     if (pictures<0) {
       delete mpg;
       mpg=0;
-      QMessageBox::critical(0,"Error creating index - dvbcut",
-                            QString("Cannot create index for\n")+filename+":\n"+errorstring,
-                            QMessageBox::Abort,QMessageBox::NoButton);
+      critical("Error creating index - dvbcut",
+	       QString("Cannot create index for\n")+filename+":\n"+errorstring);
       fileOpenAction->setEnabled(true);
       return;
     } else if (!errorstring.empty()) {
-      QMessageBox::critical(0,"Error saving index file - dvbcut",
-                            QString(errorstring),
-                            QMessageBox::Abort,QMessageBox::NoButton);
+      critical("Error saving index file - dvbcut", QString(errorstring));
     }
   }
 
   if (pictures<1) {
     delete mpg;
     mpg=0;
-    QMessageBox::critical(0,"Invalid MPEG file - dvbcut",
-                          QString("The chosen file\n")+filename+"\ndoes not contain any video",
-                          QMessageBox::Abort,QMessageBox::NoButton);
+    critical("Invalid MPEG file - dvbcut",
+	     QString("The chosen file\n")+filename+"\ndoes not contain any video");
     fileOpenAction->setEnabled(true);
     return;
   }
@@ -1424,4 +1416,26 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
   }
   // propagate to base class
   return dvbcutbase::eventFilter(watched, e);
+}
+
+int
+dvbcut::question(const QString & caption, const QString & text)
+{
+  if (nogui) {
+    fprintf(stderr, "%s\n%s\n(assuming No)\n", caption.ascii(), text.ascii());
+    return QMessageBox::No;
+  }
+  return QMessageBox::question(this, caption, text, QMessageBox::Yes,
+    QMessageBox::No | QMessageBox::Default | QMessageBox::Escape);
+}
+
+int
+dvbcut::critical(const QString & caption, const QString & text)
+{
+  if (nogui) {
+    fprintf(stderr, "%s\n%s\n(aborting)\n", caption.ascii(), text.ascii());
+    return QMessageBox::Abort;
+  }
+  return QMessageBox::critical(this, caption, text,
+    QMessageBox::Abort, QMessageBox::NoButton);
 }

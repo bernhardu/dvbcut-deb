@@ -1,8 +1,18 @@
+2007-05-27	Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* Add batch mode. You can now call "dvbcut -batch <project>.prj"
+	  and dvbcut will export the file in your preferred format
+	  (default is DVB format using the dvbcut muxer). Note that the
+	  project file is essential because it contains the cut list.
+	  The name of the output file will be "<project>.mpg". If
+	  that file already exists, dvbcut adds numeric suffixes
+	  (e.g. "<project>_1.mpg") until the name is unique.
+
 2007-05-13	Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* lavfmuxer.cpp: include patch from Wolfram Gloger.
 
-	* when using the mouse wheel, limit position to [0...pictures-1].
+	* When using the mouse wheel, limit position to [0...pictures-1].
 
 2007-05-09  Sven Over  <svenover@svenover.de>
 
@@ -13,7 +23,7 @@
 
 2007-05-06	Michael Riepe  <too-tired@users.sourceforge.net>
 
-	* remember last used export format.
+	* Remember last used export format.
 
 2007-05-03	Michael Riepe  <too-tired@users.sourceforge.net>
 
