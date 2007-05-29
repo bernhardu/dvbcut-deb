@@ -21,7 +21,9 @@
 
 #include <string>
 #include <list>
+extern "C" {
 #include <ffmpeg/avformat.h>
+}
 
 #include "port.h"
 #include "tsfile.h"
@@ -30,8 +32,11 @@
 #include "types.h"
 #include "pts.h"
 
+/* obsolete, do not use --mr
 #define STREAM_ITEM_FLAG_DATA_ALIGNMENT_INDICATOR (1<<0)
+*/
 #define STREAM_ITEM_FLAG_HAS_PTS                  (1<<1)
+#define STREAM_ITEM_FLAG_FRAME                    (1<<2)
 
 /**
 @author Sven Over
@@ -82,18 +87,9 @@ public:
       flags &=~ STREAM_ITEM_FLAG_HAS_PTS;
       pts=AV_NOPTS_VALUE;
       }
-    bool data_alignment_indicator() const
+    bool is_frame() const
       {
-      return flags & STREAM_ITEM_FLAG_DATA_ALIGNMENT_INDICATOR;
-      }
-    void setdata_alignment_indicator(bool set
-                                       =true)
-      {
-      if (set
-         )
-        flags |= STREAM_ITEM_FLAG_DATA_ALIGNMENT_INDICATOR;
-      else
-        flags &=~ STREAM_ITEM_FLAG_DATA_ALIGNMENT_INDICATOR;
+      return flags & STREAM_ITEM_FLAG_FRAME;
       }
     }
   ;
