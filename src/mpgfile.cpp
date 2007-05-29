@@ -565,8 +565,12 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
       {
         bool stopped=false;
         sd->audio_addpts();
-        streamdata::itemlisttype::const_iterator nx,it=sd->itemlist().begin();
+        streamdata::itemlisttype::const_iterator nx,it;
 
+	while ((it = sd->itemlist().begin())!=sd->itemlist().end() &&
+	       !it->is_frame())
+	  sd->pop();
+	if (it!=sd->itemlist().end())
         while(!stopped)
         {
           audiopts[a]=it->headerpts(audiopts[a]);
@@ -578,7 +582,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
           }
           nx=it;
           ++nx;
-          while (nx!=sd->itemlist().end() && !nx->headerhaspts())
+          while (nx!=sd->itemlist().end() && !nx->is_frame())
             ++nx;
           if (nx==sd->itemlist().end())
             break;
@@ -619,6 +623,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
           if (bytes>0)
           {
             pts_t pts=audiopts[a]-audiooffset[a];
+	    //fprintf(stderr, "mux.put audio %d %lld\n", bytes, pts);
             mux.putpacket(audiostream(a),sd->getdata(),bytes,pts,pts,MUXER_FLAG_KEY);
 
             sd->discard(bytes);

@@ -1,3 +1,11 @@
+2007-05-29	Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* audio_addpts() patch by Wolfram Gloger.
+
+	* Code cleanup + beautification by myself.
+
+	* src/index.cpp: remove false "missing frame" alarms.
+
 2007-05-27	Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Add batch mode. You can now call "dvbcut -batch <project>.prj"
