@@ -1,3 +1,7 @@
+2007-05-30	Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/streamdata.cpp: add missing #include <assert.h>
+
 2007-05-29	Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* audio_addpts() patch by Wolfram Gloger.
