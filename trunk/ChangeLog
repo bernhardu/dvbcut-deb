@@ -1,3 +1,7 @@
+2007-06-03	Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/mpegmuxer.cpp: fix size calculation.
+
 2007-05-30	Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/streamdata.cpp: add missing #include <assert.h>

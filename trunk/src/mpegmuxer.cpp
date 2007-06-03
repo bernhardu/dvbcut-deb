@@ -422,16 +422,16 @@ void mpegmuxer::packetizer(int str,pts_t maxdts)
       headerlen+=3;
     int len=9+headerlen+a->getsize();
     if (pespacket_setlength)
-      len+=9*((len-6)/65536);
+      len+=9*((len-10)/65532);
 
     if (!video || packsize) {
       int maxsize=9+headerlen+s->getbufsize()*3/4;
       if (pespacket_setlength)
-        maxsize+=9*((maxsize-6)/65536);
+        maxsize+=9*((maxsize-10)/65532);
       if (packsize && maxsize>pack::maxpayload(packsize))
         maxsize=pack::maxpayload(packsize);
-      if (pespacket_setlength && (maxsize-6)>65535 && ((maxsize-6)%65541)<=9)
-        maxsize-=((maxsize-6)%65541);
+      if (pespacket_setlength && maxsize>65541 && maxsize%65541<=9)
+        maxsize-=maxsize%65541;
 
       std::list<au*>::iterator it=s->aulist.begin();
       ++it;
@@ -447,8 +447,8 @@ void mpegmuxer::packetizer(int str,pts_t maxdts)
           break;
         int newlen;
         if (pespacket_setlength) {
-          newlen=len-9*((len-6)/65545)+aa->getsize();
-          newlen+=9*((newlen-6)/65536);
+          newlen=len-9*((len-10)/65541)+aa->getsize();
+          newlen+=9*((newlen-10)/65532);
           } else
           newlen=len+aa->getsize();
         if (s->type==streamtype::mpegaudio && (newlen>maxsize) && (len>maxsize-50))
@@ -621,7 +621,8 @@ void mpegmuxer::packetizer(int str,pts_t maxdts)
       }
 
     if (len) {
-      fprintf(stderr,"str=%d len=%d aulist.size=%d packlist.size=%d\n",str,len,s->aulist.size(),s->packlist.size());
+      fprintf(stderr,"str=%d len=%d aulist.size=%d packlist.size=%d\n",
+	str,len,s->aulist.size(),s->packlist.size());
       assert(len==0);
       }
     }
