@@ -1,22 +1,40 @@
+For compiling the windows version of DVBcut, you need
 
+- MingGW and MSYS 
+- QT-3 for windows (http://qtwin.sourceforge.net/qt3-win32). The files
+  must be located in ../qt-3 (relative to this file).
 
-For compiling windows version you need
-- MingGW And MSYS 
-- QT-3 for windows http://qtwin.sourceforge.net/qt3-win32. The files must be in ../qt-3 (relative to this file)
+Optionally for 2sec-audio playback one needs
 
-To compile launch mingw.sh
+- libraries libmad.a, liba52.a (from package a52dec) and libao.a
+  installed under /usr/local.  These can easily be built/installed from
+  source packages by doing the usual "./configure; make; make install",
+  libao needs to be V0.8.8 or newer and "./configure --disable-shared"
+  to get a static library.
 
-Changes made for windows on lastest svn sources
-- using off64_t instead of off_t
-- using O_BINARY mode on ::open
-- cursor manager changes
-- one change in ui files (qt complain when compiling it) 
-- using shell script for compiling instead on Scons (mingw.sh)
-- adding files for emulating some missing functions (ex mmap). There are in import directory.
+Newer DVBcut versions (>v0.5.4) also require
 
+- libmpeg2.a (from mpeg2dec) installed under /usr/local (which also
+  compiles easily from source).
 
+After adapting the path to your mingw installation in ./import/stdlib.h
+simply launch "./mingw.sh" to compile DVBcut.
 
-For playing, You will need MPlayer 1.0rc1 (http://www.mplayerhq.hu) for Windows.
-If you play files >2.4G you will need to replace off_t by off64_t in all Mplayer sources and to use _lseeki64 instead lseek in stream_files.c.
-MPplayer have been compiled with ./configure  --disable-gui --charset=noconv --enable-directx 
-You will need directx files for mingw (http://www.videolan.org/vlc/dx7headers.tgz)
+For playing video, you will need MPlayer 1.0rc1 for Windows
+(http://www.mplayerhq.hu). You will also need the DirectX header
+files for mingw (http://www.videolan.org/vlc/dx7headers.tgz).
+
+Note: If you want to be able to play files >2.4G, replace off_t with
+off64_t in all MPlayer sources and use _lseeki64() instead of lseek()
+in stream_files.c.
+
+Compile MPlayer with
+
+	./configure --disable-gui --charset=noconv --enable-directx
+	make
+	make install
+
+Precompiled mplayer binaries with large file support (and other stuff)
+can be downloaded from http://oss.netfarm.it/mplayer-win32.php.
+Precompiled DVBcut binaries for Windows are available at
+http://www.glasstetter.net/dvbcut/.
