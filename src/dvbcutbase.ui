@@ -524,6 +524,9 @@
         <property name="text">
             <string>Set start marker</string>
         </property>
+        <property name="accel">
+            <string>A</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -536,7 +539,10 @@
             <iconset>image9</iconset>
         </property>
         <property name="text">
-            <string>Set stop marker</string>
+            <string>Set end marker</string>
+        </property>
+        <property name="accel">
+            <string>N</string>
         </property>
     </action>
     <action>
@@ -552,6 +558,9 @@
         <property name="text">
             <string>Set chapter marker</string>
         </property>
+        <property name="accel">
+            <string>C</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -565,6 +574,9 @@
         </property>
         <property name="text">
             <string>Set bookmark</string>
+        </property>
+        <property name="accel">
+            <string>B</string>
         </property>
     </action>
     <action>
