@@ -1,5 +1,9 @@
 2007-06-17	Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/defines.h: include *.rec in DEFAULT_LOADFILTER.
+
+2007-06-17	Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* src/dvbcutbase.ui: add accelerators for st(A)rt, e(N)d,
 	  (C)hapter and (B)ookmark.
 
