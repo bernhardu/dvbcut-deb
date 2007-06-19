@@ -308,8 +308,10 @@ void dvbcut::fileExport()
     return;
 
   progresswindow *prgwin = 0;
-  if (!nogui)
+  if (!nogui) {
     prgwin = new progresswindow(this);
+    prgwin->setCaption(QString("export - " + expfilen));
+  }
 
   //   lavfmuxer mux(fmt,*mpg,outfilename);
 
@@ -1020,6 +1022,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   }
 
   // a valid file name has been entered
+  setCaption(QString("dvbcut - " + filename));
 
   // if an MPEG file has already been opened, close it and reset the UI
   if (mpg) {
