@@ -179,6 +179,18 @@ void dvbcut::fileOpen()
 
 void dvbcut::fileSaveAs()
 {
+  if (prjfilen.empty() && !mpgfilen.empty()) {
+    std::string prefix = mpgfilen;
+    int lastdot = prefix.rfind(".");
+    int lastslash = prefix.rfind("/");
+    if (lastdot >= 0 && lastdot > lastslash)
+      prefix = prefix.substr(0, lastdot);
+    prjfilen = prefix + ".dvbcut";
+    int nr = 0;
+    while (QFileInfo(QString(prjfilen)).exists())
+      prjfilen = prefix + "_" + ((const char*)QString::number(++nr)) + ".dvbcut";
+  }
+
   QString s=QFileDialog::getSaveFileName(
       prjfilen,
   settings.prjfilter,

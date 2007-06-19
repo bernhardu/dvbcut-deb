@@ -1,5 +1,9 @@
 2007-06-19	Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/dvbcut.cpp: suggest a name for the project file.
+
+2007-06-19	Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* src/dvbcut.cpp: show filenames in caption.
 
 2007-06-17	Michael Riepe  <too-tired@users.sourceforge.net>
