@@ -44,7 +44,6 @@ class mpgfile
 public:
 
 protected:
-  std::string m_filename;
   inbuffer buf;
   stream s[MAXAVSTREAMS];
   int videostreams, audiostreams;
@@ -52,7 +51,7 @@ protected:
   index::index idx;
   int pictures;
 
-  mpgfile(const std::string &filename, inbuffer &b, int initial_offset);
+  mpgfile(inbuffer &b, int initial_offset);
 
 
 public:
@@ -64,11 +63,6 @@ public:
   virtual bool istransportstream()
     {
     return false;
-    }
-
-  std::string filename()
-    {
-    return m_filename;
     }
 
   int getinitialoffset() const

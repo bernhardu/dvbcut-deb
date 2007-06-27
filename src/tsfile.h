@@ -100,7 +100,7 @@ protected:
   int streamnumber[8192]; // TS pids are 0..8191
 
 public:
-  tsfile(const std::string &filename, inbuffer &b, int initial_offset);
+  tsfile(inbuffer &b, int initial_offset);
 
   ~tsfile();
   int streamreader(class streamhandle &s);

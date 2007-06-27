@@ -44,8 +44,8 @@ const int mpgfile::frameratescr[16]=
     1080000,1080000,1080000,1080000,1080000,1080000,1080000
   };
 
-mpgfile::mpgfile(const std::string &filename, inbuffer &b, int initial_offset) : m_filename(filename),
-    buf(b,8<<20,128<<20),
+mpgfile::mpgfile(inbuffer &b, int initial_offset)
+    : buf(b,8<<20,128<<20),
     videostreams(0),audiostreams(0),
     initialoffset(initial_offset),idx(*this),pictures(0)
 {}
@@ -77,9 +77,9 @@ mpgfile* mpgfile::open(const std::string &filename, std::string *errormessage)
 
   int initialoffset;
   if ((initialoffset=tsfile::probe(buf))>=0) // is this an mpeg transport stream?
-    return new tsfile(filename, buf, initialoffset);
+    return new tsfile(buf, initialoffset);
   if ((initialoffset=psfile::probe(buf))>=0) // is this an mpeg program stream?
-    return new psfile(filename, buf, initialoffset);
+    return new psfile(buf, initialoffset);
 
   if (errormessage)
     *errormessage="Unknown file type";
