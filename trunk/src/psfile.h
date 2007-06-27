@@ -30,7 +30,7 @@ protected:
   int streamnumber[0x300]; // PS stream ids are 0..0xff plus possibly 2x256 private streams
 
 public:
-  psfile(const std::string &filename, inbuffer &b, int initial_offset);
+  psfile(inbuffer &b, int initial_offset);
 
   ~psfile();
   int streamreader(class streamhandle &s);

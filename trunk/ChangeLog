@@ -1,35 +1,48 @@
-2007-06-19	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/mpgfile.cpp:
+	* src/mpgfile.h:
+	* src/psfile.cpp:
+	* src/psfile.h:
+	* src/tsfile.cpp:
+	* src/tsfile.h:
+	  Do not pass a filename to class mpgfile and its derivatives.
+	  Once we support multi-file sources, a filename makes no sense
+	  any longer.  We should instead pass the entire group of files
+	  via a multi-file source class (e.g. a modified inbuffer).
+
+2007-06-19  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp: suggest a name for the project file.
 
-2007-06-19	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-06-19  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp: show filenames in caption.
 
-2007-06-17	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-06-17  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/defines.h: include *.rec in DEFAULT_LOADFILTER.
 
-2007-06-17	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-06-17  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcutbase.ui: add accelerators for st(A)rt, e(N)d,
 	  (C)hapter and (B)ookmark.
 
 	* src/defines.h: include *.vdr and *.tts in DEFAULT_LOADFILTER.
 
-2007-06-12	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-06-12  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Windows build script & README update by Ralph Glasstetter.
 
-2007-06-03	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-06-03  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/mpegmuxer.cpp: fix size calculation.
 
-2007-05-30	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-05-30  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/streamdata.cpp: add missing #include <assert.h>
 
-2007-05-29	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-05-29  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* audio_addpts() patch by Wolfram Gloger.
 
@@ -37,7 +50,7 @@
 
 	* src/index.cpp: remove false "missing frame" alarms.
 
-2007-05-27	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-05-27  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Add batch mode. You can now call "dvbcut -batch <project>.prj"
 	  and dvbcut will export the file in your preferred format
@@ -47,7 +60,7 @@
 	  that file already exists, dvbcut adds numeric suffixes
 	  (e.g. "<project>_1.mpg") until the name is unique.
 
-2007-05-13	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-05-13  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* lavfmuxer.cpp: include patch from Wolfram Gloger.
 
@@ -60,17 +73,17 @@
 	* Got rid of libavcodec usage in playaudio.cpp. Instead, libmad and
 	liba52 are now used. SCons files changed accordingly.
 
-2007-05-06	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-05-06  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Remember last used export format.
 
-2007-05-03	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-05-03  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/mpgfile.cpp: print estimated data rate.
 
-	* strc/index.cpp: changed additional error messages.
+	* src/index.cpp: changed additional error messages.
 
-2007-04-29	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-04-29  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Changed export accelerator to 'E'.
 
@@ -78,15 +91,15 @@
 
 	* Released version 0.5.4.
 
-2007-03-06	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-03-06  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Report missing frames in GOP while indexing.
 
-2007-02-12	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-02-12  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Write proper GOP time_code values when exporting.
 
-2007-01-30	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-01-30  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Added workaround for div/0 bug in ffmpeg.
 
@@ -103,7 +116,7 @@
 	__bswap_constant_xx macros seem not to be available. Changed defines
 	in defines.h not to use them anymore.
 
-2007-01-26	Michael Riepe  <too-tired@users.sourceforge.net>
+2007-01-26  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* Integrated Windows port by Olivier Raoul.
 

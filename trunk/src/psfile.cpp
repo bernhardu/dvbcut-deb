@@ -21,8 +21,8 @@
 #include "stream.h"
 #include <ffmpeg/avcodec.h>
 
-psfile::psfile(const std::string &filename, inbuffer &b, int initial_offset)
-    : mpgfile(filename, b, initial_offset)
+psfile::psfile(inbuffer &b, int initial_offset)
+    : mpgfile(b, initial_offset)
   {
   int vid=-1;
   for(unsigned int i=0;i<0x300;++i)
