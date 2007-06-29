@@ -110,6 +110,7 @@ void dvbcut::setbusy(bool b)
 dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
   :dvbcutbase(parent, name, fl),
     audiotrackpopup(0), recentfilespopup(0), audiotrackmenuid(-1),
+    buf(8 << 20, -1, false, 128 << 20),
     mpg(0), pictures(0),
     curpic(~0), showimage(true), fine(false),
     jogsliding(false), jogmiddlepic(0),
@@ -1011,6 +1012,9 @@ void dvbcut::loadrecentfile(int id)
 
 void dvbcut::open(std::string filename, std::string idxfilename)
 {
+  // reset inbuffer
+  buf.reset();
+
   if (filename.empty()) {
     QString fn=QFileDialog::getOpenFileName(
         QString::null,
@@ -1146,7 +1150,13 @@ void dvbcut::open(std::string filename, std::string idxfilename)
   busy.setbusy(true);
 
   std::string errormessage;
-  mpg=mpgfile::open(filename,&errormessage);
+  if (buf.open(filename.c_str())) {
+    mpg = mpgfile::open(buf, &errormessage);
+  }
+  else {
+    errormessage = std::string("open '") + filename + "': " + strerror(errno);
+    mpg = 0;
+  }
   busy.setbusy(false);
 
   if (!mpg) {

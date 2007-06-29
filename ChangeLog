@@ -1,3 +1,25 @@
+2007-06-29  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/buffer.h (class inbuffer):
+	* src/buffer.cpp (class inbuffer):
+		Let open() return bool.
+		Remove copy constructor for inbuffer.
+		Add reset() member for inbuffer reuse.
+ 
+ 	* src/mpgfile.h:
+ 	* src/mpgfile.cpp:
+ 		Create mpgfile from inbuffer, not from filename.
+ 		Use a reference to a single inbuffer.
+
+	* src/main.cpp:
+		Centralize option handling.
+		Pass inbuffer to mpgfile::open().
+ 
+	* src/dvbcut.h:
+	* src/dvbcut.cpp:
+		Add reusable inbuffer member to class dvbcut.
+		Pass inbuffer to mpgfile::open().
+ 
 2007-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/mpgfile.cpp:

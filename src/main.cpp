@@ -36,75 +36,91 @@
 
 static char *argv0;
 
-void usage_exit(int rv=1)
-  {
+void
+usage_exit(int rv=1) {
   fprintf(stderr,"Usage:\n"
-    "  %s -generateidx [-idx <indexfilename>] <mpgfilename>\n"
+    "  %s -generateidx [-idx <indexfilename>] <mpgfilename> ...\n"
     "  %s -batch <prjfilename>\n",
     argv0, argv0);
   exit(rv);
-  }
+}
 
-int main(int argc, char *argv[])
-  {
+int
+main(int argc, char *argv[]) {
   argv0=argv[0];
   bool generateidx=false;
   bool batchmode=false;
+  std::string idxfilename;
+  int i;
 
-  for(int i=1;i<argc;++i)
-    if (!strcmp(argv[i],"-generateidx"))
-      generateidx=true;
+  /*
+   * process arguments
+   */
+  for (i = 1; i < argc && argv[i][0] == '-'; ++i) {
+    size_t n = strlen(argv[i]);
+    if (n == 1)	// "-"
+      break;
+    else if (strncmp(argv[i], "-batch", n) == 0)
+      batchmode = true;
+    else if (strncmp(argv[i], "-generateidx", n) == 0)
+      generateidx = true;
+    else if (strncmp(argv[i], "-idx", n) == 0 && ++i < argc)
+      idxfilename = argv[i];
+    else
+      usage_exit();
+  }
+
+  /*
+   * sanity check
+   */
+  if (batchmode && generateidx)
+    usage_exit();
 
   if (generateidx) {
-    std::string idxfilename,mpgfilename;
-
-    for(int i=1;i<argc;++i) {
-      if (argv[i][0]=='-' && argv[i][1]!=0) // option
-        {
-        if (!strcmp(argv[i]+1,"idx") && (i+1)<argc)
-          idxfilename=argv[++i];
-        else if (strcmp(argv[i]+1,"generateidx"))
-          usage_exit();
-        } else if (mpgfilename.empty())
-        mpgfilename=argv[i];
-      else
-        usage_exit();
-      }
-
-    if (mpgfilename.empty())
+    if (i >= argc) // no input files given
       usage_exit();
 
-    if (idxfilename.empty())
-      if (mpgfilename=="-")
-        idxfilename="-";
-      else
-        idxfilename=mpgfilename+".idx";
+    std::string mpgfilename = argv[i];	// use first one (for now)
 
+    if (idxfilename.empty())
+      if (mpgfilename == "-")
+        idxfilename = "-";
+      else
+        idxfilename = mpgfilename + ".idx";
+
+    mpgfile *mpg = 0;
     std::string errormessage;
-    mpgfile *mpg=mpgfile::open(mpgfilename,&errormessage);
+    inbuffer buf(8 << 20, -1, false, 128 << 20);
+    if (buf.open(mpgfilename.c_str())) {
+      mpg = mpgfile::open(buf, &errormessage);
+    }
+    else {
+      errormessage = std::string("open '") + mpgfilename + "': " + strerror(errno);
+    }
 
     if (mpg==0) {
       fprintf(stderr,"%s: %s\n",argv0,errormessage.c_str());
       return 1;
-      }
+    }
 
     index::index idx(*mpg);
     int pics=idx.generate();
     if (pics==0) {
       fprintf(stderr,"%s: file '%s' contains no pictures\n",argv0,mpgfilename.c_str());
       return 1;
-      } else if (pics<0) {
+    }
+    else if (pics<0) {
       fprintf(stderr,"%s: '%s': %s\n",argv0,mpgfilename.c_str(),strerror(errno));
       return 1;
-      }
+    }
 
     if (idx.save(idxfilename.c_str())<0) {
       fprintf(stderr,"%s: '%s': %s\n",argv0,idxfilename.c_str(),strerror(errno));
       return 1;
-      }
+    }
 
     return 0;
-    }
+  }
 
   QApplication a(argc, argv);
 
@@ -113,50 +129,37 @@ int main(int argc, char *argv[])
 #endif // HAVE_LIB_AO
 
   av_register_all();
-  std::string filename,idxfilename;
-
-  for(int i=1;i<argc;++i) {
-    if (argv[i][0]=='-' && argv[i][1]!=0) // option
-      {
-      if (!strcmp(argv[i]+1,"idx") && (i+1)<argc)
-        idxfilename=argv[++i];
-      else if (!strcmp(argv[i]+1,"batch"))
-	batchmode=true;
-      else
-        usage_exit();
-      } else if (filename.empty())
-      filename=argv[i];
-    else
-      usage_exit();
-    }
+  std::string filename;
 
   int rv=1;
   dvbcut *main=new dvbcut;
   main->batchmode(batchmode);
 
   if (batchmode) {
-      if (filename.empty())
-	usage_exit();
-      main->open(filename,idxfilename);
-      main->fileExport();
-      rv = 0;
-    }
+    if (i + 1 != argc)	// must provide exactly one filename
+      usage_exit();
+    filename = argv[i];
+    main->open(filename,idxfilename);
+    main->fileExport();
+    rv = 0;
+  }
   else {
     main->show();
 
-    if (!filename.empty())
+    if (i < argc) {
+      filename = argv[i];
       main->open(filename,idxfilename);
-
+    }
 
     if (main) {
       a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
       rv = a.exec();
-      }
     }
+  }
 
 #ifdef HAVE_LIB_AO
   ao_shutdown();
 #endif // HAVE_LIB_AO
 
   return rv;
-  }
+}
