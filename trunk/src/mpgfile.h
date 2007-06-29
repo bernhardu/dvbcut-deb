@@ -44,7 +44,7 @@ class mpgfile
 public:
 
 protected:
-  inbuffer buf;
+  inbuffer &buf;
   stream s[MAXAVSTREAMS];
   int videostreams, audiostreams;
   int initialoffset;
@@ -57,7 +57,7 @@ protected:
 public:
   virtual ~mpgfile();
 
-  static mpgfile *open(const std::string &filename, std::string *errormessage=0);
+  static mpgfile *open(inbuffer &b, std::string *errormessage = 0);
   virtual int streamreader(class streamhandle &s)=0;
   virtual int mplayeraudioid(int audiostream)=0;
   virtual bool istransportstream()

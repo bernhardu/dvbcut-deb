@@ -34,6 +34,7 @@ class dvbcut: public dvbcutbase
 protected:
   QPopupMenu *audiotrackpopup,*recentfilespopup;
   int audiotrackmenuid;
+  inbuffer buf;
   mpgfile *mpg;
   int pictures;
   int curpic;

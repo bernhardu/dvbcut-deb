@@ -157,54 +157,6 @@ inbuffer::inbuffer(unsigned int _size, int _fd, bool tobeclosed, unsigned int _m
   setup();
   }
 
-inbuffer::inbuffer(inbuffer &b, unsigned int _size, unsigned int _mmapsize) :
-    d(0),fd(b.fd),close(b.close),eof(b.eof), needseek(b.needseek),
-    filesize(b.filesize), filesizechecked(b.filesizechecked),
-    mmapped(b.mmapped)
-  {
-  b.close=false;
-  if (_size==0)
-    size=b.size;
-  else
-    size=_size;
-
-  if (_mmapsize==0)
-    mmapsize=b.mmapsize;
-  else
-    mmapsize=_mmapsize;
-
-  if (mmapped) {
-    if (mmapsize>0)
-      size=mmapsize;
-    pos=b.pos-(b.pos%pagesize);
-    readpos=b.readpos+(b.pos%pagesize);
-    writepos=size;
-    if (pos+writepos>filesize)
-      writepos=filesize-pos;
-    d=::mmap(0,writepos,PROT_READ,MAP_SHARED,fd,pos);
-    if (d==MAP_FAILED) {
-      size=_size;
-      mmapped=false;
-      } else
-      return;
-    }
-
-  if (b.inbytes()>size)
-    size=b.inbytes();
-  if (size<1024)
-    size=1024;
-  d=malloc(size);
-
-  uint32_t discard=0;
-  if (b.writepos>size)
-    discard=b.writepos-size;
-
-  readpos=b.readpos-discard;
-  writepos=b.writepos-discard;
-  pos=b.pos+discard;
-  memcpy(d,(char*)b.d+discard,writepos);
-  }
-
 void inbuffer::checkfilesize()
   {
   filesizechecked=true;
@@ -214,37 +166,56 @@ void inbuffer::checkfilesize()
     needseek=-1;
   }
 
-inbuffer::~inbuffer()
-  {
-  if (d) {
-    if (mmapped)
-      ::munmap(d,writepos);
-    else
-      free(d);
-    }
-  if (close && fd>=0)
-    ::close(fd);
-  }
+inbuffer::~inbuffer() {
+  reset();
+}
 
-int inbuffer::open(const char* filename)
-  {
-  if (filename[0]=='-' && filename[1]==0) // use stdint
-    {
+bool
+inbuffer::open(const char* filename) {
+  if (filename[0]=='-' && filename[1]==0) {
+    // use stdint
     close=false;
     needseek=0;
-    return fd=STDIN_FILENO;
-    }
+    fd=STDIN_FILENO;
+    return true;
+  }
 
   close=true;
   needseek=0;
   fd=::open(filename,O_RDONLY|O_BINARY);
   if (fd<0)
-    return fd;
+    return false;
 
   setup();
 
-  return fd;
+  return true;
+}
+
+void
+inbuffer::reset() {
+  if (d) {
+    if (mmapped)
+      ::munmap(d,writepos);
+    else
+      free(d);
+    d = 0;
   }
+  if (close) {
+    if (fd != -1)
+      ::close(fd);
+    close = false;
+  }
+  // re-initialize members
+  readpos = 0;
+  writepos = 0;
+  fd = -1;
+  eof = false;
+  pos = 0;
+  needseek = 0;
+  filesize = -1;
+  filesizechecked = false;
+  mmapped = false;
+}
 
 bool inbuffer::statfilesize(dvbcut_off_t& _size) const
   {

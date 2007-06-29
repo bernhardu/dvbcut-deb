@@ -157,9 +157,9 @@ protected:
   void setup();
 public:
   inbuffer(unsigned int _size, int _fd=-1, bool tobeclosed=false, unsigned int mmapsize=0);
-  inbuffer(inbuffer &b, unsigned int _size=0, unsigned int mmapsize=0);
   ~inbuffer();
-  int open(const char *filename);
+  void reset();
+  bool open(const char *filename);
   bool statfilesize(dvbcut_off_t& _size) const;
 
   const void *data() const

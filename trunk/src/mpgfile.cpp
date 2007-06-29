@@ -45,7 +45,7 @@ const int mpgfile::frameratescr[16]=
   };
 
 mpgfile::mpgfile(inbuffer &b, int initial_offset)
-    : buf(b,8<<20,128<<20),
+    : buf(b),
     videostreams(0),audiostreams(0),
     initialoffset(initial_offset),idx(*this),pictures(0)
 {}
@@ -54,35 +54,25 @@ mpgfile::~mpgfile()
 {}
 
 /// Factory function
-mpgfile* mpgfile::open(const std::string &filename, std::string *errormessage)
-{
+mpgfile*
+mpgfile::open(inbuffer &b, std::string *errormessage) {
   if (errormessage)
     errormessage->clear();
-  inbuffer buf(64 << 10, -1, false, 128 << 10);
 
-  int fd = buf.open(filename.c_str());
-  if (fd < 0)
-  {
+  if (b.providedata(64 << 10) < (64 << 10)) {
     if (errormessage)
-      *errormessage = std::string("open '") + filename + "': " + strerror(errno);
-    return 0;
-  }
-
-  if (buf.providedata(64 << 10) < (64 << 10))
-  {
-    if (errormessage)
-      *errormessage = std::string("File '") + filename + "' too short";
+      *errormessage = "File too short";
     return 0;
   }
 
   int initialoffset;
-  if ((initialoffset=tsfile::probe(buf))>=0) // is this an mpeg transport stream?
-    return new tsfile(buf, initialoffset);
-  if ((initialoffset=psfile::probe(buf))>=0) // is this an mpeg program stream?
-    return new psfile(buf, initialoffset);
+  if ((initialoffset=tsfile::probe(b))>=0) // is this an mpeg transport stream?
+    return new tsfile(b, initialoffset);
+  if ((initialoffset=psfile::probe(b))>=0) // is this an mpeg program stream?
+    return new psfile(b, initialoffset);
 
   if (errormessage)
-    *errormessage="Unknown file type";
+    *errormessage = "Unknown file type";
   return 0;
 }
 
