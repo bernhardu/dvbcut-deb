@@ -1,25 +1,43 @@
+2007-06-30  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/buffer.cpp (class inbuffer):
+	* src/buffer.h (class inbuffer):
+		Support multiple input files.
+
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+		Open multiple input files.
+		Read & write new project file format.
+		Factor out pathname canonicalization.
+
+	* src/main.cpp:
+		Open multiple input files.
+
+	* src/mpgfile.cpp:
+		Use number of frames for bitrate estimation.
+
 2007-06-29  Michael Riepe  <too-tired@users.sourceforge.net>
 
-	* src/buffer.h (class inbuffer):
 	* src/buffer.cpp (class inbuffer):
+	* src/buffer.h (class inbuffer):
 		Let open() return bool.
 		Remove copy constructor for inbuffer.
 		Add reset() member for inbuffer reuse.
- 
- 	* src/mpgfile.h:
- 	* src/mpgfile.cpp:
- 		Create mpgfile from inbuffer, not from filename.
- 		Use a reference to a single inbuffer.
-
-	* src/main.cpp:
-		Centralize option handling.
-		Pass inbuffer to mpgfile::open().
  
 	* src/dvbcut.h:
 	* src/dvbcut.cpp:
 		Add reusable inbuffer member to class dvbcut.
 		Pass inbuffer to mpgfile::open().
  
+	* src/main.cpp:
+		Centralize option handling.
+		Pass inbuffer to mpgfile::open().
+ 
+ 	* src/mpgfile.h:
+ 	* src/mpgfile.cpp:
+ 		Create mpgfile from inbuffer, not from filename.
+ 		Use a reference to a single inbuffer.
+
 2007-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/mpgfile.cpp:

@@ -26,6 +26,10 @@
 #include <stdlib.h>
 // #include <stdio.h>
 #include <stdint.h>
+#include <assert.h>
+
+#include <string>
+#include <vector>
 
 #include "port.h"
 #include "buffer.h"
@@ -145,212 +149,185 @@ int buffer::writedata(int fd)
 
 long inbuffer::pagesize=0;
 
-inbuffer::inbuffer(unsigned int _size, int _fd, bool tobeclosed, unsigned int _mmapsize) :
-    d(0), size(_size), mmapsize(_mmapsize), readpos(0), writepos(0), fd(_fd),
-    close(tobeclosed), eof(false), pos(0), needseek(0),
-    filesize(-1), filesizechecked(false), mmapped(false)
-  {
+inbuffer::inbuffer(unsigned int _size, unsigned int _mmapsize) :
+    d(0), size(_size), mmapsize(_mmapsize), readpos(0), writepos(0),
+    eof(false), pos(0), filesize(0), mmapped(false)
+{
   if (!pagesize)
     pagesize=sysconf(_SC_PAGESIZE);
-  if (fd<0)
-    return;
-  setup();
-  }
-
-void inbuffer::checkfilesize()
-  {
-  filesizechecked=true;
-  filesize=lseek(fd,0,SEEK_END);
-
-  if (filesize>0) // seek was successful and file has non-zero size
-    needseek=-1;
-  }
+}
 
 inbuffer::~inbuffer() {
-  reset();
+  close();
 }
 
 bool
-inbuffer::open(const char* filename) {
-  if (filename[0]=='-' && filename[1]==0) {
-    // use stdint
-    close=false;
-    needseek=0;
-    fd=STDIN_FILENO;
-    return true;
-  }
+inbuffer::open(std::string filename, std::string *errmsg) {
+  infile f;
 
-  close=true;
-  needseek=0;
-  fd=::open(filename,O_RDONLY|O_BINARY);
-  if (fd<0)
+  f.fd = ::open(filename.c_str(), O_RDONLY | O_BINARY);
+  if (f.fd == -1) {
+    if (errmsg)
+      *errmsg = filename + ": open: " + strerror(errno);
     return false;
-
-  setup();
-
+  }
+  off_t size = ::lseek(f.fd, 0, SEEK_END);
+  if (size == -1) {
+    if (errmsg)
+      *errmsg = filename + ": lseek: " + strerror(errno);
+    ::close(f.fd);
+    return false;
+  }
+  f.off = filesize;
+  f.end = filesize += size;
+  files.push_back(f);
   return true;
 }
 
 void
+inbuffer::close() {
+  // close all files
+  std::vector<infile>::const_iterator i = files.begin();
+  while (i != files.end()) {
+    ::close(i->fd);
+    ++i;
+  }
+  files.clear();
+  // free buffer
+  if (mmapped)
+    ::munmap(d, writepos);
+  else if (d)
+    free(d);
+  mmapped = false;
+  d = 0;
+}
+
+void
 inbuffer::reset() {
-  if (d) {
-    if (mmapped)
-      ::munmap(d,writepos);
-    else
-      free(d);
-    d = 0;
-  }
-  if (close) {
-    if (fd != -1)
-      ::close(fd);
-    close = false;
-  }
+  close();
   // re-initialize members
   readpos = 0;
   writepos = 0;
-  fd = -1;
   eof = false;
   pos = 0;
-  needseek = 0;
-  filesize = -1;
-  filesizechecked = false;
-  mmapped = false;
+  filesize = 0;
 }
 
-bool inbuffer::statfilesize(dvbcut_off_t& _size) const
-  {
-#ifdef __WIN32__
-  struct _stati64 st;
-  if ((::_fstati64(fd,&st)==0)&&(S_ISREG(st.st_mode))) {
-#else /* __WIN32__ */
-  struct stat st;
-  if ((::fstat(fd,&st)==0)&&(S_ISREG(st.st_mode))) {
-#endif /* __WIN32__ */
-	_size=st.st_size;
-	return true;
-	}
-  return false;
+int
+inbuffer::providedata(unsigned int amount, long long position) {
+  if (position < 0 || position >= filesize)
+    return 0;
+
+  if (position + amount > filesize)
+    amount = filesize - position;
+  if (position >= pos && position + amount <= pos + writepos) {
+    readpos = position - pos;
+    return inbytes();
   }
 
-void inbuffer::setup()
-  {
-  unsigned int _size=size;
-
-  if (statfilesize(filesize)) {
-    filesizechecked=true;
-    if (mmapsize>0)
-      size=mmapsize;
-    if (size>filesize)
-      size=filesize;
-    d=::mmap(0,size,PROT_READ,MAP_SHARED,fd,0);
-    if (d==MAP_FAILED) {
-      size=_size;
-      mmapped=false;
-      } else {
-      writepos=size;
-      mmapped=true;
-      return;
-      }
-    }
-
-  if (size > 0)
-    d = malloc(size);
-
+  std::vector<infile>::const_iterator i = files.begin();
+  assert(i != files.end());	// otherwise we would have returned already
+  while (position >= i->end) {
+    ++i;
+    assert(i != files.end());
   }
+  assert(position >= i->off);
 
-int inbuffer::providedata(unsigned int amount, long long position)
-  {
-  if (amount>size)
-    amount=size;
-
-  if (position>=pos && position+amount<=pos+writepos) {
-    readpos=position-pos;
-    return writepos-readpos;
-    }
-
+  // remove old mapping, if any
   if (mmapped) {
-    if (position>=filesize)
-      return 0;
-    if (position+amount>filesize)
-      amount=filesize-position;
-    munmap(d,writepos);
-    pos=position+amount-size/2;
-    if (pos<0)
-      pos=0;
-    else if (pos>position)
-      pos=position;
-    pos-=pos%pagesize;
-    readpos=position-pos;
-    writepos=size;
-    if (pos+writepos>filesize) {
-      if (filesize>size) {
-        pos=filesize-size;
-        pos-=pos%pagesize;
-        pos+=pagesize;
-        if (pos<0)
-          pos=0;
-        readpos=position-pos;
-        }
-      writepos=filesize-pos;
-
-      }
-    d=::mmap(0,writepos,PROT_READ,MAP_SHARED,fd,pos);
-    if (d==MAP_FAILED) {
-      readpos=writepos=0;
-      d=malloc(size);
-      mmapped=false;
-      } else {
-      return writepos-readpos;
-      }
-    }
-
-  if (position>=pos && position<pos+writepos) {
-    unsigned int pp=position-pos;
-    if (pp>0) {
-      writepos-=pp;
-      memmove(d,(char*)d+pp,writepos);
-      }
-    } else {
-    needseek+=position-(pos+writepos);
-    writepos=0;
-    }
-
-  pos=position;
-  readpos=0;
-
-  if (needseek && (lseek(fd,pos+writepos,SEEK_SET)<0)) {
-    if (needseek>0) {
-      while (needseek>0) {
-        int seek=size-writepos;
-        if (seek>needseek)
-          seek=needseek;
-        int rd=::read(fd,(char*)d+writepos,seek);
-        if (rd<0)
-          return rd;
-        if (rd==0) {
-          eof=true;
-          return 0;
-          }
-        needseek-=rd;
-        }
-      } else
-      return -1;
-    }
-  needseek=0;
-
-  while (writepos<amount) {
-    int rd=::read(fd,(char*)d+writepos,size-writepos);
-    if (rd<0)
-      return rd;
-    if (rd==0) {
-      eof=true;
-      break;
-      }
-    writepos+=rd;
-    }
-
-  return writepos;
+    ::munmap(d, writepos);
+    mmapped = false;
+    d = 0;
   }
+
+  if (mmapsize > 0 && position + amount <= i->end) {
+    // calculate mmap window
+    dvbcut_off_t newpos = position + amount - mmapsize / 2;
+    if (newpos > position)
+      newpos = position;
+    else if (newpos < i->off)
+      newpos = i->off;
+    // align to pagesize
+    // note: relpos must be aligned, NOT newpos!
+    off_t relpos = newpos - i->off;
+    size_t modulus = relpos % pagesize;
+    relpos -= modulus;
+    newpos -= modulus;
+    size_t len = mmapsize;
+    if (newpos + len > i->end)
+      len = i->end - newpos;
+    void *ptr = ::mmap(0, len, PROT_READ, MAP_SHARED, i->fd, relpos);
+    if (ptr != MAP_FAILED) {
+      // mmap succeeded
+      if (d)
+	free(d);
+      d = ptr;
+      readpos = position - newpos;
+      writepos = len;
+      pos = newpos;
+      mmapped = true;
+      return inbytes();
+    }
+  }
+
+  // allocate read buffer
+  if (!d) {
+    d = malloc(size);
+    if (!d) {
+      fprintf(stderr, "inbuffer::providedata: can't allocate %ld bytes: %s\n",
+	(long)size, strerror(errno));
+      abort();
+    }
+    readpos = 0;
+    writepos = 0;
+    pos = 0;
+  }
+
+  if (amount > size)
+    amount = size;
+  dvbcut_off_t seekpos = position;
+  // reuse existing data if possible
+  if (position >= pos && position < pos + writepos) {
+    unsigned int pp = position - pos;
+    if (pp > 0) {
+      writepos -= pp;
+      memmove(d, (char*)d + pp, writepos);
+    }
+    seekpos += writepos;
+  }
+  else {
+    writepos = 0;
+  }
+  readpos = 0;
+  pos = position;
+  bool needseek = true;
+  while (writepos < amount) {
+    while (seekpos >= i->end) {
+      ++i;
+      assert(i != files.end());
+      needseek = true;
+    }
+    assert(seekpos >= i->off);
+    off_t relpos = seekpos - i->off;
+    if (::lseek(i->fd, relpos, SEEK_SET) == -1)
+      return -1;
+    needseek = false;
+    size_t len = amount - writepos;
+    if (len > i->end - seekpos)
+      len = i->end - seekpos;
+    assert(len > 0);
+    ssize_t n = ::read(i->fd, (char*)d + writepos, len);
+    if (n == -1)
+      return -1;
+    if (n == 0) {	// this should NOT happen!
+      eof = true;
+      break;
+    }
+    writepos += n;
+    seekpos += n;
+  }
+  return inbytes();
+}
 
 // OUTBUFFER ****************************************************************
 

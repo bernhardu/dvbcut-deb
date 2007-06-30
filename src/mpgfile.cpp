@@ -350,13 +350,14 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
   }
 
   int seekpic=idx.indexnr(start);
+  int framerate = mpgfile::frameratescr[idx[seekpic].getframerate()];
   bool fixedstart=true;
 
   if (mux.isempty())
   {
     fixedstart=false;
     mux.unsetempty();
-    pts_t startpts=mpgfile::frameratescr[idx[seekpic].getframerate()]/300;
+    pts_t startpts = framerate / 300;
     for (int i=0;i<MAXAVSTREAMS;++i)
       mux.setpts(i,startpts);
   }
@@ -378,7 +379,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
     dvbcut_off_t start_pos = idx[idx.indexnr(start)].getpos().fileposition();
     dvbcut_off_t stop_pos = idx[idx.indexnr(stop)].getpos().fileposition();
     dvbcut_off_t bytes = stop_pos - start_pos;
-    pts_t delta_pts = videostoppts - videostartpts;
+    pts_t delta_pts = (pts_t)(stop - start) * framerate / 300;
     double mux_rate = (double)bytes * 9e4 / (double)delta_pts;
     if (log)
       log->print("Estimated mux rate: %.2f MBps",mux_rate*1e-6);
