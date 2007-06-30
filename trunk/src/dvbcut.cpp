@@ -110,7 +110,7 @@ void dvbcut::setbusy(bool b)
 dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
   :dvbcutbase(parent, name, fl),
     audiotrackpopup(0), recentfilespopup(0), audiotrackmenuid(-1),
-    buf(8 << 20, -1, false, 128 << 20),
+    buf(8 << 20, 128 << 20),
     mpg(0), pictures(0),
     curpic(~0), showimage(true), fine(false),
     jogsliding(false), jogmiddlepic(0),
@@ -180,8 +180,8 @@ void dvbcut::fileOpen()
 
 void dvbcut::fileSaveAs()
 {
-  if (prjfilen.empty() && !mpgfilen.empty()) {
-    std::string prefix = mpgfilen;
+  if (prjfilen.empty() && !mpgfilen.empty() && !mpgfilen.front().empty()) {
+    std::string prefix = mpgfilen.front();
     int lastdot = prefix.rfind(".");
     int lastslash = prefix.rfind("/");
     if (lastdot >= 0 && lastdot > lastslash)
@@ -193,19 +193,18 @@ void dvbcut::fileSaveAs()
   }
 
   QString s=QFileDialog::getSaveFileName(
-      prjfilen,
-  settings.prjfilter,
-  this,
-  "Save project as...",
-  "Choose the name of the project file" );
+    prjfilen,
+    settings.prjfilter,
+    this,
+    "Save project as...",
+    "Choose the name of the project file" );
 
   if (!s)
     return;
 
   if (QFileInfo(s).exists() && question(
       "File exists - dvbcut",
-      s+"\nalready exists. "
-          "Overwrite?") !=
+      s + "\nalready exists. Overwrite?") !=
       QMessageBox::Yes)
     return;
 
@@ -223,43 +222,59 @@ void dvbcut::fileSave()
 
   QFile outfile(prjfilen);
   if (!outfile.open(IO_WriteOnly)) {
-    critical("Failed to write project file - dvbcut",QString(prjfilen)+
-        ":\nCould not open file");
+    critical("Failed to write project file - dvbcut",
+      QString(prjfilen) + ":\nCould not open file");
     return;
   }
 
   QDomDocument doc("dvbcut");
-  QDomElement root=doc.createElement("dvbcut");
-  root.setAttribute("mpgfile",mpgfilen);
+  QDomElement root = doc.createElement("dvbcut");
+#if 0
+  root.setAttribute("mpgfile",mpgfilen.front());
   if (!idxfilen.empty())
     root.setAttribute("idxfile",idxfilen);
+#endif
   doc.appendChild(root);
+
+  std::list<std::string>::const_iterator it = mpgfilen.begin();
+  while (it != mpgfilen.end()) {
+    QDomElement elem = doc.createElement("mpgfile");
+    elem.setAttribute("path", *it);
+    root.appendChild(elem);
+    ++it;
+  }
+
+  if (!idxfilen.empty()) {
+    QDomElement elem = doc.createElement("idxfile");
+    elem.setAttribute("path", idxfilen);
+    root.appendChild(elem);
+  }
 
   for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
     if (item->rtti()==EventListItem::RTTI()) {
-    QString elemname;
-    EventListItem *eli=(EventListItem*)item;
-    EventListItem::eventtype evt=eli->geteventtype();
+      QString elemname;
+      EventListItem *eli=(EventListItem*)item;
+      EventListItem::eventtype evt=eli->geteventtype();
 
-    if (evt==EventListItem::start)
-      elemname="start";
-    else if (evt==EventListItem::stop)
-      elemname="stop";
-    else if (evt==EventListItem::chapter)
-      elemname="chapter";
-    else if (evt==EventListItem::bookmark)
-      elemname="bookmark";
-    else
-      continue;
+      if (evt==EventListItem::start)
+	elemname="start";
+      else if (evt==EventListItem::stop)
+	elemname="stop";
+      else if (evt==EventListItem::chapter)
+	elemname="chapter";
+      else if (evt==EventListItem::bookmark)
+	elemname="bookmark";
+      else
+	continue;
 
-    QDomElement elem=doc.createElement(elemname);
-    elem.setAttribute("picture",eli->getpicture());
-    root.appendChild(elem);
+      QDomElement elem=doc.createElement(elemname);
+      elem.setAttribute("picture",eli->getpicture());
+      root.appendChild(elem);
     }
 
-    QTextStream stream(&outfile);
-    stream <<  doc.toString();
-    outfile.close();
+  QTextStream stream(&outfile);
+  stream <<  doc.toString();
+  outfile.close();
 }
 
 void dvbcut::fileExport()
@@ -269,8 +284,8 @@ void dvbcut::fileExport()
 
     if (!prjfilen.empty())
       newexpfilen=prjfilen;
-    else if (!mpgfilen.empty())
-      newexpfilen=mpgfilen;
+    else if (!mpgfilen.empty() && !mpgfilen.front().empty())
+      newexpfilen=mpgfilen.front();
 
     if (!newexpfilen.empty()) {
       int lastdot(newexpfilen.rfind("."));
@@ -665,7 +680,7 @@ void dvbcut::playPlay()
     mplayer_process->addArgument(QString().sprintf("0x%x",int(mpg->mplayeraudioid(currentaudiotrack))));
   }
 
-  mplayer_process->addArgument(QString(mpgfilen));
+  mplayer_process->addArgument(QString(mpgfilen.front()));
 
   mplayer_process->setCommunication(QProcess::Stdout|QProcess::Stderr|QProcess::DupStderr);
 
@@ -1004,38 +1019,36 @@ void dvbcut::loadrecentfile(int id)
 {
   if (id<0 || id>=(signed)settings.recentfiles.size())
     return;
-  open(settings.recentfiles[id].first, settings.recentfiles[id].second);
+  std::list<std::string> dummy_list;
+  dummy_list.push_back(settings.recentfiles[id].first);
+  open(dummy_list, settings.recentfiles[id].second);
 }
 
 // **************************************************************************
 // ***  public functions
 
-void dvbcut::open(std::string filename, std::string idxfilename)
+void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
 {
   // reset inbuffer
   buf.reset();
 
-  if (filename.empty()) {
-    QString fn=QFileDialog::getOpenFileName(
-        QString::null,
-    settings.loadfilter,
-    this,
-    "Open file...",
-    "Choose an MPEG file to open" );
-    if (!fn)
-      return;
-    filename=(const char*)fn;
+  if (filenames.empty()) {
+    QStringList fn = QFileDialog::getOpenFileNames(
+      settings.loadfilter,
+      QString("."),
+      this,
+      "Open file...",
+      "Choose one or more MPEG files to open");
+    for (QStringList::Iterator it = fn.begin(); it != fn.end(); ++it)
+      filenames.push_back((const char*)*it);
   }
 
-  if (filename.empty())
+  if (filenames.empty())
     return;
 
-  if (filename[0]!='/') {
-    char resolved_path[PATH_MAX];
-    char *rp=realpath(filename.c_str(),resolved_path);
-    if (rp)
-      filename=rp;
-  }
+  make_canonical(filenames);
+
+  std::string filename = filenames.front();
 
   // a valid file name has been entered
   setCaption(QString("dvbcut - " + filename));
@@ -1115,30 +1128,54 @@ void dvbcut::open(std::string filename, std::string idxfilename)
         if (domdoc.setContent(&infile,false,&errormsg)) {
           QDomElement docelem = domdoc.documentElement();
           if (docelem.tagName() != "dvbcut") {
-            critical("Failed to read project file - dvbcut",QString(filename)+
-                ":\nNot a valid dvbcut project file");
+            critical("Failed to read project file - dvbcut",
+	      QString(filename) + ":\nNot a valid dvbcut project file");
             fileOpenAction->setEnabled(true);
             return;
           }
-
-          QString mpgfilename=docelem.attribute("mpgfile");
-          if (mpgfilename.isEmpty()) {
-            critical("Failed to read project file - dvbcut",QString(filename)+
-                ":\nNo mpeg filename "
-                    "given in project file");
-            fileOpenAction->setEnabled(true);
-            return;
-          }
-
-          prjfilename=filename;
-          filename=(const char *)mpgfilename;
-          QString qidxfilename=docelem.attribute("idxfile");
-          if (qidxfilename.isEmpty())
-            idxfilename.clear();
-          else
-            idxfilename=(const char *)qidxfilename;
-        } else {
-          critical("Failed to read project file - dvbcut",QString(filename)+":\n"+errormsg);
+	  // parse elements, new-style first
+	  QDomNode n;
+	  QString qs;
+          filenames.clear();
+          idxfilename.clear();
+	  for (n = domdoc.documentElement().firstChild(); !n.isNull(); n = n.nextSibling()) {
+	    QDomElement e = n.toElement();
+	    if (e.isNull())
+	      continue;
+	    if (e.tagName() == "mpgfile") {
+	      qs = e.attribute("path");
+	      if (!qs.isEmpty())
+		filenames.push_back((const char*)qs);
+	    }
+	    else if (e.tagName() == "idxfile") {
+	      qs = e.attribute("path");
+	      if (!qs.isEmpty())
+		idxfilename = (const char*)qs;
+	    }
+	  }
+	  // try old-style project file format
+	  if (filenames.empty()) {
+	    qs = docelem.attribute("mpgfile");
+	    if (!qs.isEmpty())
+	      filenames.push_back((const char*)qs);
+	  }
+	  if (idxfilename.empty()) {
+	    qs = docelem.attribute("idxfile");
+	    if (!qs.isEmpty())
+	      idxfilename = (const char*)qs;
+	  }
+	  // sanity check
+	  if (filenames.empty()) {
+	    critical("Failed to read project file - dvbcut",
+	      QString(filename) + ":\nNo MPEG filename given in project file");
+	    fileOpenAction->setEnabled(true);
+	    return;
+	  }
+          prjfilename = filename;
+        }
+        else {
+          critical("Failed to read project file - dvbcut",
+	    QString(filename) + ":\n" + errormsg);
           fileOpenAction->setEnabled(true);
           return;
         }
@@ -1146,21 +1183,24 @@ void dvbcut::open(std::string filename, std::string idxfilename)
     }
   }
 
+  // make filename the first MPEG file
+  filename = filenames.front();
+
   dvbcutbusy busy(this);
   busy.setbusy(true);
 
+  mpg = 0;
   std::string errormessage;
-  if (buf.open(filename.c_str())) {
+  std::list<std::string>::const_iterator it = filenames.begin();
+  while (it != filenames.end() && buf.open(*it, &errormessage))
+    ++it;
+  if (it == filenames.end()) {
     mpg = mpgfile::open(buf, &errormessage);
-  }
-  else {
-    errormessage = std::string("open '") + filename + "': " + strerror(errno);
-    mpg = 0;
   }
   busy.setbusy(false);
 
   if (!mpg) {
-    critical("Failed to open file - dvbcut",QString(filename)+":\n"+errormessage);
+    critical("Failed to open file - dvbcut", errormessage);
     fileOpenAction->setEnabled(true);
     return;
   }
@@ -1183,13 +1223,9 @@ void dvbcut::open(std::string filename, std::string idxfilename)
       fileOpenAction->setEnabled(true);
       return;
     }
-
-  } else if (idxfilename[0]!='/') {
-    char resolved_path[PATH_MAX];
-    char *rp=realpath(idxfilename.c_str(),resolved_path);
-    if (rp)
-      idxfilename=rp;
   }
+
+  make_canonical(idxfilename);
 
   pictures=-1;
 
@@ -1259,12 +1295,12 @@ void dvbcut::open(std::string filename, std::string idxfilename)
     return;
   }
 
-  mpgfilen=filename;
+  mpgfilen=filenames;
   idxfilen=idxfilename;
   prjfilen=prjfilename;
   expfilen.clear();
   if (prjfilen.empty())
-    addtorecentfiles(mpgfilen,idxfilen);
+    addtorecentfiles(mpgfilen.front(),idxfilen);
   else
     addtorecentfiles(prjfilen);
 
@@ -1322,7 +1358,7 @@ void dvbcut::open(std::string filename, std::string idxfilename)
         new EventListItem(eventlist,imgp->getimage(picnum),evt,picnum,(*mpg)[picnum].getpicturetype(),(*mpg)[picnum].getpts()-firstpts);
         qApp->processEvents();
       }
-      }
+    }
   }
 
   fileOpenAction->setEnabled(true);
@@ -1463,4 +1499,28 @@ dvbcut::critical(const QString & caption, const QString & text)
   }
   return QMessageBox::critical(this, caption, text,
     QMessageBox::Abort, QMessageBox::NoButton);
+}
+
+void
+dvbcut::make_canonical(std::string &filename) {
+  if (filename[0] != '/') {
+    char resolved_path[PATH_MAX];
+    char *rp = realpath(filename.c_str(), resolved_path);
+    if (rp)
+      filename = rp;
+  }
+}
+
+void
+dvbcut::make_canonical(std::list<std::string> &filenames) {
+  std::list<std::string>::const_iterator it = filenames.begin();
+  std::list<std::string> newlist;
+
+  while (it != filenames.end()) {
+    std::string tmp = *it;
+    make_canonical(tmp);
+    newlist.push_back(tmp);
+    ++it;
+  }
+  filenames = newlist;
 }

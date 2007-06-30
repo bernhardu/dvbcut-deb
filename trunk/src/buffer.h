@@ -137,84 +137,53 @@ public:
     }
   };
 
-class inbuffer
-  {
+class inbuffer {
 protected:
   void *d;
   unsigned int size, mmapsize, readpos, writepos;
 
-  int fd;
-  bool close;
+  struct infile {
+    dvbcut_off_t off;
+    dvbcut_off_t end;
+    int fd;
+  };
+  std::vector<infile> files;
   bool eof;
   dvbcut_off_t pos;
-  dvbcut_off_t needseek;
   dvbcut_off_t filesize;
-  bool filesizechecked;
   bool mmapped;
   static long pagesize;
 
-  void checkfilesize();
-  void setup();
+  void close();
+
 public:
-  inbuffer(unsigned int _size, int _fd=-1, bool tobeclosed=false, unsigned int mmapsize=0);
+  inbuffer(unsigned int _size, unsigned int mmapsize = 0);
   ~inbuffer();
+  bool open(std::string filename, std::string *errmsg = 0);
   void reset();
-  bool open(const char *filename);
-  bool statfilesize(dvbcut_off_t& _size) const;
 
-  const void *data() const
-    {
-    return (void*)((char*)d+readpos);
-    }
-  //   void *data()
-  //     {
-  //     return (void*)((char*)d+readpos);
-  //     }
-  unsigned int getsize() const
-    {
-    return size;
-    }
-  unsigned int inbytes() const
-    {
-    return writepos-readpos;
-    }
-  bool iseof() const
-    {
-    return eof;
-    }
+  const void *data() const { return (void*)((char*)d + readpos); }
+  unsigned int getsize() const { return size; }
+  unsigned int inbytes() const { return writepos - readpos; }
+  bool iseof() const { return eof; }
 
-  int providedata(unsigned int amount)
-    {
-    if (amount<=writepos-readpos)
-      return writepos-readpos;
-    return providedata(amount, pos+readpos);
-    }
   int providedata(unsigned int amount, long long position);
-  void discarddata(unsigned int amount)
-    {
-    readpos+=amount;
-    if (readpos>=writepos) {
-      needseek+=readpos-writepos;
-      pos+=readpos;
-      readpos=writepos=0;
-      }
+  int providedata(unsigned int amount) {
+    if (amount <= inbytes())
+      return inbytes();
+    return providedata(amount, pos + readpos);
+  }
+  void discarddata(unsigned int amount) {
+    readpos += amount;
+    if (readpos >= writepos) {
+      pos += readpos;
+      readpos = 0;
+      writepos = 0;
     }
-  unsigned int getdata(void *data, unsigned int len);
-  void forceseek()
-    {
-    needseek=-(1ll<<61);
-    }
-  dvbcut_off_t getfilesize()
-    {
-    if (!filesizechecked)
-      checkfilesize();
-    return filesize;
-    }
-  dvbcut_off_t getfilepos() const
-    {
-    return pos+readpos;
-    }
-  };
+  }
+  dvbcut_off_t getfilesize() const { return filesize; }
+  dvbcut_off_t getfilepos() const { return pos + readpos; }
+};
 
 class outbuffer : protected buffer
   {

@@ -20,6 +20,7 @@
 #define _DVBCUT_DVBCUT_H
 
 #include <string>
+#include <list>
 #include "mpgfile.h"
 #include "dvbcutbase.h"
 #include "pts.h"
@@ -44,7 +45,8 @@ protected:
   bool fine;
   bool jogsliding;
   int jogmiddlepic;
-  std::string prjfilen,mpgfilen,idxfilen,expfilen;
+  std::string prjfilen,idxfilen,expfilen;
+  std::list<std::string> mpgfilen;
   QProcess *mplayer_process;
   bool mplayer_success;
   QString mplayer_out;
@@ -68,10 +70,14 @@ protected:
   int question(const QString & caption, const QString & text);
   int critical(const QString & caption, const QString & text);
 
+  // filename handling
+  void make_canonical(std::string &filename);
+  void make_canonical(std::list<std::string> &filenames);
+
 public:
   ~dvbcut();
   dvbcut(QWidget *parent = 0, const char *name = 0, WFlags fl = WType_TopLevel|WDestructiveClose );
-  void open(std::string filename=std::string(), std::string idxfilename=std::string());
+  void open(std::list<std::string> filenames=std::list<std::string>(), std::string idxfilename=std::string());
   void setbusy(bool b=true);
   void batchmode(bool b=true) { nogui = b; }
   // static dvbcut *New(std::string filename=std::string(), std::string idxfilename=std::string());

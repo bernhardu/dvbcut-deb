@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string>
+#include <list>
 
 #ifdef HAVE_LIB_AO
 #include <ao/ao.h>
@@ -83,19 +84,16 @@ main(int argc, char *argv[]) {
     std::string mpgfilename = argv[i];	// use first one (for now)
 
     if (idxfilename.empty())
-      if (mpgfilename == "-")
-        idxfilename = "-";
-      else
-        idxfilename = mpgfilename + ".idx";
+      idxfilename = mpgfilename + ".idx";
 
     mpgfile *mpg = 0;
     std::string errormessage;
-    inbuffer buf(8 << 20, -1, false, 128 << 20);
-    if (buf.open(mpgfilename.c_str())) {
-      mpg = mpgfile::open(buf, &errormessage);
+    inbuffer buf(8 << 20, 128 << 20);
+    while (i < argc && buf.open(argv[i], &errormessage)) {
+      ++i;
     }
-    else {
-      errormessage = std::string("open '") + mpgfilename + "': " + strerror(errno);
+    if (i == argc) {
+      mpg = mpgfile::open(buf, &errormessage);
     }
 
     if (mpg==0) {
@@ -129,7 +127,7 @@ main(int argc, char *argv[]) {
 #endif // HAVE_LIB_AO
 
   av_register_all();
-  std::string filename;
+  std::list<std::string> filenames;
 
   int rv=1;
   dvbcut *main=new dvbcut;
@@ -138,8 +136,8 @@ main(int argc, char *argv[]) {
   if (batchmode) {
     if (i + 1 != argc)	// must provide exactly one filename
       usage_exit();
-    filename = argv[i];
-    main->open(filename,idxfilename);
+    filenames.push_back(std::string(argv[i]));
+    main->open(filenames,idxfilename);
     main->fileExport();
     rv = 0;
   }
@@ -147,8 +145,11 @@ main(int argc, char *argv[]) {
     main->show();
 
     if (i < argc) {
-      filename = argv[i];
-      main->open(filename,idxfilename);
+      do {
+	filenames.push_back(std::string(argv[i]));
+      }
+      while (++i < argc);
+      main->open(filenames,idxfilename);
     }
 
     if (main) {
