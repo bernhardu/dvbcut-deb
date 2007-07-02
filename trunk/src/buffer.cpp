@@ -329,6 +329,21 @@ inbuffer::providedata(unsigned int amount, long long position) {
   return inbytes();
 }
 
+int
+inbuffer::getfilenum(dvbcut_off_t offset, dvbcut_off_t &fileoff) { 
+  std::vector<infile>::const_iterator it = files.begin();
+  unsigned int num = 0;
+  while (it != files.end()) {
+    if (offset < it->end) {
+      fileoff = it->off;
+      return num;
+    }
+    ++num;
+    ++it;
+  }
+  return -1;
+}
+
 // OUTBUFFER ****************************************************************
 
 outbuffer::~outbuffer()

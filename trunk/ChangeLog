@@ -1,3 +1,10 @@
+2007-07-02  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/buffer.cpp:
+	* src/buffer.h:
+	* src/dvbcut.cpp:
+		"play multiple files" patch by Ralph Glasstetter.
+
 2007-06-30  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/buffer.cpp (class inbuffer):
