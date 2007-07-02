@@ -183,6 +183,7 @@ public:
   }
   dvbcut_off_t getfilesize() const { return filesize; }
   dvbcut_off_t getfilepos() const { return pos + readpos; }
+  int getfilenum(dvbcut_off_t offset, dvbcut_off_t &fileoff);
 };
 
 class outbuffer : protected buffer

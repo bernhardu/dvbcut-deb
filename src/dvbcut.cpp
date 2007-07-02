@@ -662,6 +662,11 @@ void dvbcut::playPlay()
   dvbcut_off_t offset=(*mpg)[curpic].getpos().packetposition();
   mplayer_curpts=(*mpg)[curpic].getpts();
 
+  dvbcut_off_t partoffset;
+  int partindex = buf.getfilenum(offset, partoffset);
+  if (partindex == -1)
+    return;	// what else can we do?
+
   mplayer_process=new QProcess(QString("mplayer"));
   mplayer_process->addArgument("-noconsolecontrols");
 #ifdef __WIN32__
@@ -671,7 +676,7 @@ void dvbcut::playPlay()
   mplayer_process->addArgument("-wid");
   mplayer_process->addArgument(QString().sprintf("0x%x",int(imagedisplay->winId())));
   mplayer_process->addArgument("-sb");
-  mplayer_process->addArgument(QString::number(offset));
+  mplayer_process->addArgument(QString::number(offset - partoffset));
   mplayer_process->addArgument("-geometry");
   mplayer_process->addArgument(QString().sprintf("%dx%d+0+0",int(imagedisplay->width()),int(imagedisplay->height())));
 
@@ -680,8 +685,12 @@ void dvbcut::playPlay()
     mplayer_process->addArgument(QString().sprintf("0x%x",int(mpg->mplayeraudioid(currentaudiotrack))));
   }
 
-  mplayer_process->addArgument(QString(mpgfilen.front()));
-
+  // for now, pass all filenames from the current one up to the last one
+  std::list<std::string>::const_iterator it = mpgfilen.begin();
+  for (int i = 0; it != mpgfilen.end(); ++i, ++it)
+    if (i >= partindex)
+      mplayer_process->addArgument(QString(*it));
+ 
   mplayer_process->setCommunication(QProcess::Stdout|QProcess::Stderr|QProcess::DupStderr);
 
   connect(mplayer_process, SIGNAL(processExited()), this, SLOT(mplayer_exited()));
