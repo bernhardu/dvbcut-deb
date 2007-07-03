@@ -1,3 +1,13 @@
+2007-07-03  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/buffer.cpp:
+		Use fstat/_fstati64 to obtain the file size. This is
+		required to overcome the 2 GB limit on 32-bit systems
+		(Windows in particular).
+
+	* src/defines.h:
+		Better defaults for multi-file mode.
+
 2007-07-02  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/buffer.cpp:

@@ -171,15 +171,26 @@ inbuffer::open(std::string filename, std::string *errmsg) {
       *errmsg = filename + ": open: " + strerror(errno);
     return false;
   }
-  off_t size = ::lseek(f.fd, 0, SEEK_END);
-  if (size == -1) {
+#ifdef __WIN32__
+  struct _stati64 st;
+  if (::_fstati64(f.fd, &st) == -1) {
+#else /* __WIN32__ */
+  struct stat st;
+  if (::fstat(f.fd, &st) == -1) {
+#endif /* __WIN32__ */
     if (errmsg)
-      *errmsg = filename + ": lseek: " + strerror(errno);
+      *errmsg = filename + ": fstat: " + strerror(errno);
+    ::close(f.fd);
+    return false;
+  }
+  if (!S_ISREG(st.st_mode)) {
+    if (errmsg)
+      *errmsg = filename + ": not a regular file";
     ::close(f.fd);
     return false;
   }
   f.off = filesize;
-  f.end = filesize += size;
+  f.end = filesize += st.st_size;
   files.push_back(f);
   return true;
 }
