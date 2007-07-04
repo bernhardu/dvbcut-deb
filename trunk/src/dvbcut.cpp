@@ -1044,12 +1044,23 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   if (filenames.empty()) {
     QStringList fn = QFileDialog::getOpenFileNames(
       settings.loadfilter,
-      QString("."),
+      settings.lastdir,
       this,
       "Open file...",
       "Choose one or more MPEG files to open");
+    if (fn.empty())
+      return;
     for (QStringList::Iterator it = fn.begin(); it != fn.end(); ++it)
       filenames.push_back((const char*)*it);
+
+    // remember directory
+    QString dir = fn.front();
+    int n = dir.findRev('/');
+    if (n > 0)
+      dir = dir.left(n);
+    else if (n == 0)
+      dir = "/";
+    settings.lastdir = dir;
   }
 
   if (filenames.empty())

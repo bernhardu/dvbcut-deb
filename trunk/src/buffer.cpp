@@ -296,7 +296,6 @@ inbuffer::providedata(unsigned int amount, long long position) {
 
   if (amount > size)
     amount = size;
-  dvbcut_off_t seekpos = position;
   // reuse existing data if possible
   if (position >= pos && position < pos + writepos) {
     unsigned int pp = position - pos;
@@ -304,7 +303,6 @@ inbuffer::providedata(unsigned int amount, long long position) {
       writepos -= pp;
       memmove(d, (char*)d + pp, writepos);
     }
-    seekpos += writepos;
   }
   else {
     writepos = 0;
@@ -313,17 +311,25 @@ inbuffer::providedata(unsigned int amount, long long position) {
   pos = position;
   bool needseek = true;
   while (writepos < amount) {
+    dvbcut_off_t seekpos = pos + writepos;
     while (seekpos >= i->end) {
       ++i;
       assert(i != files.end());
       needseek = true;
     }
     assert(seekpos >= i->off);
-    off_t relpos = seekpos - i->off;
-    if (::lseek(i->fd, relpos, SEEK_SET) == -1)
-      return -1;
-    needseek = false;
-    size_t len = amount - writepos;
+    if (needseek) {
+#ifdef __WIN32__
+      __int64 relpos = seekpos - i->off;
+      if (::_lseeki64(i->fd, relpos, SEEK_SET) == -1)
+#else /* __WIN32__ */
+      off_t relpos = seekpos - i->off;
+      if (::lseek(i->fd, relpos, SEEK_SET) == -1)
+#endif /* __WIN32__ */
+	return -1;
+      needseek = false;
+    }
+    size_t len = size - writepos;
     if (len > i->end - seekpos)
       len = i->end - seekpos;
     assert(len > 0);
@@ -335,7 +341,6 @@ inbuffer::providedata(unsigned int amount, long long position) {
       break;
     }
     writepos += n;
-    seekpos += n;
   }
   return inbytes();
 }

@@ -40,6 +40,7 @@ public:
   void load_settings();
   void save_settings();
 
+  QString lastdir;
   QString idxfilter;
   QString prjfilter;
   QString loadfilter;

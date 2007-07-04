@@ -1,3 +1,17 @@
+2007-07-04  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/buffer.cpp:
+		Use _lseeki64 on Windows.
+		Only seek if necessary.
+		Try to read a buffer full of data.
+
+	* src/dvbcut.cpp:
+		Remember last used load directory for Open.
+ 
+	* src/settings.cpp:
+	* src/settings.h:
+		Add "lastdir" setting.
+
 2007-07-03  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/buffer.cpp:
