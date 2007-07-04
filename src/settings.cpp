@@ -58,6 +58,7 @@ dvbcut_settings::load_settings() {
   lin_interval = readNumEntry("/lin_interval", 3600);
   if (lin_interval < 0)
     lin_interval = 0;
+  lastdir = readEntry("/lastdir", ".");
   idxfilter = readEntry("/idxfilter", DVBCUT_DEFAULT_IDXFILTER);
   prjfilter = readEntry("/prjfilter", DVBCUT_DEFAULT_PRJFILTER);
   loadfilter = readEntry("/loadfilter", DVBCUT_DEFAULT_LOADFILTER);
@@ -91,6 +92,7 @@ dvbcut_settings::save_settings() {
   writeEntry("/jog_offset", jog_offset);
   writeEntry("/jog_interval", jog_interval);
   writeEntry("/lin_interval", lin_interval);
+  writeEntry("/lastdir", lastdir);
   writeEntry("/idxfilter", idxfilter);
   writeEntry("/prjfilter", prjfilter);
   writeEntry("/loadfilter", loadfilter);
