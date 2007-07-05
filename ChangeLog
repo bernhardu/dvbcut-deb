@@ -1,6 +1,18 @@
 2007-07-05  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.w32:
+		Use -Wall.
+		Only remove ffmpeg install directories when distcleaning.
+
+	* src/buffer.cpp:
+		Disable mmap() on Windows.
+
+	* mingw.sh:
+		Use src/Makefile.w32 for everything.
+
+2007-07-05  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/Makefile.w32:
 		New file.
 
 	* mingw.sh:

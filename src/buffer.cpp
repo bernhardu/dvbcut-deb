@@ -205,9 +205,12 @@ inbuffer::close() {
   }
   files.clear();
   // free buffer
+#ifndef _WIN32
   if (mmapped)
     ::munmap(d, writepos);
-  else if (d)
+  else
+#endif
+  if (d)
     free(d);
   mmapped = false;
   d = 0;
@@ -244,6 +247,7 @@ inbuffer::providedata(unsigned int amount, long long position) {
   }
   assert(position >= i->off);
 
+#ifndef _WIN32
   // remove old mapping, if any
   if (mmapped) {
     ::munmap(d, writepos);
@@ -280,6 +284,7 @@ inbuffer::providedata(unsigned int amount, long long position) {
       return inbytes();
     }
   }
+#endif
 
   // allocate read buffer
   if (!d) {
