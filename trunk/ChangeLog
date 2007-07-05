@@ -1,3 +1,8 @@
+2007-07-05  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	Added svn:keyword property for all files except src/*.ui
+	(I don't want to confuse Qt designer).
+
 2007-07-04  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/buffer.cpp:
