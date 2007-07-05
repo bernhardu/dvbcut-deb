@@ -1,5 +1,14 @@
 2007-07-05  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/Makefile.w32:
+		New file.
+
+	* mingw.sh:
+		Set svn:executable property.
+		Use src/Makefile.w32.
+
+2007-07-05  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	Added svn:keyword property for all files except src/*.ui
 	(I don't want to confuse Qt designer).
 

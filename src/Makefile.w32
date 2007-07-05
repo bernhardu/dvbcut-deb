@@ -1,0 +1,98 @@
+TOP = `cd .. && pwd`
+
+QTDIR = ../../qt-3
+
+PATH := $(QTDIR)/bin:$(PATH)
+
+%.h uic_%.cpp: %.ui
+	uic -o $*.h $*.ui
+	uic -impl $*.h -o uic_$*.cpp $*.ui
+
+moc_%.cpp: %.h
+	moc -o $@ $<
+
+MOC = \
+	moc_dvbcut.cpp \
+	moc_dvbcutbase.cpp \
+	moc_exportdialog.cpp \
+	moc_exportdialogbase.cpp \
+	moc_mplayererrorbase.cpp \
+	moc_progressstatusbar.cpp \
+	moc_progresswindow.cpp \
+	moc_progresswindowbase.cpp
+
+SRCS = \
+	avframe.cpp differenceimageprovider.cpp buffer.cpp \
+	dvbcut.cpp eventlistitem.cpp exception.cpp exportdialog.cpp \
+	imageprovider.cpp index.cpp lavfmuxer.cpp logoutput.cpp \
+	main.cpp mpegmuxer.cpp mpgfile.cpp playaudio.cpp \
+	progressstatusbar.cpp progresswindow.cpp psfile.cpp \
+	pts.cpp streamdata.cpp tsfile.cpp uic_dvbcutbase.cpp \
+	uic_mplayererrorbase.cpp uic_progresswindowbase.cpp \
+	uic_exportdialogbase.cpp settings.cpp $(MOC) \
+	../import/stdlib.cpp
+
+OBJS = $(SRCS:.cpp=.o)
+
+CXX = g++
+CXXFLAGS = -O2
+CPPFLAGS = -I../ffmpeg/include -I../import -I/usr/local/include \
+	-I. -DQT3_SUPPORT -DHAVE_LIB_MAD -DHAVE_LIB_A52 -DHAVE_LIB_AO \
+	-I$(QTDIR)/include/Qt -I$(QTDIR)/include/QtCore \
+	-I$(QTDIR)/include/QtGui -I$(QTDIR)/include/Qt3Support \
+	-I$(QTDIR)/include
+LDFLAGS = -L$(QTDIR)/lib -L../ffmpeg/lib -L/usr/local/lib
+LDLIBS = -lavformat -lavcodec -lavutil -lqt-mt -lmad -la52 -lao -lwinmm -lmpeg2
+
+all: ../bin/dvbcut.exe
+
+../bin/dvbcut.exe: ../ffmpeg/lib/libavcodec.a $(OBJS)
+	$(CXX) -o $@ $(LDFLAGS) $(OBJS) $(LDLIBS)
+
+OPT.ffmpeg = \
+	--prefix=$(TOP)/ffmpeg \
+	--enable-mingw32 \
+	--enable-gpl \
+	--disable-decoders \
+	--enable-memalign-hack \
+	--disable-encoders \
+	--disable-ffplay \
+	--disable-ffserver \
+	--disable-vhook \
+	--disable-zlib \
+	--disable-network \
+	--disable-dv1394 \
+	--disable-bktr \
+	--disable-v4l \
+	--disable-audio-beos \
+	--disable-audio-oss \
+	--enable-codec=mpeg2encoder \
+	--enable-codec=mp2_encoder \
+	--enable-codec=ac3_decoder \
+	--enable-codec=ac3_encoder \
+	--enable-a52 \
+	--disable-mmx \
+	--disable-debug
+
+../ffmpeg/lib/libavcodec.a:
+	if cd ../ffmpeg.src; then \
+	  ./configure $(OPT.ffmpeg) || exit 1; \
+	  $(MAKE) installlib || exit 1; \
+	fi
+clean:
+	-rm -f *.o moc_*.cpp
+	-rm -rf ../ffmpeg/lib ../ffmpeg/include
+	-cd ../ffmpeg.src && $(MAKE) clean
+
+distclean: clean
+	# remove uic generated files as well
+	-rm -f uic_*.cpp
+	-rm -f .depend stamp-depend
+
+dep: stamp-depend
+stamp-depend: $(SRCS)
+	-@rm -f .depend $@
+	-$(CXX) -MM $(CPPFLAGS) $(SRCS) > .depend
+	echo timestamp > $@
+
+-include .depend
