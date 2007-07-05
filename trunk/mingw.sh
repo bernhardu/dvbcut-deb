@@ -6,6 +6,8 @@ echo "*** Building FFMPEG..."
 make -C ffmpeg.src installlib
 make -C ffmpeg.src clean
 fi
+make -C src -f Makefile.w32
+exit
 cd src
 #qt3to4.exe *.cpp *.h
 
