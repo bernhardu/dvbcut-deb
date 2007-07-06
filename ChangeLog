@@ -1,3 +1,8 @@
+2007-07-07  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/Makefile.w32:
+		Add copyright and license text.
+
 2007-07-06  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.w32:
