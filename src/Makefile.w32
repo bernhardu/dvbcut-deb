@@ -4,9 +4,11 @@ QTDIR = ../../qt-3
 
 PATH := $(QTDIR)/bin:$(PATH)
 
-%.h uic_%.cpp: %.ui
-	uic -o $*.h $*.ui
-	uic -impl $*.h -o uic_$*.cpp $*.ui
+%.h: %.ui
+	uic -o $@ $<
+
+uic_%.cpp: %.h
+	uic -impl $< -o $@ $*.ui
 
 moc_%.cpp: %.h
 	moc -o $@ $<
@@ -21,15 +23,19 @@ MOC = \
 	moc_progresswindow.cpp \
 	moc_progresswindowbase.cpp
 
+UIC = \
+	uic_dvbcutbase.cpp \
+	uic_exportdialogbase.cpp \
+	uic_mplayererrorbase.cpp \
+	uic_progresswindowbase.cpp
+
 SRCS = \
 	avframe.cpp differenceimageprovider.cpp buffer.cpp \
 	dvbcut.cpp eventlistitem.cpp exception.cpp exportdialog.cpp \
 	imageprovider.cpp index.cpp lavfmuxer.cpp logoutput.cpp \
 	main.cpp mpegmuxer.cpp mpgfile.cpp playaudio.cpp \
 	progressstatusbar.cpp progresswindow.cpp psfile.cpp \
-	pts.cpp streamdata.cpp tsfile.cpp uic_dvbcutbase.cpp \
-	uic_mplayererrorbase.cpp uic_progresswindowbase.cpp \
-	uic_exportdialogbase.cpp settings.cpp $(MOC) \
+	pts.cpp streamdata.cpp tsfile.cpp settings.cpp $(MOC) $(UIC) \
 	../import/stdlib.cpp
 
 OBJS = $(SRCS:.cpp=.o)
@@ -46,7 +52,7 @@ LDLIBS = -lavformat -lavcodec -lavutil -lqt-mt -lmad -la52 -lao -lwinmm -lmpeg2
 
 all: ../bin/dvbcut.exe
 
-../bin/dvbcut.exe: ../ffmpeg/lib/libavcodec.a $(OBJS)
+../bin/dvbcut.exe: ../ffmpeg/lib/libavcodec.a $(SRCS) $(OBJS)
 	$(CXX) -o $@ $(LDFLAGS) $(OBJS) $(LDLIBS)
 
 OPT.ffmpeg = \
