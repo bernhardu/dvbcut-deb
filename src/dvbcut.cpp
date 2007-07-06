@@ -373,6 +373,9 @@ void dvbcut::fileExport()
     return;
   }
 
+  // starting export, switch source to sequential mode
+  buf.setsequential(true);
+
   int startpic=-1;
   int totalpics=0;
 
@@ -502,6 +505,9 @@ void dvbcut::fileExport()
       }
   if (!nogui)
     delete prgwin;
+
+  // done exporting, switch back to random mode
+  buf.setsequential(false);
 }
 
 void dvbcut::fileClose()
@@ -1214,6 +1220,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   std::list<std::string>::const_iterator it = filenames.begin();
   while (it != filenames.end() && buf.open(*it, &errormessage))
     ++it;
+  buf.setsequential(true);
   if (it == filenames.end()) {
     mpg = mpgfile::open(buf, &errormessage);
   }
@@ -1314,6 +1321,9 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
     fileOpenAction->setEnabled(true);
     return;
   }
+
+  // file loaded, switch to random mode
+  buf.setsequential(false);
 
   mpgfilen=filenames;
   idxfilen=idxfilename;

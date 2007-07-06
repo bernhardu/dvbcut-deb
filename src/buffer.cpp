@@ -151,7 +151,7 @@ long inbuffer::pagesize=0;
 
 inbuffer::inbuffer(unsigned int _size, unsigned int _mmapsize) :
     d(0), size(_size), mmapsize(_mmapsize), readpos(0), writepos(0),
-    eof(false), pos(0), filesize(0), mmapped(false)
+    eof(false), pos(0), filesize(0), mmapped(false), sequential(false)
 {
   if (!pagesize)
     pagesize=sysconf(_SC_PAGESIZE);
@@ -242,6 +242,12 @@ inbuffer::providedata(unsigned int amount, long long position) {
   std::vector<infile>::const_iterator i = files.begin();
   assert(i != files.end());	// otherwise we would have returned already
   while (position >= i->end) {
+#ifdef POSIX_FADV_DONTNEED
+    if (sequential) {
+      off_t len = i->end - i->off;
+      posix_fadvise(i->fd, 0, len, POSIX_FADV_DONTNEED);
+    }
+#endif
     ++i;
     assert(i != files.end());
   }
@@ -268,6 +274,13 @@ inbuffer::providedata(unsigned int amount, long long position) {
     size_t modulus = relpos % pagesize;
     relpos -= modulus;
     newpos -= modulus;
+#ifdef POSIX_FADV_DONTNEED
+    if (sequential) {
+      // we're done with earlier parts
+      if (relpos)
+	posix_fadvise(i->fd, 0, relpos, POSIX_FADV_DONTNEED);
+    }
+#endif
     size_t len = mmapsize;
     if (newpos + len > i->end)
       len = i->end - newpos;

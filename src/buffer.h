@@ -153,6 +153,7 @@ protected:
   dvbcut_off_t filesize;
   bool mmapped;
   static long pagesize;
+  bool sequential;
 
   void close();
 
@@ -184,6 +185,7 @@ public:
   dvbcut_off_t getfilesize() const { return filesize; }
   dvbcut_off_t getfilepos() const { return pos + readpos; }
   int getfilenum(dvbcut_off_t offset, dvbcut_off_t &fileoff);
+  void setsequential(bool flag) { sequential = flag; }
 };
 
 class outbuffer : protected buffer

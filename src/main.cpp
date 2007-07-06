@@ -92,6 +92,7 @@ main(int argc, char *argv[]) {
     while (i < argc && buf.open(argv[i], &errormessage)) {
       ++i;
     }
+    buf.setsequential(true);
     if (i == argc) {
       mpg = mpgfile::open(buf, &errormessage);
     }
