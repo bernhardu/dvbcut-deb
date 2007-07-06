@@ -1,3 +1,15 @@
+2007-07-06  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/buffer.cpp:
+	* src/buffer.h:
+		Use posix_fadvise in sequential mode.
+
+	* src/main.cpp:
+		Use sequential mode when indexing.
+
+	* src/dvbcut.cpp:
+		Use sequential mode when indexing or exporting.
+
 2007-07-05  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.w32:
