@@ -41,7 +41,7 @@ void
 usage_exit(int rv=1) {
   fprintf(stderr,"Usage:\n"
     "  %s -generateidx [-idx <indexfilename>] <mpgfilename> ...\n"
-    "  %s -batch <prjfilename>\n",
+    "  %s -batch <prjfilename> | <mpgfilename> ...\n",
     argv0, argv0);
   exit(rv);
 }
@@ -134,10 +134,14 @@ main(int argc, char *argv[]) {
   dvbcut *main=new dvbcut;
   main->batchmode(batchmode);
 
-  if (batchmode) {
-    if (i + 1 != argc)	// must provide exactly one filename
-      usage_exit();
+  while (i < argc) {
     filenames.push_back(std::string(argv[i]));
+    ++i;
+  }
+
+  if (batchmode) {
+    if (filenames.empty())	// must provide at least one filename
+      usage_exit();
     main->open(filenames,idxfilename);
     main->fileExport();
     rv = 0;
@@ -145,13 +149,8 @@ main(int argc, char *argv[]) {
   else {
     main->show();
 
-    if (i < argc) {
-      do {
-	filenames.push_back(std::string(argv[i]));
-      }
-      while (++i < argc);
+    if (!filenames.empty())
       main->open(filenames,idxfilename);
-    }
 
     if (main) {
       a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
