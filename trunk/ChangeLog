@@ -1,3 +1,12 @@
+2007-07-09  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
+		Export all frames in batch mode if there isn't a project file
+		(patch by Ralph Glasstetter).
+
+	* src/main.cpp:
+		Allow multiple filenames in batch mode.
+
 2007-07-07  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.w32:

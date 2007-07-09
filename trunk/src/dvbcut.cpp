@@ -326,7 +326,7 @@ void dvbcut::fileExport()
     if (expfilen.empty())
       return;
     expd->hide();
-    }
+  }
 
   if (QFileInfo(expfilen).exists() && question(
       "File exists - dvbcut",
@@ -376,133 +376,159 @@ void dvbcut::fileExport()
   // starting export, switch source to sequential mode
   buf.setsequential(true);
 
-  int startpic=-1;
+  int startpic=-1, stoppic=-1;
   int totalpics=0;
 
   for(QListBoxItem *lbi=eventlist->firstItem();lbi;lbi=lbi->next())
     if (lbi->rtti()==EventListItem::RTTI()) {
-    EventListItem &eli=(EventListItem&)*lbi;
-    switch (eli.geteventtype()) {
-      case EventListItem::start:
-        if (startpic<0) {
-          startpic=eli.getpicture();
-        }
-        break;
-      case EventListItem::stop:
-        if (startpic>=0) {
-          int stoppic=eli.getpicture();
-          totalpics+=stoppic-startpic;
-          startpic=-1;
-        }
-        break;
-      default:
-        break;
-    }
+      EventListItem &eli=(EventListItem&)*lbi;
+      switch (eli.geteventtype()) {
+	case EventListItem::start:
+	  if (startpic<0) {
+	    startpic=eli.getpicture();
+	  }
+	  break;
+	case EventListItem::stop:
+	  if (startpic>=0) {
+	    stoppic=eli.getpicture();
+	    totalpics+=stoppic-startpic;
+	    startpic=-1;
+	  }
+	  break;
+	default:
+	  break;
+      }
     }
 
-    int savedpic=0;
-    long long savedtime=0;
-    pts_t startpts=0;
-    std::list<pts_t> chapterlist;
-    chapterlist.push_back(0);
-    startpic=-1;
+  int savedpic=0;
+  long long savedtime=0;
+  pts_t startpts=0, stoppts=0;
+  std::list<pts_t> chapterlist;
+  chapterlist.push_back(0);
+  startpic=-1;
 
+  if (totalpics > 0) {
+    // at least one START/STOP marker pair was found!
     for(QListBoxItem *lbi=eventlist->firstItem();lbi && (nogui || !prgwin->cancelled());lbi=lbi->next())
       if (lbi->rtti()==EventListItem::RTTI()) {
-      EventListItem &eli=(EventListItem&)*lbi;
+	EventListItem &eli=(EventListItem&)*lbi;
 
-      switch (eli.geteventtype()) {
-        case EventListItem::start:
-          if (startpic<0) {
-            startpic=eli.getpicture();
-            startpts=(*mpg)[startpic].getpts();
-          }
-          break;
-        case EventListItem::stop:
-          if (startpic>=0) {
-            int stoppic=eli.getpicture();
-            pts_t stoppts=(*mpg)[stoppic].getpts();
-            if (!nogui)
-	      prgwin->printheading("Exporting %d pictures: %s .. %s",
-				  stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
-            mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,prgwin);
-            savedpic+=stoppic-startpic;
-            savedtime+=stoppts-startpts;
-            startpic=-1;
-          }
-          break;
-        case EventListItem::chapter:
-          if (startpic==-1)
-            chapterlist.push_back(savedtime);
-          else
-            chapterlist.push_back((*mpg)[eli.getpicture()].getpts()-startpts+savedtime);
-          break;
-        case EventListItem::none:
-        case EventListItem::bookmark:
-          break;
+	switch (eli.geteventtype()) {
+	  case EventListItem::start:
+	    if (startpic<0) {
+	      startpic=eli.getpicture();
+	      startpts=(*mpg)[startpic].getpts();
+	    }
+	    break;
+	  case EventListItem::stop:
+	    if (startpic>=0) {
+	      stoppic=eli.getpicture();
+	      stoppts=(*mpg)[stoppic].getpts();
+	      if (!nogui)
+		prgwin->printheading("Exporting %d pictures: %s .. %s",
+				    stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
+	      else
+		fprintf(stderr,"Exporting %d pictures: %s .. %s\n",
+				    stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
+	      mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,prgwin);
+	      savedpic+=stoppic-startpic;
+	      savedtime+=stoppts-startpts;
+	      startpic=-1;
+	    }
+	    break;
+	  case EventListItem::chapter:
+	    if (startpic==-1)
+	      chapterlist.push_back(savedtime);
+	    else
+	      chapterlist.push_back((*mpg)[eli.getpicture()].getpts()-startpts+savedtime);
+	    break;
+	  case EventListItem::none:
+	  case EventListItem::bookmark:
+	    break;
+	}
       }
+  }
+  else if (nogui) {
+    // batch conversion with no START/STOP pair given at all! 
+    startpic=0; 
+    startpts=(*mpg)[startpic].getpts();   
+    // last picture is missing! ==> Indexer has to add a (invisible) dummy frame at the end... 
+    stoppic=pictures-1;
+    stoppts=(*mpg)[stoppic].getpts();
+    savedpic=0;
+    totalpics=stoppic-startpic;
+    fprintf(stderr,"Exporting %d pictures: %s .. %s\n",
+		   stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
+    mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,prgwin);
+    savedpic=stoppic-startpic;
+    savedtime=stoppts-startpts;
+  }
 
-      }
+  mux.reset();
 
-      mux.reset();
+  if (!nogui)
+    prgwin->printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
+			int(savedtime/(3600*90000)),
+			int(savedtime/(60*90000))%60,
+			int(savedtime/90000)%60,
+			int(savedtime/90)%1000	);
+  else
+    fprintf(stderr,"Saved %d pictures (%02d:%02d:%02d.%03d)\n",savedpic,
+			int(savedtime/(3600*90000)),
+			int(savedtime/(60*90000))%60,
+			int(savedtime/90000)%60,
+			int(savedtime/90)%1000	);
 
-      if (!nogui)
-	prgwin->printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
-                          int(savedtime/(3600*90000)),
-                          int(savedtime/(60*90000))%60,
-                          int(savedtime/90000)%60,
-                          int(savedtime/90)%1000	);
-
-      std::string chapterstring;
-      if (!chapterlist.empty()) {
-        int nchar=0;
-        char chapter[16];
-        if (!nogui)
-	  prgwin->printheading("\nChapterlist:");
-        pts_t lastch=-1;
-        for(std::list<pts_t>::const_iterator it=chapterlist.begin();
-            it!=chapterlist.end();++it)
-          if (*it != lastch) {
-          lastch=*it;
+  std::string chapterstring;
+  if (!chapterlist.empty()) {
+    int nchar=0;
+    char chapter[16];
+    if (!nogui)
+      prgwin->printheading("\nChapterlist:");
+    pts_t lastch=-1;
+    for(std::list<pts_t>::const_iterator it=chapterlist.begin();
+        it!=chapterlist.end();++it)
+      if (*it != lastch) {
+        lastch=*it;
         // formatting the chapter string
-          if(nchar>0) {
-            nchar++; 
-            chapterstring+=",";
-          }  
-          nchar+=sprintf(chapter,"%02d:%02d:%02d.%03d",
-                         int(lastch/(3600*90000)),
-                         int(lastch/(60*90000))%60,
-                         int(lastch/90000)%60,
-                         int(lastch/90)%1000	);
+        if(nchar>0) {
+          nchar++; 
+          chapterstring+=",";
+        }  
+        nchar+=sprintf(chapter,"%02d:%02d:%02d.%03d",
+                       int(lastch/(3600*90000)),
+                       int(lastch/(60*90000))%60,
+                       int(lastch/90000)%60,
+                       int(lastch/90)%1000	);
         // normal output as before
-          if (!nogui)
-	    prgwin->print(chapter);
+        if (!nogui)
+	  prgwin->print(chapter);
         // append chapter marks to a comma separated list for dvdauthor xml-file         
-          chapterstring+=chapter;
-          }
+        chapterstring+=chapter;
       }
+  }
   // simple dvdauthor xml file with chapter marks
-      std::string filename,destname;
-      if(expfilen.rfind("/")<expfilen.length()) 
-        filename=expfilen.substr(expfilen.rfind("/")+1);
-      else 
-        filename=expfilen;
-      destname=filename.substr(0,filename.rfind("."));
-      if (!nogui) {
-	prgwin->printheading("\nSimple XML-file for dvdauthor with chapter marks:");
-	prgwin->print("<dvdauthor dest=\"%s\">",destname.c_str());
-	prgwin->print("  <vmgm />");
-	prgwin->print("  <titleset>");
-	prgwin->print("    <titles>");
-	prgwin->print("      <pgc>");
-	prgwin->print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
-	prgwin->print("      </pgc>");
-	prgwin->print("    </titles>");
-	prgwin->print("  </titleset>");
-	prgwin->print("</dvdauthor>");
+  std::string filename,destname;
+  if(expfilen.rfind("/")<expfilen.length()) 
+    filename=expfilen.substr(expfilen.rfind("/")+1);
+  else 
+    filename=expfilen;
+  destname=filename.substr(0,filename.rfind("."));
+  if (!nogui) {
+    prgwin->printheading("\nSimple XML-file for dvdauthor with chapter marks:");
+    prgwin->print("<dvdauthor dest=\"%s\">",destname.c_str());
+    prgwin->print("  <vmgm />");
+    prgwin->print("  <titleset>");
+    prgwin->print("    <titles>");
+    prgwin->print("      <pgc>");
+    prgwin->print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
+    prgwin->print("      </pgc>");
+    prgwin->print("    </titles>");
+    prgwin->print("  </titleset>");
+    prgwin->print("</dvdauthor>");
 
-	prgwin->finish();
-      }
+    prgwin->finish();
+  }
   if (!nogui)
     delete prgwin;
 
@@ -1262,6 +1288,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
     pictures=mpg->loadindex(idxfilename.c_str(),&errorstring);
     int serrno=errno;
     busy.setbusy(false);
+    if (nogui && pictures > 0)
+      fprintf(stderr,"Loaded index with %d pictures!\n",pictures);
     if (pictures==-1 && serrno!=ENOENT) {
       delete mpg;
       mpg=0;
@@ -1293,6 +1321,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
     busy.setbusy(true);
     pictures=mpg->generateindex(idxfilename.empty()?0:idxfilename.c_str(),&errorstring,&psb);
     busy.setbusy(false);
+    if (nogui && pictures > 0)
+      fprintf(stderr,"Generated index with %d pictures!\n",pictures);
 
     if (psb.cancelled()) {
       delete mpg;
