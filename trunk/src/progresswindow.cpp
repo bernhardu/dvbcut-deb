@@ -85,7 +85,10 @@ void progresswindow::print(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
-  logbrowser->append(quotetext(text));
+  if (*text)
+    logbrowser->append(quotetext(text));
+  else
+    logbrowser->append("<br>");
   free(text);
   qApp->processEvents();
   }

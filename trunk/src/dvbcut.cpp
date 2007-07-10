@@ -336,9 +336,14 @@ void dvbcut::fileExport()
     return;
 
   progresswindow *prgwin = 0;
-  if (!nogui) {
+  logoutput *log;
+  if (nogui) {
+    log = new logoutput;
+  }
+  else {
     prgwin = new progresswindow(this);
     prgwin->setCaption(QString("export - " + expfilen));
+    log = prgwin;
   }
 
   //   lavfmuxer mux(fmt,*mpg,outfilename);
@@ -366,10 +371,14 @@ void dvbcut::fileExport()
       break;
   }
 
-  if (!nogui && !mux->ready()) {
-    prgwin->printerror("Unable to set up muxer!");
-    prgwin->finish();
-    delete prgwin;
+  if (!mux->ready()) {
+    log->printerror("Unable to set up muxer!");
+    if (nogui)
+      delete log;
+    else {
+      prgwin->finish();
+      delete prgwin;
+    }
     return;
   }
 
@@ -424,13 +433,9 @@ void dvbcut::fileExport()
 	    if (startpic>=0) {
 	      stoppic=eli.getpicture();
 	      stoppts=(*mpg)[stoppic].getpts();
-	      if (!nogui)
-		prgwin->printheading("Exporting %d pictures: %s .. %s",
-				    stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
-	      else
-		fprintf(stderr,"Exporting %d pictures: %s .. %s\n",
-				    stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
-	      mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,prgwin);
+	      log->printheading("Exporting %d pictures: %s .. %s",
+				stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
+	      mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,log);
 	      savedpic+=stoppic-startpic;
 	      savedtime+=stoppts-startpts;
 	      startpic=-1;
@@ -459,32 +464,25 @@ void dvbcut::fileExport()
     totalpics=stoppic-startpic;
     fprintf(stderr,"Exporting %d pictures: %s .. %s\n",
 		   stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
-    mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,prgwin);
+    mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,log);
     savedpic=stoppic-startpic;
     savedtime=stoppts-startpts;
   }
 
   mux.reset();
 
-  if (!nogui)
-    prgwin->printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
-			int(savedtime/(3600*90000)),
-			int(savedtime/(60*90000))%60,
-			int(savedtime/90000)%60,
-			int(savedtime/90)%1000	);
-  else
-    fprintf(stderr,"Saved %d pictures (%02d:%02d:%02d.%03d)\n",savedpic,
-			int(savedtime/(3600*90000)),
-			int(savedtime/(60*90000))%60,
-			int(savedtime/90000)%60,
-			int(savedtime/90)%1000	);
+  log->printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
+		    int(savedtime/(3600*90000)),
+		    int(savedtime/(60*90000))%60,
+		    int(savedtime/90000)%60,
+		    int(savedtime/90)%1000	);
 
   std::string chapterstring;
   if (!chapterlist.empty()) {
     int nchar=0;
     char chapter[16];
-    if (!nogui)
-      prgwin->printheading("\nChapterlist:");
+    log->print("");
+    log->printheading("Chapter list");
     pts_t lastch=-1;
     for(std::list<pts_t>::const_iterator it=chapterlist.begin();
         it!=chapterlist.end();++it)
@@ -501,8 +499,7 @@ void dvbcut::fileExport()
                        int(lastch/90000)%60,
                        int(lastch/90)%1000	);
         // normal output as before
-        if (!nogui)
-	  prgwin->print(chapter);
+	log->print(chapter);
         // append chapter marks to a comma separated list for dvdauthor xml-file         
         chapterstring+=chapter;
       }
@@ -514,23 +511,25 @@ void dvbcut::fileExport()
   else 
     filename=expfilen;
   destname=filename.substr(0,filename.rfind("."));
-  if (!nogui) {
-    prgwin->printheading("\nSimple XML-file for dvdauthor with chapter marks:");
-    prgwin->print("<dvdauthor dest=\"%s\">",destname.c_str());
-    prgwin->print("  <vmgm />");
-    prgwin->print("  <titleset>");
-    prgwin->print("    <titles>");
-    prgwin->print("      <pgc>");
-    prgwin->print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
-    prgwin->print("      </pgc>");
-    prgwin->print("    </titles>");
-    prgwin->print("  </titleset>");
-    prgwin->print("</dvdauthor>");
+  log->print("");
+  log->printheading("Simple XML-file for dvdauthor with chapter marks");
+  log->print("<dvdauthor dest=\"%s\">",destname.c_str());
+  log->print("  <vmgm />");
+  log->print("  <titleset>");
+  log->print("    <titles>");
+  log->print("      <pgc>");
+  log->print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
+  log->print("      </pgc>");
+  log->print("    </titles>");
+  log->print("  </titleset>");
+  log->print("</dvdauthor>");
 
+  if (nogui)
+    delete log;
+  else {
     prgwin->finish();
-  }
-  if (!nogui)
     delete prgwin;
+  }
 
   // done exporting, switch back to random mode
   buf.setsequential(false);
