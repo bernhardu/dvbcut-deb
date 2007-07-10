@@ -382,9 +382,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
     pts_t delta_pts = (pts_t)(stop - start) * framerate / 300;
     double mux_rate = (double)bytes * 9e4 / (double)delta_pts;
     if (log)
-      log->print("Estimated mux rate: %.2f MBps",mux_rate*1e-6);
-    else
-      fprintf(stderr,"Estimated mux rate: %.2f MBps\n",mux_rate*1e-6);
+      log->printinfo("Estimated mux rate: %.2f MB/s", mux_rate * 1e-6);
   }
 
   while (seekpic>0 && idx[seekpic].getpts()>=videostartpts-180000)
@@ -649,12 +647,13 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
         float starts=float(audiostartpts[a]-videostartpts)/90.;
         float stops=float(audiostoppts[a]-videostoppts)/90.;
         float shift=float(audiooffset[a]-videooffset)/90.;
-        log->printinfo("Audio channel %d: starts %.3f milliseconds %s video\n"
-                       "Audio channel %d: stops %.3f milliseconds %s video\n"
-                       "Audio channel %d: delayed %.3f milliseconds\n",
-                       a+1,fabsf(starts-shift), (starts>=shift) ? "after":"before",
-                       a+1,fabsf(stops-shift), (stops>=shift) ? "after":"before",
-                       a+1,shift);
+        log->printinfo("Audio channel %d: starts %.3f milliseconds %s video",
+          a+1, fabsf(starts-shift), (starts>=shift) ? "after":"before");
+        log->printinfo("Audio channel %d: stops %.3f milliseconds %s video",
+          a+1, fabsf(stops-shift), (stops>=shift) ? "after":"before");
+	log->printinfo("Audio channel %d: delayed %.3f milliseconds",
+          a+1, shift);
+	log->print("");
       }
 
   mux.setpts(VIDEOSTREAM, videostoppts-videooffset);
@@ -665,9 +664,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
 void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int savedpics,int savepics, logoutput *log)
 {
   if (log)
-    log->print("Recoding %d pictures",stop-start);
-  else
-    fprintf(stderr,"RECODING PICTURES [%d;%d)\n",start,stop);
+    log->printinfo("Recoding %d pictures", stop-start);
 
   std::list<avframe*> framelist;
   decodegop(start,stop,framelist);
