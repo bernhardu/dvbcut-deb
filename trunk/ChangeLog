@@ -1,3 +1,11 @@
+2007-07-11  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/Makefile.w32:
+		Add explicit dependencies for moc and uil files.
+
+	* numerous other files:
+		Add $Id$ keyword.
+
 2007-07-10  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:
