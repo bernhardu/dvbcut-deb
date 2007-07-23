@@ -1071,9 +1071,6 @@ void dvbcut::loadrecentfile(int id)
 
 void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
 {
-  // reset inbuffer
-  buf.reset();
-
   if (filenames.empty()) {
     QStringList fn = QFileDialog::getOpenFileNames(
       settings.loadfilter,
@@ -1105,6 +1102,9 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
 
   // a valid file name has been entered
   setCaption(QString("dvbcut - " + filename));
+
+  // reset inbuffer
+  buf.reset();
 
   // if an MPEG file has already been opened, close it and reset the UI
   if (mpg) {

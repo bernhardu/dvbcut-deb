@@ -1,10 +1,15 @@
+2007-07-23  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
+		Reset inbuffer only if there are new input files.
+
 2007-07-11  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.w32:
 		Add explicit dependencies for moc and uil files.
 
 	* numerous other files:
-		Add $Id$ keyword.
+		Add "Id" keyword.
 
 2007-07-10  Michael Riepe  <too-tired@users.sourceforge.net>
 
