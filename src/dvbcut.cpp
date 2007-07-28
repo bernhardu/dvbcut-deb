@@ -62,6 +62,10 @@
 #include "settings.h"
 #include "exception.h"
 
+#include "version.h"
+
+#define VERSION_STRING	"dvbcut " VERSION "/" REVISION
+
 // **************************************************************************
 // ***  busy cursor helpers
 
@@ -143,6 +147,9 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
 
   // install event handler
   linslider->installEventFilter(this);
+
+  // set caption
+  setCaption(QString(VERSION_STRING));
 }
 
 // **************************************************************************
@@ -1101,7 +1108,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   std::string filename = filenames.front();
 
   // a valid file name has been entered
-  setCaption(QString("dvbcut - " + filename));
+  setCaption(QString(VERSION_STRING " - " + filename));
 
   // reset inbuffer
   buf.reset();
