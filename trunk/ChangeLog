@@ -1,3 +1,16 @@
+2007-07-28  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* VERSION:
+	* setversion.sh:
+		New files.
+
+	* src/SConscript:
+	* src/Makefile.w32:
+		Generate version.h.
+
+	* src/dvbcut.cpp:
+		Include version string in caption.
+
 2007-07-23  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:
