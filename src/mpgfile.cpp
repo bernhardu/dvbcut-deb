@@ -238,6 +238,24 @@ void mpgfile::initaudiocodeccontext(int aud)
   }
 }
 
+void mpgfile::initcodeccontexts(int vid)
+{
+  if (vid>=0) {
+    videostreams=1;
+    stream *S=&s[VIDEOSTREAM];
+    S->id=vid;
+    S->allocavcc();
+    S->avcc->codec_type=CODEC_TYPE_VIDEO;
+    S->avcc->codec_id=CODEC_ID_MPEG2VIDEO;
+    S->dec=avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
+    S->enc=avcodec_find_encoder(CODEC_ID_MPEG2VIDEO);
+    S->type=streamtype::mpeg2video;
+    }
+
+  for (int i=0;i<audiostreams;++i)
+    initaudiocodeccontext(i);
+}
+
 #ifdef HAVE_LIB_AO
 void mpgfile::playaudio(int aud, int picture, int ms)
 {

@@ -21,7 +21,6 @@
 #include "psfile.h"
 #include "streamhandle.h"
 #include "stream.h"
-#include <ffmpeg/avcodec.h>
 
 psfile::psfile(inbuffer &b, int initial_offset)
     : mpgfile(b, initial_offset)
@@ -66,8 +65,10 @@ psfile::psfile(inbuffer &b, int initial_offset)
         len=((data[4]<<8)|data[5])+6;
 
     if (sid>=0xe0 && sid<=0xef) {
-      if (vid<0)
+      if (vid<0) {
         vid=sid;
+	streamnumber[vid]=VIDEOSTREAM;
+      }
       inbytes-=len;
       data+=len;
       continue;
@@ -108,22 +109,7 @@ psfile::psfile(inbuffer &b, int initial_offset)
         break;
       }
 
-  if (vid>=0) {
-    videostreams=1;
-    streamnumber[vid]=VIDEOSTREAM;
-    stream *S=&s[VIDEOSTREAM];
-    S->id=vid;
-    S->allocavcc();
-    S->avcc->codec_type=CODEC_TYPE_VIDEO;
-    S->avcc->codec_id=CODEC_ID_MPEG2VIDEO;
-    S->dec=&mpeg2video_decoder;
-    S->enc=&mpeg2video_encoder;
-    S->type=streamtype::mpeg2video;
-    }
-
-
-  for (int i=0;i<audiostreams;++i)
-    initaudiocodeccontext(i);
+  initcodeccontexts(vid);
   }
 
 

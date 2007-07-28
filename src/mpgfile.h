@@ -21,7 +21,6 @@
 #ifndef _DVBCUT_MPGFILE_H
 #define _DVBCUT_MPGFILE_H
 
-#include <ffmpeg/avcodec.h>
 #include <string>
 #include <vector>
 #include <list>
@@ -143,6 +142,7 @@ public:
 
   void decodegop(int start, int stop, std::list<avframe*> &framelist);
   void initaudiocodeccontext(int aud);
+  void initcodeccontexts(int vid);
   void playaudio(int aud, int picture, int ms);
   void savempg(muxer &mux, int start, int stop, int progresspics=0,
                int progresstotal=0, logoutput *log=0);

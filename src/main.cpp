@@ -30,7 +30,9 @@
 #endif // HAVE_LIB_AO
 
 #include <qapplication.h>
+extern "C" {
 #include <ffmpeg/avformat.h>
+}
 #include <qimage.h>
 #include <qsettings.h>
 #include "dvbcut.h"

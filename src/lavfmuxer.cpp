@@ -18,8 +18,10 @@
 
 /* $Id$ */
 
+extern "C" {
 #include <ffmpeg/avformat.h>
 #include <ffmpeg/avcodec.h>
+}
 #include <string.h>
 #include <utility>
 #include <list>
@@ -28,10 +30,6 @@
 #include "lavfmuxer.h"
 
 #include <stdio.h>
-
-#if LIBAVCODEC_VERSION_INT < (51 << 16)
-#define liba52_decoder ac3_decoder
-#endif
 
 lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg, const char *filename)
     : muxer(), avfc(0), fileopened(false)
@@ -87,8 +85,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 
 	if (sd->getitemlistsize() > 1) {
 	  if (!avcodec_open(s->codec,
-			    (mpg.getstreamtype(astr)==streamtype::ac3audio) ?
-			    &liba52_decoder : &mp2_decoder)) {
+			    avcodec_find_decoder(s->codec->codec_id))) {
 	    int16_t samples[6*1536]; // must be enough for 6 AC-3 channels --mr
 	    int frame_size=sizeof(samples);
 	    //fprintf(stderr, "** decode audio size=%d\n", sd->inbytes());

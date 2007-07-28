@@ -21,7 +21,9 @@
 #ifndef _DVBCUT_AVFRAME_H
 #define _DVBCUT_AVFRAME_H
 
+extern "C" {
 #include <ffmpeg/avcodec.h>
+}
 
 class QImage;
 
