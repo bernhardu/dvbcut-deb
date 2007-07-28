@@ -1,5 +1,10 @@
 2007-07-28  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/Makefile.w32:
+		Fix "versioned" build on Windows.
+
+2007-07-28  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* SConstruct:
 	* src/avframe.h:
 	* src/lavfmuxer.cpp:
