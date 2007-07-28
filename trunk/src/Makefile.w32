@@ -149,5 +149,6 @@ exportdialogbase.h: exportdialogbase.ui
 mplayererrorbase.h: mplayererrorbase.ui
 progresswindowbase.h: progresswindowbase.ui
 
+dvbcut.o: version.h
 version.h: $(SRCS) $(HDRS)
 	../setversion.sh $^
