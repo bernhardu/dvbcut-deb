@@ -21,7 +21,10 @@
 #ifndef _DVBCUT_LAVFMUXER_H
 #define _DVBCUT_LAVFMUXER_H
 
+extern "C" {
 #include <ffmpeg/avformat.h>
+}
+
 #include "mpgfile.h"
 #include "muxer.h"
 

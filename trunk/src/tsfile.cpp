@@ -24,8 +24,6 @@
 #include <list>
 #include <utility>
 
-#include <ffmpeg/avcodec.h>
-
 tsfile::tsfile(inbuffer &b, int initial_offset)
     : mpgfile(b, initial_offset)
   {
@@ -71,8 +69,10 @@ tsfile::tsfile(inbuffer &b, int initial_offset)
         audios.push_back(std::pair<int,int>(sid,pid));
         apid[pid]=true;
         }
-      } else if (vid<0 && ((sid&0xf0)==0xe0)) // mpeg video stream
-      vid=pid;
+      } else if (vid<0 && ((sid&0xf0)==0xe0)) { // mpeg video stream
+	vid=pid;
+	streamnumber[vid]=VIDEOSTREAM;
+      }
     }
   audios.sort();
   for (std::list<std::pair<int,int> >::iterator it=audios.begin();it!=audios.end();++it) {
@@ -92,21 +92,7 @@ tsfile::tsfile(inbuffer &b, int initial_offset)
       break;
     }
 
-  if (vid>=0) {
-    videostreams=1;
-    streamnumber[vid]=VIDEOSTREAM;
-    stream *S=&s[VIDEOSTREAM];
-    S->id=vid;
-    S->allocavcc();
-    S->avcc->codec_type=CODEC_TYPE_VIDEO;
-    S->avcc->codec_id=CODEC_ID_MPEG2VIDEO;
-    S->dec=&mpeg2video_decoder;
-    S->enc=&mpeg2video_encoder;
-    S->type=streamtype::mpeg2video;
-    }
-
-  for (int i=0;i<audiostreams;++i)
-    initaudiocodeccontext(i);
+  initcodeccontexts(vid);
   }
 
 tsfile::~tsfile()
@@ -209,12 +195,12 @@ int tsfile::streamreader(streamhandle &s)
     //     else
       {
       if (sid>=0xe0 && sid<0xf0 && sd->header.size()>=payloadbegin+4)
-        if ( *(uint32_t*)(sd->header.c_str()+payloadbegin)==mbo32(0x00000001) )
+        if ( *(uint32_t*)(&sd->header[payloadbegin])==mbo32(0x00000001) )
           ++payloadbegin;
       }
 
     sd->appenditem(filepos_t(sd->nextfilepos,0), std::string(sd->header,6,payloadbegin-6),
-                   sd->header.c_str()+payloadbegin, sd->header.size()-payloadbegin);
+                   &sd->header[payloadbegin], sd->header.size()-payloadbegin);
     returnvalue += sd->header.size()-payloadbegin;
     sd->header.clear();
     return returnvalue;

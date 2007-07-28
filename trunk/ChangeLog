@@ -1,5 +1,19 @@
 2007-07-28  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* SConstruct:
+	* src/avframe.h:
+	* src/lavfmuxer.cpp:
+	* src/lavfmuxer.h:
+	* src/main.cpp:
+	* src/mpgfile.cpp:
+	* src/mpgfile.h:
+	* src/psfile.cpp:
+	* src/stream.h:
+	* src/tsfile.cpp:
+		Ffmpeg interface cleanup patch by Wolfram Gloger.
+
+2007-07-28  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* VERSION:
 	* setversion.sh:
 		New files.
