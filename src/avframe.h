@@ -23,6 +23,9 @@
 
 extern "C" {
 #include <ffmpeg/avcodec.h>
+#ifdef HAVE_LIB_SWSCALE
+#include <ffmpeg/swscale.h>
+#endif
 }
 
 class QImage;
@@ -37,6 +40,9 @@ protected:
   void *tobefreed;
   int w,h,dw;
   enum PixelFormat pix_fmt;
+#ifdef HAVE_LIB_SWSCALE
+  struct SwsContext *img_convert_ctx;
+#endif
 
 public:
   avframe();
