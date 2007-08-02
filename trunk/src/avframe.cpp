@@ -23,7 +23,11 @@
 #include <stdio.h>
 #include "avframe.h"
 
+#ifdef HAVE_LIB_SWSCALE
+avframe::avframe() : tobefreed(0),w(0),h(0),dw(0),pix_fmt(),img_convert_ctx(0)
+#else
 avframe::avframe() : tobefreed(0),w(0),h(0),dw(0),pix_fmt()
+#endif
   {
   f=avcodec_alloc_frame();
   }
@@ -54,7 +58,11 @@ avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
   h=ctx->height;
   pix_fmt=ctx->pix_fmt;
   dw=w*ctx->sample_aspect_ratio.num/ctx->sample_aspect_ratio.den;
-
+#ifdef HAVE_LIB_SWSCALE
+  img_convert_ctx=sws_getContext(w, h, pix_fmt, 
+                                 w, h, PIX_FMT_BGR24, SWS_BICUBIC, 
+                                 NULL, NULL, NULL);
+#endif
   }
 
 avframe::~avframe()
@@ -63,11 +71,19 @@ avframe::~avframe()
     free(tobefreed);
   if (f)
     av_free(f);
+#ifdef HAVE_LIB_SWSCALE
+  if (img_convert_ctx)
+    sws_freeContext(img_convert_ctx);
+#endif
   }
 
 QImage avframe::getqimage(bool scaled, int viewscalefactor)
   {
+#ifdef HAVE_LIB_SWSCALE
+  if (w<=0 || h<=0 || img_convert_ctx==NULL)
+#else
   if (w<=0 || h<=0)
+#endif
     return QImage();
 
   uint8_t *rgbbuffer=(uint8_t*)malloc(avpicture_get_size(PIX_FMT_RGB24, w, h)+64);
@@ -79,10 +95,19 @@ QImage avframe::getqimage(bool scaled, int viewscalefactor)
                  rgbbuffer+headerlen,
                  PIX_FMT_RGB24,w,h);
 
+#ifdef HAVE_LIB_SWSCALE
+  sws_scale(img_convert_ctx, f->data, f->linesize, 0, h, 
+              avframergb->data, avframergb->linesize);
+#else
   img_convert((AVPicture *)avframergb, PIX_FMT_RGB24, (AVPicture*)f, pix_fmt, w, h);
+#endif
 
   QImage im;
   im.loadFromData(rgbbuffer, headerlen+w*h*3, "PPM");
+
+#ifdef HAVE_LIB_SWSCALE
+  im = im.swapRGB();
+#endif
 
   if ((scaled && w!=dw)||(viewscalefactor!=1)) {
 #ifdef SMOOTHSCALE

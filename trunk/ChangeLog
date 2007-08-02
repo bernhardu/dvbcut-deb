@@ -1,3 +1,15 @@
+2007-08-02  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* SConstruct:
+		Check for libswscale.
+
+	* src/avframe.h:
+	* src/avframe.cpp:
+		Use libswscale if present (patch by Michael Kreuzer).
+
+	* src/Makefile.w32:
+		Also scan Makefile.w32 for id keyword.
+
 2007-07-30  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.w32:

@@ -88,10 +88,6 @@ if (not env.GetOption('clean')):
     print "Checking for C library a52... yes"
   elif (conf.CheckLibWithHeader('a52', ['stdint.h','a52dec/a52.h'], 'C')):
     conf.env.Append(CPPDEFINES="HAVE_LIB_A52")
-  
-### FINISH
-    
-env=conf.Finish()
 
 ###### BUILD ENVIRONMENT (pt2)
 
@@ -120,6 +116,19 @@ env.Append(LIBS=['avformat','avcodec','avutil'])
 if (localffmpeg==False):
   env.Append(CPPDEFINES=["__STDC_CONSTANT_MACROS", "__STDC_LIMIT_MACROS"])
 
+### LIBSWSCALE
+
+if (not env.GetOption('clean') and not localffmpeg):
+  if (conf.TryAction('pkg-config --exists libswscale')[0]):
+    conf.env.Append(CPPDEFINES="HAVE_LIB_SWSCALE")
+    conf.env.ParseConfig('pkg-config --cflags --libs libswscale')
+    print "Checking for C library swscale... yes"
+  elif (conf.CheckLibWithHeader('swscale', 'ffmpeg/swscale.h', 'C')):
+    conf.env.Append(CPPDEFINES="HAVE_LIB_SWSCALE")
+  
+### FINISH
+    
+env=conf.Finish()
   
 ###### WORK
 

@@ -150,5 +150,5 @@ mplayererrorbase.h: mplayererrorbase.ui
 progresswindowbase.h: progresswindowbase.ui
 
 dvbcut.o: version.h
-version.h: $(SRCS) $(HDRS)
+version.h: $(SRCS) $(HDRS) Makefile.w32
 	../setversion.sh $^
