@@ -1,3 +1,9 @@
+2007-08-03  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/tsfile.h:
+	* src/tsfile.cpp:
+		Add SI table parser.
+
 2007-08-02  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* SConstruct:

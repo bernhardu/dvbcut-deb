@@ -33,60 +33,46 @@
 class tsfile : public mpgfile
   {
 protected:
-  struct tspacket
-    {
+  struct tspacket {
     uint8_t data[TSPACKETSIZE];
 
-    int pid() const
-      {
+    int pid() const {
       return ((data[1]&0x1f)<<8) | data[2];
-      }
-    bool transport_error_indicator() const
-      {
+    }
+    bool transport_error_indicator() const {
       return data[1] & 0x80;
-      }
-    bool payload_unit_start_indicator() const
-      {
+    }
+    bool payload_unit_start_indicator() const {
       return data[1] & 0x40;
-      }
-    bool transport_priority() const
-      {
+    }
+    bool transport_priority() const {
       return data[1] & 0x20;
-      }
-    int transport_scrambling_control() const
-      {
+    }
+    int transport_scrambling_control() const {
       return (data[3]>>6)&0x03;
-      }
-    bool contains_adaptation_field() const
-      {
+    }
+    bool contains_adaptation_field() const {
       return data[3]&0x20;
-      }
-    bool contains_payload() const
-      {
+    }
+    bool contains_payload() const {
       return data[3]&0x10;
-      }
-    int continuity_counter() const
-      {
+    }
+    int continuity_counter() const {
       return data[3]&0x0f;
-      }
-    const void *adaptation_field() const
-      {
+    }
+    const void *adaptation_field() const {
       return contains_adaptation_field()?&data[4]:0;
-      }
-    int adaptation_field_length() const
-      {
+    }
+    int adaptation_field_length() const {
       return contains_adaptation_field()?(1+data[4]):0;
-      }
-    const void *payload() const
-      {
+    }
+    const void *payload() const {
       return contains_payload()?(void*) &data[4+adaptation_field_length()]:0;
-      }
-    int payload_length() const
-      {
+    }
+    int payload_length() const {
       return contains_payload()?(184-adaptation_field_length()):0;
-      }
-    int sid() const
-      {
+    }
+    int sid() const {
       if (!(payload_unit_start_indicator()&&contains_payload()))
         return -1;
       int afl=adaptation_field_length();
@@ -96,10 +82,13 @@ protected:
       if (d[0]==0 && d[1]==0 && d[2]==1)
         return d[3];
       return -1;
-      }
-    };
+    }
+  };
 
   int streamnumber[8192]; // TS pids are 0..8191
+
+  bool check_si_tables();
+  const uint8_t *get_si_table(const uint8_t*, size_t, int, unsigned*);
 
 public:
   tsfile(inbuffer &b, int initial_offset);
@@ -107,15 +96,13 @@ public:
   ~tsfile();
   int streamreader(class streamhandle &s);
   static int probe(inbuffer &buf);
-  virtual int mplayeraudioid(int astr)
-    {
+  virtual int mplayeraudioid(int astr) {
     return s[audiostream(astr)].id;
-    }
-  virtual bool istransportstream()
-    {
+  }
+  virtual bool istransportstream() {
     return true;
-    }
+  }
 
-  };
+};
 
 #endif
