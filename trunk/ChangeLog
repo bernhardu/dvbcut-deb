@@ -1,3 +1,10 @@
+2007-08-10  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/tsfile.cpp:
+		Also detect teletext and subtitle streams. We may
+		not be able to use them, but it's good to know that
+		they're there.
+
 2007-08-03  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/tsfile.h:

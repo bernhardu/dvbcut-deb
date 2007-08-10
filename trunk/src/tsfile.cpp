@@ -248,7 +248,7 @@ tsfile::get_si_table(const uint8_t *d, size_t len, int pid, unsigned *tlen) {
 }
 
 static const uint8_t*
-get_audio_descriptor(const uint8_t *d, unsigned len) {
+get_stream_descriptor(const uint8_t *d, unsigned len) {
   while (len >= 2) {
     unsigned x = d[1] + 2;
     if (len < x)	// descriptor truncated
@@ -256,12 +256,18 @@ get_audio_descriptor(const uint8_t *d, unsigned len) {
     switch (d[0]) {
       default:
 	break;
+      /* audio */
       case 0x6a:	// AC-3 descriptor
       /* in the future, maybe also:
       case 0x73:	// DTS audio descriptor
       case 0x79:	// AAC descriptor
       case 0x7a:	// enhanced AC-3 descriptor
       */
+	return d;
+      /* teletext/subtitles */
+      case 0x46:	// VBI teletext descriptor
+      case 0x56:	// teletext descriptor
+      case 0x59:	// subtitling descriptor
 	return d;
     }
     d += x;
@@ -386,9 +392,9 @@ tsfile::check_si_tables() {
 	    apids.push_back(std::pair<int, int>(stream_type, pid));
 	    break;
 	  case 0x06:	// PES packets containing private data
-	    const uint8_t *desc = get_audio_descriptor(pmt + i + 5, dlen);
+	    const uint8_t *desc = get_stream_descriptor(pmt + i + 5, dlen);
 	    if (desc)
-	      apids.push_back(std::pair<int, int>(stream_type, pid));
+	      apids.push_back(std::pair<int, int>(256 + *desc, pid));
 	    break;
 	}
       }
@@ -401,23 +407,52 @@ tsfile::check_si_tables() {
       streamnumber[vpid] = VIDEOSTREAM;
       std::list<std::pair<int, int> >::iterator ait = apids.begin();
       while (ait != apids.end()) {
-	fprintf(stderr, "PMT: found audio stream at pid %d\n", ait->second);
-	streamnumber[ait->second] = audiostream(audiostreams);
-	stream *S = &s[audiostream(audiostreams++)];
-	s->id = ait->second;
-	if (ait->first == 0x06) {
-	  S->type = streamtype::ac3audio;
+	streamtype::type t = streamtype::unknown;
+	switch (ait->first) {
+	  case 0x03:
+	  case 0x04:
+	    t = streamtype::mpegaudio;
+	    break;
+	  case 0x16a:	// AC-3 descriptor
+	    t = streamtype::ac3audio;
+	    break;
+	  /* in the future, maybe also:
+	  case 0x173:	// DTS audio descriptor
+	    t = streamtype::dtsaudio;
+	    break;
+	  case 0x179:	// AAC descriptor
+	    t = streamtype::aacaudio;
+	    break;
+	  case 0x17a:	// enhanced AC-3 descriptor
+	    t = streamtype::eac3audio;
+	    break;
+	  */
+	  case 0x146:	// VBI teletext descriptor
+	  case 0x156:	// teletext descriptor
+	    fprintf(stderr, "PMT: can't handle teletext stream at pid %d\n", ait->second);
+	    break;
+	  case 0x159:	// subtitling descriptor
+	    fprintf(stderr, "PMT: can't handle subtitle stream at pid %d\n", ait->second);
+	    break;
+	  default:
+	    break;
 	}
-	else {
-	  S->type = streamtype::mpegaudio;
+	if (t != streamtype::unknown) {
+	  fprintf(stderr, "PMT: found audio stream at pid %d\n", ait->second);
+	  streamnumber[ait->second] = audiostream(audiostreams);
+	  stream *S = &s[audiostream(audiostreams++)];
+	  S->id = ait->second;
+	  S->type = t;
+	  if (audiostreams >= MAXAUDIOSTREAMS)
+	    break;
 	}
-	if (audiostreams >= MAXAUDIOSTREAMS)
-	  break;
 	++ait;
       }
       initcodeccontexts(vpid);
       return true;
     }
+    // start over
+    apids.clear();
   }
   return false;
 }
