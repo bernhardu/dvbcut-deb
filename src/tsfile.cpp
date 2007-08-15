@@ -58,10 +58,26 @@ tsfile::tsfile(inbuffer &b, int initial_offset) : mpgfile(b, initial_offset)
     }
     else if (sid==0xbd) {	// private stream 1, possibly AC3 audio stream
       const uint8_t *payload=(const uint8_t*) p.payload();
-      if ((p.payload_length()>=9) && (p.payload_length()>=11+payload[8])
-       && (*(uint16_t*)&payload[9+payload[8]]==mbo16(0xb77)) ) {
+      const uint16_t plen = p.payload_length();
+      if (plen >= 9
+       && plen >= 11 + payload[8]
+       && payload[9 + payload[8]] == 0x0b
+       && payload[10 + payload[8]] == 0x77) {
         audios.push_back(std::pair<int,int>(sid,pid));
         apid[pid]=true;
+      }
+      else if (plen == 184
+       && payload[8] == 0x24
+       && (payload[45] & 0xf0) == 0x10
+       && payload[47] == 0x2c) {
+	// probably VBI/teletext data
+      }
+      else if (plen >= 9
+       && plen >= 12 + payload[8]
+       && payload[9 + payload[8]] == 0x20
+       && payload[10 + payload[8]] == 0x00
+       && payload[11 + payload[8]] == 0x0f) {
+	// probably dvb subtitles
       }
     }
     else if (vid<0 && ((sid&0xf0)==0xe0)) { // mpeg video stream
@@ -225,24 +241,72 @@ int tsfile::probe(inbuffer &buf) {
   return -1;
 }
 
-const uint8_t*
-tsfile::get_si_table(const uint8_t *d, size_t len, int pid, unsigned *tlen) {
-  for (size_t i = 0; i + TSPACKETSIZE <= len; i += TSPACKETSIZE) {
-    const tspacket *p = (const tspacket*)&d[i];
+size_t
+tsfile::get_si_table(uint8_t *tbl, size_t max, size_t &index, int pid, int tid) {
+  const uint8_t *d = (uint8_t*)buf.data();
+  size_t len = buf.inbytes();
+  uint8_t cc = 0xff;
+  size_t size = 0;
+  while (index + TSPACKETSIZE <= len) {
+    const tspacket *p = (const tspacket*)&d[index];
+    index += TSPACKETSIZE;
     // check packet
     if (p->transport_error_indicator()
      || p->pid() != pid
-     || !p->payload_unit_start_indicator()
-     || p->payload_length() < 1)
+     || !p->contains_payload()) {
       continue;
-    const uint8_t *buf = (uint8_t*)p->payload();
-    // evaluate pointer field
-    unsigned n = buf[0] + 1;
-    if (n >= (unsigned)p->payload_length())	// too short
+    }
+    if (p->payload_unit_start_indicator()) {
+      // first packet of table
+      cc = p->continuity_counter();
+      size = 0;
+    }
+    else if (size != 0) {
+      // additional packet, check continuity
+      uint8_t ccdelta = (p->continuity_counter() - cc) & 0x0f;
+      switch (ccdelta) {
+	default: size = 0; continue;	// sequence error, retry
+	case 0: continue;		// repeated packet
+	case 1: break;			// correct sequence
+      }
+      cc = p->continuity_counter();
+    }
+    else {
       continue;
-    if (tlen)
-      *tlen = p->payload_length() - n;
-    return buf + n;
+    }
+    if (p->payload_length() < 1) {	// payload too short
+      continue;
+    }
+    const uint8_t *payload = (uint8_t*)p->payload();
+    size_t amount = p->payload_length();
+    unsigned n = 0;
+    if (p->payload_unit_start_indicator()) {
+      // evaluate pointer field
+      n = payload[0] + 1;
+      if (n >= amount) {	// too short
+	continue;
+      }
+      amount -= n;
+      if (payload[n] != tid) {	// wrong table
+	continue;
+      }
+    }
+    if (amount > max - size) {
+      amount = max - size;
+    }
+    if (amount == 0) {
+      // table too long, discard it
+      size = 0;
+      continue;
+    }
+    memcpy(tbl + size, payload + n, amount);
+    size += amount;
+    if (size >= 3) {
+      size_t tmp = 3 + (((tbl[1] << 8) | tbl[2]) & 0x0fff);
+      if (tmp <= size) {
+	return tmp;	// table complete
+      }
+    }
   }
   return 0;
 }
@@ -265,6 +329,7 @@ get_stream_descriptor(const uint8_t *d, unsigned len) {
       */
 	return d;
       /* teletext/subtitles */
+      case 0x45:	// VBI data descriptor
       case 0x46:	// VBI teletext descriptor
       case 0x56:	// teletext descriptor
       case 0x59:	// subtitling descriptor
@@ -298,28 +363,23 @@ tsfile::check_si_tables() {
     return false;
 
   // read PAT
-  const uint8_t *pat;
-  unsigned patlen;
-  for (pat = d; ; pat += TSPACKETSIZE) {
-    if (pat >= d + len)
-      return false;	// no valid PAT found
-    pat = get_si_table(pat, d + len - pat, 0x0000, &patlen);
-    if (pat == 0)
-      return false;	// no valid PAT found
-    if (pat[0] != 0x00			// wrong TID
-     || (pat[1] & 0xc0) != 0x80)	// bad syntax
-      continue;
-    // XXX: CRC32 check omitted
-    unsigned tlen = ((pat[1] << 8) | pat[2]) & 0xfff;
-    if (tlen + 3 < 12			// too short
+  uint8_t pat[1024];
+  size_t patlen;
+  size_t index = 0;
+  for (;;) {
+    patlen = get_si_table(pat, sizeof(pat), index, 0x0000, 0x00);
+    if (patlen == 0)			// not found
+      return false;
+    if (patlen < 12			// too short
+     || (pat[1] & 0xc0) != 0x80		// bad syntax
      || !(pat[5] & 0x01))		// not current
       continue;
-    // valid PAT found
-    if (pat[6] != 0 || pat[7] != 0 || patlen < tlen + 3) {
-      fprintf(stderr, "PAT segmented or truncated\n");
+    // XXX: CRC32 check omitted
+    if (pat[6] != 0 || pat[7] != 0) {
+      /* this is NOT an error, but currently unhandled */
+      fprintf(stderr, "can not handle segmented PAT; guessing streams\n");
       return false;
     }
-    patlen = tlen + 3;
     break;
   }
 
@@ -344,29 +404,22 @@ tsfile::check_si_tables() {
   std::list<std::pair<int, int> > apids;
   for (std::list<int>::iterator it = pmts.begin(); it != pmts.end(); ++it) {
     // read PMT
-    const uint8_t *pmt;
-    unsigned pmtlen;
-    for (pmt = d; pmt < d + len; pmt += TSPACKETSIZE) {
-      pmt = get_si_table(pmt, d + len - pmt, *it, &pmtlen);
-      if (pmt == 0)
+    uint8_t pmt[1024];
+    size_t pmtlen;
+    index = 0;
+    for (;;) {
+      pmtlen = get_si_table(pmt, sizeof(pmt), index, *it, 0x02);
+      if (pmtlen == 0)			// not found
 	break;
-      if (pmt[0] != 0x02		// wrong TID
-       || (pmt[1] & 0xc0) != 0x80)	// bad syntax
+      if (pmtlen < 16			// too short
+       || (pmt[1] & 0xc0) != 0x80	// bad syntax
+       || !(pmt[5] & 0x01)		// not current
+       || pmt[6] != 0 || pmt[7] != 0)	// not allowed
 	continue;
       // XXX: CRC32 check omitted
-      unsigned tlen = ((pmt[1] << 8) | pmt[2]) & 0xfff;
-      if (tlen + 3 < 16			// too short
-       || !(pmt[5] & 0x01))		// not current
-	continue;
-      // valid PMT found
-      if (pmt[6] != 0 || pmt[7] != 0 || pmtlen < tlen + 3) {
-	fprintf(stderr, "PMT segmented or truncated\n");
-	continue;
-      }
-      pmtlen = tlen + 3;
       break;
     }
-    if (pmt == 0 || pmt >= d + len)
+    if (pmtlen == 0)
       continue;
 
     // iterate through streams
@@ -375,7 +428,7 @@ tsfile::check_si_tables() {
     while (i + 9 <= pmtlen) {
       uint8_t stream_type = pmt[i];
       int pid = ((pmt[i + 1] << 8) | pmt[i + 2]) & 0x1fff;
-      unsigned dlen = ((pmt[i + 3] << 8) | pmt[i + 4]) & 0x0fff;
+      size_t dlen = ((pmt[i + 3] << 8) | pmt[i + 4]) & 0x0fff;
       if (i + 5 + dlen + 4 > len)
 	break;
       if (pids[pid]) {	// is the PID actually present?
@@ -404,6 +457,10 @@ tsfile::check_si_tables() {
     // did we find at least a video stream?
     if (vpid != -1) {
       fprintf(stderr, "PMT: found video stream at pid %d\n", vpid);
+      if (apids.empty()) {
+	fprintf(stderr, "but I have to guess the audio streams :-(\n");
+	return false;
+      }
       streamnumber[vpid] = VIDEOSTREAM;
       std::list<std::pair<int, int> >::iterator ait = apids.begin();
       while (ait != apids.end()) {
@@ -427,11 +484,14 @@ tsfile::check_si_tables() {
 	    t = streamtype::eac3audio;
 	    break;
 	  */
+	  case 0x145:	// VBI data descriptor
 	  case 0x146:	// VBI teletext descriptor
 	  case 0x156:	// teletext descriptor
+	    // t = streamtype::vbisub;
 	    fprintf(stderr, "PMT: can't handle teletext stream at pid %d\n", ait->second);
 	    break;
 	  case 0x159:	// subtitling descriptor
+	    // t = streamtype::dvbsub;
 	    fprintf(stderr, "PMT: can't handle subtitle stream at pid %d\n", ait->second);
 	    break;
 	  default:
