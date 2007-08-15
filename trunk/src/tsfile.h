@@ -88,7 +88,7 @@ protected:
   int streamnumber[8192]; // TS pids are 0..8191
 
   bool check_si_tables();
-  const uint8_t *get_si_table(const uint8_t*, size_t, int, unsigned*);
+  size_t get_si_table(uint8_t*, size_t,  size_t&, int, int);
 
 public:
   tsfile(inbuffer &b, int initial_offset);
