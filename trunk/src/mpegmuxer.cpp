@@ -93,13 +93,17 @@ mpegmuxer::mpegmuxer(uint32_t audiostreammask, mpgfile &mpg, const char *filenam
   int audiobuffersize=dvd?(4<<10):(48<<10);
   for (int i=0;i<mpg.getaudiostreams();++i)
     if (audiostreammask & (1u<<i)) {
-      if (mpg.getstreamtype(audiostream(i))==streamtype::ac3audio)
-        st[audiostream(i)]=new stream(mpg.getstreamtype(audiostream(i)),
-                                      0x180+i,
+      streamtype::type t = mpg.getstreamtype(audiostream(i));
+      if (t==streamtype::ac3audio)
+        st[audiostream(i)]=new stream(t, 0x180+i,
                                       audiobuffersize,58<<10,true);
+      /* not supported yet:
+      else if (t==streamtype::dtsaudio)
+        st[audiostream(i)]=new stream(t, 0x188+i,
+                                      audiobuffersize,58<<10,true);
+      */
       else
-        st[audiostream(i)]=new stream(mpg.getstreamtype(audiostream(i)),
-                                      0xc0+i,
+        st[audiostream(i)]=new stream(t, 0xc0+i,
                                       audiobuffersize,audiobuffersize,false);
       strpres[audiostream(i)]=true;
       }
@@ -422,6 +426,10 @@ void mpegmuxer::packetizer(int str,pts_t maxdts)
       ++headerlen;
     if (s->type==streamtype::ac3audio)
       headerlen+=3;
+    /* not supported yet:
+    if (s->type==streamtype::dtsaudio)
+      headerlen+=3;
+    */
     int len=9+headerlen+a->getsize();
     if (pespacket_setlength)
       len+=9*((len-10)/65532);
@@ -519,6 +527,10 @@ void mpegmuxer::packetizer(int str,pts_t maxdts)
         --officialheaderlen;
       if (s->type==streamtype::ac3audio)
         officialheaderlen-=3;
+      /* not supported yet:
+      if (s->type==streamtype::dtsaudio)
+        officialheaderlen-=3;
+      */
       *(data++)=officialheaderlen;
       len-=3;
       plen-=3;
