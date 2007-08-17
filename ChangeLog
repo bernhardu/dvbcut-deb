@@ -1,3 +1,11 @@
+2007-08-17  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/mpegmuxer.cpp:
+		Prepare for DTS audio.
+
+	* src/psfile.cpp:
+		Improved stream detection (including DTS and subtitle hooks).
+
 2007-08-15  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/tsfile.cpp:
