@@ -35,6 +35,7 @@ extern "C" {
 }
 #include <qimage.h>
 #include <qsettings.h>
+#include <qtextcodec.h>
 #include "dvbcut.h"
 #include "mpgfile.h"
 #include "index.h"
@@ -126,6 +127,7 @@ main(int argc, char *argv[]) {
   }
 
   QApplication a(argc, argv);
+  QTextCodec::setCodecForCStrings(QTextCodec::codecForLocale());
 
 #ifdef HAVE_LIB_AO
   ao_initialize();
