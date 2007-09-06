@@ -1,3 +1,8 @@
+2007-09-06  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/main.cpp:
+		Locale patch by Michael Kreuzer.
+
 2007-08-17  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/mpegmuxer.cpp:
