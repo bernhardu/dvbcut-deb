@@ -282,7 +282,8 @@ void dvbcut::fileSave()
     }
 
   QTextStream stream(&outfile);
-  stream <<  doc.toString();
+  stream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+  stream << doc.toCString();
   outfile.close();
 }
 
@@ -1182,7 +1183,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
           break;
         line=line.stripWhiteSpace();
       }
-      if (line.startsWith(QString("<!DOCTYPE dvbcut"))) {
+      if (line.startsWith(QString("<!DOCTYPE"))
+       || line.startsWith(QString("<?xml"))) {
         infile.at(0);
         QString errormsg;
         if (domdoc.setContent(&infile,false,&errormsg)) {
