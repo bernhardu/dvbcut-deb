@@ -1,3 +1,9 @@
+2007-09-07  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
+		Always use UTF-8 encoding for project file.
+		Add a proper XML declaration at the beginning.
+
 2007-09-06  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/main.cpp:
