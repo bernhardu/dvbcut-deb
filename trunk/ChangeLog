@@ -1,3 +1,8 @@
+2007-09-13  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
+		Really fix project file encoding this time.
+
 2007-09-07  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:
