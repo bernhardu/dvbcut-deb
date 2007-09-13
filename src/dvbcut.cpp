@@ -282,6 +282,7 @@ void dvbcut::fileSave()
     }
 
   QTextStream stream(&outfile);
+  stream.setEncoding(QTextStream::Latin1);
   stream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
   stream << doc.toCString();
   outfile.close();
