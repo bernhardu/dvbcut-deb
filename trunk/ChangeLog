@@ -1,3 +1,9 @@
+2007-09-27  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
+		Add delete all/others function to event list
+		(patch by Ralph Glasstetter).
+
 2007-09-13  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:

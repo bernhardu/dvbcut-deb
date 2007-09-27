@@ -894,7 +894,12 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
   QPopupMenu popup(eventlist);
   popup.insertItem("Go to",1);
   popup.insertItem("Delete",2);
-  popup.insertItem("Display difference from this picture",3);
+  popup.insertItem("Delete others",3);
+  popup.insertItem("Delete all",4);
+  popup.insertItem("Display difference from this picture",5);
+
+  QListBox *lb=lbi->listBox();
+  QListBoxItem *first=lb->firstItem(),*current,*next;
 
   switch (popup.exec(point)) {
     case 1:
@@ -908,6 +913,19 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
       break;
 
     case 3:
+      current=first;
+      while(current) {
+         next=current->next();
+         if(current!=lbi) delete current;
+         current=next;
+      }   
+      break;
+
+    case 4:
+      lb->clear();
+      break;
+
+    case 5:
       if (imgp)
         delete imgp;
       imgp=new differenceimageprovider(*mpg,((EventListItem*)lbi)->getpicture(),new dvbcutbusy(this),false,viewscalefactor);
