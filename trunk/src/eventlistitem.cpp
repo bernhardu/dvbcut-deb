@@ -48,6 +48,12 @@ void EventListItem::paint( QPainter *painter )
   int itemHeight = height( listBox() );
   int x=3;
 
+  if (evtype == stop) {
+    QColor color(224, 224, 224);
+    QBrush brush(color);
+    painter->fillRect(0, 0, width(listBox()), itemHeight, brush);
+    }
+
   if ( !pm.isNull() ) {
     painter->drawPixmap( x, (itemHeight-pm.height())/2, pm);
     x+=pm.width()+3;

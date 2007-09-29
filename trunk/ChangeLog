@@ -1,3 +1,8 @@
+2007-09-29  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/eventlistitem.cpp:
+		Use light gray background for STOP items.
+
 2007-09-27  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:
