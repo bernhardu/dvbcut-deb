@@ -23,6 +23,7 @@
 #include <qpainter.h>
 #include <qimage.h>
 #include "eventlistitem.h"
+#include "settings.h"
 
 EventListItem::EventListItem( QListBox *listbox, const QPixmap &pixmap,
                               eventtype type, int picture, int picturetype, pts_t _pts ) :
@@ -105,17 +106,17 @@ int EventListItem::width( const QListBox* lb ) const
 
 QString EventListItem::getstring() const
   {
-  const char *type="";
+  QString label;
   if (evtype==start)
-    type="<font size=\"+1\"><b>START</b></font><br>";
+    label = settings.start_label;
   else if (evtype==stop)
-    type="<font size=\"+1\"><b>STOP</b></font><br>";
+    label = settings.stop_label;
   else if (evtype==chapter)
-    type="CHAPTER<br>";
+    label = settings.chapter_label;
   else if (evtype==bookmark)
-    type="BOOKMARK<br>";
+    label = settings.bookmark_label;
 
-  return QString().sprintf("%s%02d:%02d:%02d.%03d<br>%d (%c)",type,
+  return label + QString().sprintf("<br>%02d:%02d:%02d.%03d<br>%d (%c)",
                            int(pts/(3600*90000)),
                            int(pts/(60*90000))%60,
                            int(pts/90000)%60,

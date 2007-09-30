@@ -56,19 +56,4 @@ static inline int videostream(int s=0)
 #define htom16(x) (x)
 #endif
 
-#define DVBCUT_QSETTINGS_DOMAIN "dvbcut.sf.net"
-#define DVBCUT_QSETTINGS_PRODUCT "dvbcut"
-#define DVBCUT_QSETTINGS_PATH "/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT "/"
-
-#define DVBCUT_DEFAULT_LOADFILTER \
-	"Recognized files (*.dvbcut *.mpg *.rec* *.ts *.tts* *.vdr);;" \
-	"dvbcut project files (*.dvbcut);;" \
-	"MPEG files (*.mpg *.rec* *.ts *.tts* *.vdr);;" \
-	"All files (*)"
-#define DVBCUT_DEFAULT_IDXFILTER \
-	"dvbcut index files (*.idx);;All files (*)"
-#define DVBCUT_DEFAULT_PRJFILTER \
-	"dvbcut project files (*.dvbcut);;All files (*)"
-
 #endif
-

@@ -58,6 +58,10 @@ public:
   int jog_interval;
   int lin_interval;
   int export_format;
+  QString start_label;
+  QString stop_label;
+  QString chapter_label;
+  QString bookmark_label;
 
 };
 

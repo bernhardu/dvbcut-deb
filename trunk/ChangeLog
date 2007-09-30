@@ -1,3 +1,15 @@
+2007-09-30  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/defines.h:
+		Move default values to src/settings.cpp.
+
+	* src/eventlistitem.cpp:
+		Use label strings from the configuration file.
+ 
+	* src/settings.cpp:
+	* src/settings.h:
+		Add label strings to the configuration file.
+
 2007-09-29  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/eventlistitem.cpp:
