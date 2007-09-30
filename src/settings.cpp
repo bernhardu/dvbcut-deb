@@ -26,6 +26,29 @@
 #include "defines.h"
 #include "settings.h"
 
+#define DVBCUT_QSETTINGS_DOMAIN "dvbcut.sf.net"
+#define DVBCUT_QSETTINGS_PRODUCT "dvbcut"
+#define DVBCUT_QSETTINGS_PATH "/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT "/"
+
+#define DVBCUT_DEFAULT_LOADFILTER \
+	"Recognized files (*.dvbcut *.mpg *.rec* *.ts *.tts* *.vdr);;" \
+	"dvbcut project files (*.dvbcut);;" \
+	"MPEG files (*.mpg *.rec* *.ts *.tts* *.vdr);;" \
+	"All files (*)"
+#define DVBCUT_DEFAULT_IDXFILTER \
+	"dvbcut index files (*.idx);;All files (*)"
+#define DVBCUT_DEFAULT_PRJFILTER \
+	"dvbcut project files (*.dvbcut);;All files (*)"
+
+#define DVBCUT_DEFAULT_START_LABEL \
+	"<font size=\"+1\" color=\"darkgreen\"><b>START</b></font>"
+#define DVBCUT_DEFAULT_STOP_LABEL \
+	"<font size=\"+1\" color=\"darkred\"><b>STOP</b></font>"
+#define DVBCUT_DEFAULT_CHAPTER_LABEL \
+	"<font color=\"darkgoldenrod\">CHAPTER</font>"
+#define DVBCUT_DEFAULT_BOOKMARK_LABEL \
+	"<font color=\"darkblue\">BOOKMARK</font>"
+
 dvbcut_settings::dvbcut_settings() {
   setPath(DVBCUT_QSETTINGS_DOMAIN, DVBCUT_QSETTINGS_PRODUCT);
   beginGroup("/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT);
@@ -78,6 +101,12 @@ dvbcut_settings::load_settings() {
 	std::pair<std::string,std::string>(filename, idxfilename));
     }
   endGroup();	// recentfiles
+  beginGroup("/labels");
+    start_label = readEntry("/start", DVBCUT_DEFAULT_START_LABEL);
+    stop_label = readEntry("/stop", DVBCUT_DEFAULT_STOP_LABEL);
+    chapter_label = readEntry("/chapter", DVBCUT_DEFAULT_CHAPTER_LABEL);
+    bookmark_label = readEntry("/bookmark", DVBCUT_DEFAULT_BOOKMARK_LABEL);
+  endGroup();	// labels
 }
 
 void
@@ -113,6 +142,12 @@ dvbcut_settings::save_settings() {
       }
     }
   endGroup();	// recentfiles
+  beginGroup("/labels");
+    writeEntry("/start", start_label);
+    writeEntry("/stop", stop_label);
+    writeEntry("/chapter", chapter_label);
+    writeEntry("/bookmark", bookmark_label);
+  endGroup();	// labels
 }
 
 // finally, the global settings
