@@ -131,6 +131,7 @@ public:
   ~index();
 
   int generate(const char *savefilename=0, std::string *errorstring=0, logoutput *log=0);
+  int save(int fd, std::string *errorstring = 0, bool closeme = false);
   int save(const char *filename, std::string *errorstring=0);
   int load(const char *filename, std::string *errorstring=0);
 

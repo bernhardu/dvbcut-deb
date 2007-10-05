@@ -1,3 +1,16 @@
+2007-10-05  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/buffer.cpp:
+	* src/buffer.h:
+		Implement "pipe mode" for reading from non-regular files.
+
+	* src/index.cpp:
+	* src/index.h:
+		Add separate function for saving to stdout.
+
+	* src/main.cpp:
+		Allow -generateidx to read from stdin again.
+
 2007-09-30  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/defines.h:

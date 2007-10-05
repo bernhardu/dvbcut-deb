@@ -18,6 +18,8 @@
 
 /* $Id$ */
 
+#define __STDC_LIMIT_MACROS	// for INT64_MAX
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -153,7 +155,8 @@ long inbuffer::pagesize=0;
 
 inbuffer::inbuffer(unsigned int _size, unsigned int _mmapsize) :
     d(0), size(_size), mmapsize(_mmapsize), readpos(0), writepos(0),
-    eof(false), pos(0), filesize(0), mmapped(false), sequential(false)
+    eof(false), pos(0), filesize(0), mmapped(false),
+    sequential(false), pipe_mode(false)
 {
   if (!pagesize)
     pagesize=sysconf(_SC_PAGESIZE);
@@ -165,12 +168,34 @@ inbuffer::~inbuffer() {
 
 bool
 inbuffer::open(std::string filename, std::string *errmsg) {
-  infile f;
+  int fd;
 
-  f.fd = ::open(filename.c_str(), O_RDONLY | O_BINARY);
-  if (f.fd == -1) {
+  fd = ::open(filename.c_str(), O_RDONLY | O_BINARY);
+  if (fd == -1) {
     if (errmsg)
       *errmsg = filename + ": open: " + strerror(errno);
+    return false;
+  }
+  if (!open(fd, errmsg, true)) {
+    if (errmsg)
+      *errmsg = filename + ": " + *errmsg;
+    return false;
+  }
+  return true;
+}
+
+bool
+inbuffer::open(int fd, std::string *errmsg, bool closeme) {
+  infile f;
+
+  f.fd = fd;
+  f.closeme = closeme;
+  if (pipe_mode) {
+    // no more files please!
+    if (errmsg)
+      *errmsg = std::string("open: can't add more input files");
+    if (f.closeme)
+      ::close(f.fd);
     return false;
   }
 #ifdef __WIN32__
@@ -181,20 +206,33 @@ inbuffer::open(std::string filename, std::string *errmsg) {
   if (::fstat(f.fd, &st) == -1) {
 #endif /* __WIN32__ */
     if (errmsg)
-      *errmsg = filename + ": fstat: " + strerror(errno);
-    ::close(f.fd);
+      *errmsg = std::string("fstat: ") + strerror(errno);
+    if (f.closeme)
+      ::close(f.fd);
     return false;
   }
-  if (!S_ISREG(st.st_mode)) {
-    if (errmsg)
-      *errmsg = filename + ": not a regular file";
-    ::close(f.fd);
-    return false;
+  if (S_ISREG(st.st_mode)) {
+    f.off = filesize;
+    f.end = filesize += st.st_size;
+    files.push_back(f);
+    return true;
   }
-  f.off = filesize;
-  f.end = filesize += st.st_size;
-  files.push_back(f);
-  return true;
+  /*
+   * Input is a (named) pipe or device.
+   * This is only allowed in single-file (aka "pipe") mode.
+   */
+  if (files.empty()) {
+    pipe_mode = true;
+    f.off = 0;
+    f.end = filesize = INT64_MAX;
+    files.push_back(f);
+    return true;
+  }
+  if (errmsg)
+    *errmsg = std::string("not a regular file");
+  if (f.closeme)
+    ::close(f.fd);
+  return false;
 }
 
 void
@@ -202,7 +240,8 @@ inbuffer::close() {
   // close all files
   std::vector<infile>::const_iterator i = files.begin();
   while (i != files.end()) {
-    ::close(i->fd);
+    if (i->closeme)
+      ::close(i->fd);
     ++i;
   }
   files.clear();
@@ -216,6 +255,7 @@ inbuffer::close() {
     free(d);
   mmapped = false;
   d = 0;
+  pipe_mode = false;
 }
 
 void
@@ -230,6 +270,63 @@ inbuffer::reset() {
 }
 
 int
+inbuffer::pipedata(unsigned int amount, long long position) {
+  std::vector<infile>::const_iterator i = files.begin();
+  assert(i != files.end());
+
+  // allocate read buffer
+  if (!d) {
+    d = malloc(size);
+    if (!d) {
+      fprintf(stderr, "inbuffer::pipedata: can't allocate %ld bytes: %s\n",
+	(long)size, strerror(errno));
+      abort();
+    }
+    readpos = 0;
+    writepos = 0;
+  }
+
+  if (amount > size)
+    amount = size;
+
+  // discard unused data
+  readpos = 0;
+  while (pos + writepos <= position) {
+    pos += writepos;
+    writepos = 0;
+    ssize_t n = ::read(i->fd, (char*)d, size);
+    if (n == -1)
+      return -1;
+    if (n == 0) {
+      eof = true;
+      return 0;
+    }
+    writepos = n;
+  }
+  if (pos < position) {
+    size_t pp = position - pos;
+    writepos -= pp;
+    memmove(d, (char*)d + pp, writepos);
+    pos = position;
+  }
+
+  // now read the data we want
+  while (writepos < amount) {
+    size_t len = size - writepos;
+    assert(len > 0);
+    ssize_t n = ::read(i->fd, (char*)d + writepos, len);
+    if (n == -1)
+      return -1;
+    if (n == 0) {
+      eof = true;
+      break;
+    }
+    writepos += n;
+  }
+  return inbytes();
+}
+
+int
 inbuffer::providedata(unsigned int amount, long long position) {
   if (position < 0 || position >= filesize)
     return 0;
@@ -239,6 +336,12 @@ inbuffer::providedata(unsigned int amount, long long position) {
   if (position >= pos && position + amount <= pos + writepos) {
     readpos = position - pos;
     return inbytes();
+  }
+
+  if (pipe_mode) {
+    if (position < pos)
+      return -1;	// can't go backwards!
+    return pipedata(amount, position);
   }
 
   std::vector<infile>::const_iterator i = files.begin();

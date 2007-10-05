@@ -147,6 +147,7 @@ protected:
   struct infile {
     dvbcut_off_t off;
     dvbcut_off_t end;
+    bool closeme;
     int fd;
   };
   std::vector<infile> files;
@@ -156,12 +157,15 @@ protected:
   bool mmapped;
   static long pagesize;
   bool sequential;
+  bool pipe_mode;
 
   void close();
+  int pipedata(unsigned int amount, long long position);
 
 public:
   inbuffer(unsigned int _size, unsigned int mmapsize = 0);
   ~inbuffer();
+  bool open(int fd, std::string *errmsg = 0, bool closeme = false);
   bool open(std::string filename, std::string *errmsg = 0);
   void reset();
 
@@ -179,7 +183,7 @@ public:
   void discarddata(unsigned int amount) {
     readpos += amount;
     if (readpos >= writepos) {
-      pos += readpos;
+      pos += writepos;
       readpos = 0;
       writepos = 0;
     }
