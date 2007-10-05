@@ -44,10 +44,17 @@ static char *argv0;
 
 void
 usage_exit(int rv=1) {
-  fprintf(stderr,"Usage:\n"
-    "  %s -generateidx [-idx <indexfilename>] <mpgfilename> ...\n"
-    "  %s -batch <prjfilename> | <mpgfilename> ...\n",
+  fprintf(stderr,
+    "Usage:\n"
+    "  %s -generateidx [-idx <indexfilename>] [<mpgfilename> ...]\n"
+    "  %s -batch <prjfilename> | <mpgfilename> ...\n\n",
     argv0, argv0);
+  fprintf(stderr,
+    "If no input files are specified, `dvbcut -generateidx' reads from\n"
+    "standard input.  By default, it also writes the index to standard\n"
+    "output, but you can specify another destination with `-idx'.\n\n");
+  fprintf(stderr,
+    "Options may be abbreviated as long as they remain unambiguous.\n\n");
   exit(rv);
 }
 
@@ -64,8 +71,10 @@ main(int argc, char *argv[]) {
    */
   for (i = 1; i < argc && argv[i][0] == '-'; ++i) {
     size_t n = strlen(argv[i]);
-    if (n == 1)	// "-"
+    if (n == 2 && argv[i][1] == '-') {	// POSIX argument separator
+      ++i;
       break;
+    }
     else if (strncmp(argv[i], "-batch", n) == 0)
       batchmode = true;
     else if (strncmp(argv[i], "-generateidx", n) == 0)
@@ -82,50 +91,65 @@ main(int argc, char *argv[]) {
   if (batchmode && generateidx)
     usage_exit();
 
+  /*
+   * Generate mode
+   */
   if (generateidx) {
-    if (i >= argc) // no input files given
-      usage_exit();
-
-    std::string mpgfilename = argv[i];	// use first one (for now)
-
-    if (idxfilename.empty())
-      idxfilename = mpgfilename + ".idx";
-
-    mpgfile *mpg = 0;
+    std::string mpgfilename = "<stdin>";
     std::string errormessage;
     inbuffer buf(8 << 20, 128 << 20);
-    while (i < argc && buf.open(argv[i], &errormessage)) {
-      ++i;
+    bool okay = true;
+    if (i >= argc) {
+      // no filenames given, read from stdin
+      okay = buf.open(STDIN_FILENO, &errormessage);
+    }
+    else {
+      mpgfilename = argv[i];	// use first one (for now)
+      if (idxfilename.empty())
+	idxfilename = mpgfilename + ".idx";
+      while (okay && i < argc) {
+	okay = buf.open(argv[i], &errormessage);
+	++i;
+      }
+    }
+    if (!okay) {
+      fprintf(stderr, "%s: %s\n", argv0, errormessage.c_str());
+      return 1;
     }
     buf.setsequential(true);
-    if (i == argc) {
-      mpg = mpgfile::open(buf, &errormessage);
-    }
 
-    if (mpg==0) {
-      fprintf(stderr,"%s: %s\n",argv0,errormessage.c_str());
+    mpgfile *mpg = mpgfile::open(buf, &errormessage);
+    if (mpg == 0) {
+      fprintf(stderr, "%s: %s\n", argv0, errormessage.c_str());
       return 1;
     }
 
     index::index idx(*mpg);
-    int pics=idx.generate();
-    if (pics==0) {
-      fprintf(stderr,"%s: file '%s' contains no pictures\n",argv0,mpgfilename.c_str());
-      return 1;
-    }
-    else if (pics<0) {
-      fprintf(stderr,"%s: '%s': %s\n",argv0,mpgfilename.c_str(),strerror(errno));
+    int pics = idx.generate();
+    if (pics <= 0) {
+      fprintf(stderr, "%s: %s: %s\n", argv0, mpgfilename.c_str(),
+	pics < 0 ? strerror(errno) : "no pictures found");
       return 1;
     }
 
-    if (idx.save(idxfilename.c_str())<0) {
-      fprintf(stderr,"%s: '%s': %s\n",argv0,idxfilename.c_str(),strerror(errno));
+    int rv;
+    if (idxfilename.empty()) {
+      rv = idx.save(STDOUT_FILENO);
+      idxfilename = "<stdout>";
+    }
+    else
+      rv = idx.save(idxfilename.c_str());
+    if (rv < 0) {
+      fprintf(stderr, "%s: %s: %s\n", argv0, idxfilename.c_str(), strerror(errno));
       return 1;
     }
 
     return 0;
   }
 
+  /*
+   * GUI and batch mode
+   */
   QApplication a(argc, argv);
   QTextCodec::setCodecForCStrings(QTextCodec::codecForLocale());
 

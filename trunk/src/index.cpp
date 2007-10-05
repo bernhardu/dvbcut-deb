@@ -348,37 +348,42 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   return check();
   }
 
-int index::save(const char *filename, std::string *errorstring)
-  {
-  int fd;
-  bool usestdout=false;
+int
+index::save(int fd, std::string *errorstring, bool closeme) {
+  int len = pictures * sizeof(picture);
+  int res = 0;
+  int save = 0;
 
-  if (filename[0]=='-' && filename[1]==0) // use stdout
-    {
-    fd=STDOUT_FILENO;
-    usestdout=true;
-    } else
-    if ((fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY,0666))<0) {
-      if (errorstring)
-        *errorstring+=std::string("Open (")+filename+"): "+strerror(errno)+"\n";
-      return fd;
-      }
-
-  int len=pictures*sizeof(picture);
-
-  if (::writer(fd,(void*)p,len)<0) {
-    int save_errno=errno;
+  if (::writer(fd, (void*)p, len) < 0) {
+    save = errno;
     if (errorstring)
-      *errorstring+=std::string("Write (")+filename+"): "+strerror(errno)+"\n";
-    ::close(fd);
-    errno=save_errno;
-    return -1;
-    }
-
-  if (!usestdout)
-    ::close(fd);
-  return 0;
+      *errorstring += std::string("write: ") + strerror(errno) + "\n";
+    res = -1;
   }
+  if (closeme)
+    ::close(fd);
+  errno = save;
+  return res;
+}
+
+int
+index::save(const char *filename, std::string *errorstring) {
+  int fd;
+
+  fd = ::open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
+  if (fd == -1) {
+    if (errorstring)
+      *errorstring += std::string(filename) + ": open: " + strerror(errno) + "\n";
+    return -1;
+  }
+  std::string tmp;
+  if (save(fd, &tmp, true) == -1) {
+    if (errorstring)
+      *errorstring += std::string(filename) + ": " + tmp;
+    return -1;
+  }
+  return 0;
+}
 
 int index::load(const char *filename, std::string *errorstring)
   {
