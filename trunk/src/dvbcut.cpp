@@ -595,6 +595,7 @@ void dvbcut::editStop()
                     EventListItem::stop,
                     curpic,(*mpg)[curpic].getpicturetype(),
                     (*mpg)[curpic].getpts()-firstpts);
+  update_quick_picture_lookup_table();
 }
 
 
@@ -610,6 +611,7 @@ void dvbcut::editStart()
                     EventListItem::start,
                     curpic,(*mpg)[curpic].getpicturetype(),
                     (*mpg)[curpic].getpts()-firstpts);
+  update_quick_picture_lookup_table();
 }
 
 void dvbcut::viewDifference()
@@ -801,28 +803,17 @@ void dvbcut::linslidervalue(int newpic)
   curpic=newpic;
   if (!jogsliding)
     jogmiddlepic=newpic;
-  const index::picture &idx=(*mpg)[curpic];
-
-  picnrlabel->setText(QString::number(curpic)+" "+IDX_PICTYPE[idx.getpicturetype()]);
-  pts_t pts=idx.getpts()-firstpts;
-  pictimelabel->setText(QString().sprintf("%02d:%02d:%02d.%03d",
-                        int(pts/(3600*90000)),
-                        int(pts/(60*90000))%60,
-                        int(pts/90000)%60,
-                        int(pts/90)%1000
-                                         ));
-
+  
+  update_time_display();
   updateimagedisplay();
-
 }
-
+  
 void dvbcut::jogsliderreleased()
 {
   jogsliding=false;
   jogmiddlepic=curpic;
   jogslider->setValue(0);
 }
-
 
 void dvbcut::jogslidervalue(int v)
 {
@@ -890,6 +881,8 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
     return;
   if (lbi->rtti()!=EventListItem::RTTI())
     return;
+  const EventListItem &eli=*static_cast<const EventListItem*>(lbi);
+
 
   QPopupMenu popup(eventlist);
   popup.insertItem("Go to",1);
@@ -904,12 +897,18 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
   switch (popup.exec(point)) {
     case 1:
       fine=true;
-      linslider->setValue(((EventListItem*)lbi)->getpicture());
+      linslider->setValue(eli.getpicture());
       fine=false;
       break;
 
     case 2:
+      {
+      EventListItem::eventtype type=eli.geteventtype();
       delete lbi;
+      
+      if (type==EventListItem::start or type==EventListItem::stop)
+        update_quick_picture_lookup_table();
+      }
       break;
 
     case 3:
@@ -928,7 +927,7 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
     case 5:
       if (imgp)
         delete imgp;
-      imgp=new differenceimageprovider(*mpg,((EventListItem*)lbi)->getpicture(),new dvbcutbusy(this),false,viewscalefactor);
+      imgp=new differenceimageprovider(*mpg,eli.getpicture(),new dvbcutbusy(this),false,viewscalefactor);
       updateimagedisplay();
       viewNormalAction->setOn(false);
       viewUnscaledAction->setOn(false);
@@ -1450,6 +1449,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
     }
   }
 
+  update_quick_picture_lookup_table();
+    
   fileOpenAction->setEnabled(true);
   fileSaveAction->setEnabled(true);
   fileSaveAsAction->setEnabled(true);
@@ -1613,3 +1614,85 @@ dvbcut::make_canonical(std::list<std::string> &filenames) {
   }
   filenames = newlist;
 }
+ 
+void dvbcut::update_time_display()
+  {
+  const index::picture &idx=(*mpg)[curpic];
+  const pts_t pts=idx.getpts()-firstpts;
+  
+  QString picnrstr=QString::number(curpic)+" "+IDX_PICTYPE[idx.getpicturetype()];
+  QString pictimestr=QString().sprintf("%02d:%02d:%02d.%03d",
+                                          int(pts/(3600*90000)),
+                                          int(pts/(60*90000))%60,
+                                          int(pts/90000)%60,
+                                          int(pts/90)%1000
+                                         );
+  
+   // find the entry in the quick_picture_lookup table that corresponds to curpic
+   quick_picture_lookup_t::iterator it=
+      std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),curpic,quick_picture_lookup_s::cmp_picture());
+  
+   if (it!=quick_picture_lookup.begin())
+   {
+     // curpic is not before the first entry of the table
+     --it;
+     if (it->export_flag)
+     {
+       // the corresponding entry says export_flag==true,
+       // so this pic is after a START entry and is going to
+       // be exported
+       picnrstr=QString("[")+QString::number(curpic-it->picture+it->outpicture)+"] "+picnrstr;
+     
+       const pts_t pts2=pts-it->pts+it->outpts;
+       pictimestr+=QString().sprintf(" [%02d:%02d:%02d.%03d]",
+                                          int(pts2/(3600*90000)),
+                                          int(pts2/(60*90000))%60,
+                                          int(pts2/90000)%60,
+                                          int(pts2/90)%1000
+                                         );     }
+   }
+   
+  picnrlabel->setText(picnrstr);
+  pictimelabel->setText(pictimestr);
+
+  }
+
+void dvbcut::update_quick_picture_lookup_table() {
+  quick_picture_lookup.clear();
+    
+  int startpic=-1;
+  int outpics=0;
+  pts_t startpts=0;
+  pts_t outpts=0;
+  
+  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+    if (item->rtti()==EventListItem::RTTI()) {
+    const EventListItem &eli=*static_cast<const EventListItem*>(item);
+    switch (eli.geteventtype()) {
+      case EventListItem::start:
+        if (startpic<0) {
+          startpic=eli.getpicture();
+          startpts=eli.getpts();
+          
+          quick_picture_lookup.push_back(quick_picture_lookup_s(startpic,true,startpts,outpics,outpts));
+        }
+        break;
+      case EventListItem::stop:
+        if (startpic>=0) {
+          int stoppic=eli.getpicture();
+          pts_t stoppts=eli.getpts();
+          
+          outpics+=stoppic-startpic;
+          outpts+=stoppts-startpts;
+          startpic=-1;
+          quick_picture_lookup.push_back(quick_picture_lookup_s(stoppic,false,stoppts,outpics,outpts));
+        }
+        break;
+      default:
+        break;
+      }
+    }
+  
+  update_time_display();
+  }
+
