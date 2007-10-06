@@ -22,6 +22,7 @@
 #define _DVBCUT_DVBCUT_H
 
 #include <string>
+#include <vector>
 #include <list>
 #include "mpgfile.h"
 #include "dvbcutbase.h"
@@ -34,7 +35,33 @@ class dvbcut: public dvbcutbase
   {
   Q_OBJECT
 
+public:
+  struct quick_picture_lookup_s
+  {
+    int picture;
+    bool export_flag;
+    pts_t pts;
+    int outpicture;
+    pts_t outpts;
+
+    quick_picture_lookup_s(int _picture, bool _export_flag, pts_t _pts, int _outpicture, pts_t _outpts) :
+      picture(_picture), export_flag(_export_flag), pts(_pts), outpicture(_outpicture), outpts(_outpts)
+    {
+    }
+
+    struct cmp_picture
+    {
+      bool operator()(int lhs, const quick_picture_lookup_s &rhs) const
+      {
+        return lhs<rhs.picture;
+      }
+    };
+  };
+  typedef std::vector<quick_picture_lookup_s> quick_picture_lookup_t;
+  
 protected:
+  quick_picture_lookup_t quick_picture_lookup;
+
   QPopupMenu *audiotrackpopup,*recentfilespopup;
   int audiotrackmenuid;
   inbuffer buf;
@@ -67,6 +94,9 @@ protected:
 
   // special event handling (mouse wheel)
   bool eventFilter(QObject *watched, QEvent *e);
+
+  void update_time_display();
+  void update_quick_picture_lookup_table();
 
   // QMessagebox interface
   int question(const QString & caption, const QString & text);

@@ -42,7 +42,11 @@ public:
     {
     return pic;
     }
-  enum eventtype geteventtype()
+  pts_t getpts() const
+    {
+    return pts;
+    }
+  enum eventtype geteventtype() const
     {
     return evtype;
     }
