@@ -313,6 +313,8 @@
         <action name="editStopAction"/>
         <action name="editChapterAction"/>
         <action name="editBookmarkAction"/>
+	<separator/>
+        <action name="editSuggestAction"/>
     </item>
     <item text="View" name="viewMenu">
         <action name="viewNormalAction"/>
@@ -581,6 +583,17 @@
     </action>
     <action>
         <property name="name">
+            <cstring>editSuggestAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Suggest markers</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
             <cstring>fileNewAction</cstring>
         </property>
         <property name="iconSet">
@@ -774,6 +787,12 @@
         <slot>editBookmark()</slot>
     </connection>
     <connection>
+        <sender>editSuggestAction</sender>
+        <signal>activated()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>editSuggest()</slot>
+    </connection>
+    <connection>
         <sender>eventlist</sender>
         <signal>doubleClicked(QListBoxItem*)</signal>
         <receiver>dvbcutbase</receiver>
@@ -891,6 +910,7 @@
     <slot>editStop()</slot>
     <slot>editChapter()</slot>
     <slot>editBookmark()</slot>
+    <slot>editSuggest()</slot>
     <slot>doubleclickedeventlist(QListBoxItem *)</slot>
     <slot>eventlistcontextmenu(QListBoxItem *, const QPoint &amp;)</slot>
     <slot>clickedgo()</slot>

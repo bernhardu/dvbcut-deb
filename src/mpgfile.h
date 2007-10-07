@@ -114,6 +114,19 @@ public:
       ++i;
     return i;
     }
+  const int nextaspectdiscontinuity(int i) const
+    {
+    if (i >= 0 && i < pictures)
+      {
+      int aspect = idx[idx.indexnr(i)].getaspectratio();
+      while (++i < pictures)
+	{
+	if (aspect != idx[idx.indexnr(i)].getaspectratio())
+	  return i;
+	}
+      }
+    return -1;
+    }
   AVCodecContext *getavcc(int str)
     {
     return s[str].avcc;

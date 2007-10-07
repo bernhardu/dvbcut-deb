@@ -1,5 +1,17 @@
 2007-10-07  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+		Add "suggest markers" function based on aspect ratio changes.
+
+	* src/dvbcutbase.ui:
+		Add "suggest markers" to edit menu.
+
+	* src/mpgfile.h:
+		Add aspect discontinuity finder function.
+
+2007-10-07  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* src/index.cpp:
 		Never write the (binary) index to a terminal.
 

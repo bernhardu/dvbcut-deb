@@ -551,67 +551,48 @@ void dvbcut::fileClose()
   close();
 }
 
-void dvbcut::editBookmark()
+void dvbcut::addEventListItem(int pic, EventListItem::eventtype type)
 {
   QPixmap p;
-  if (imgp && imgp->rtti()==IMAGEPROVIDER_STANDARD)
-    p=imgp->getimage(curpic);
+  if (imgp && imgp->rtti() == IMAGEPROVIDER_STANDARD)
+    p = imgp->getimage(pic);
   else
-    p=imageprovider(*mpg,new dvbcutbusy(this),false,4).getimage(curpic);
+    p = imageprovider(*mpg, new dvbcutbusy(this), false, 4).getimage(pic);
 
-  new EventListItem(eventlist,p,
-                    EventListItem::bookmark,
-                    curpic,(*mpg)[curpic].getpicturetype(),
-                    (*mpg)[curpic].getpts()-firstpts);
+  new EventListItem(eventlist, p, type, pic, (*mpg)[pic].getpicturetype(),
+                    (*mpg)[pic].getpts() - firstpts);
+}
 
-
+void dvbcut::editBookmark()
+{
+  addEventListItem(curpic, EventListItem::bookmark);
 }
 
 
 void dvbcut::editChapter()
 {
-  QPixmap p;
-  if (imgp && imgp->rtti()==IMAGEPROVIDER_STANDARD)
-    p=imgp->getimage(curpic);
-  else
-    p=imageprovider(*mpg,new dvbcutbusy(this),false,4).getimage(curpic);
-
-  new EventListItem(eventlist,p,
-                    EventListItem::chapter,
-                    curpic,(*mpg)[curpic].getpicturetype(),
-                    (*mpg)[curpic].getpts()-firstpts);
+  addEventListItem(curpic, EventListItem::chapter);
 }
 
 
 void dvbcut::editStop()
 {
-  QPixmap p;
-  if (imgp && imgp->rtti()==IMAGEPROVIDER_STANDARD)
-    p=imgp->getimage(curpic);
-  else
-    p=imageprovider(*mpg,new dvbcutbusy(this),false,4).getimage(curpic);
-
-  new EventListItem(eventlist,p,
-                    EventListItem::stop,
-                    curpic,(*mpg)[curpic].getpicturetype(),
-                    (*mpg)[curpic].getpts()-firstpts);
+  addEventListItem(curpic, EventListItem::stop);
   update_quick_picture_lookup_table();
 }
 
 
 void dvbcut::editStart()
 {
-  QPixmap p;
-  if (imgp && imgp->rtti()==IMAGEPROVIDER_STANDARD)
-    p=imgp->getimage(curpic);
-  else
-    p=imageprovider(*mpg,new dvbcutbusy(this),false,4).getimage(curpic);
-
-  new EventListItem(eventlist,p,
-                    EventListItem::start,
-                    curpic,(*mpg)[curpic].getpicturetype(),
-                    (*mpg)[curpic].getpts()-firstpts);
+  addEventListItem(curpic, EventListItem::start);
   update_quick_picture_lookup_table();
+}
+
+void dvbcut::editSuggest()
+{
+  int pic = 0;
+  while ((pic = mpg->nextaspectdiscontinuity(pic)) >= 0)
+    addEventListItem(pic, EventListItem::bookmark);
 }
 
 void dvbcut::viewDifference()
@@ -1170,6 +1151,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   audiotrackpopup->clear();
   editStartAction->setEnabled(false);
   editStopAction->setEnabled(false);
+  editSuggestAction->setEnabled(false);
   editChapterAction->setEnabled(false);
   editBookmarkAction->setEnabled(false);
 
@@ -1472,6 +1454,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   playStopAction->setEnabled(false);
   editStartAction->setEnabled(true);
   editStopAction->setEnabled(true);
+  editSuggestAction->setEnabled(true);
   editChapterAction->setEnabled(true);
   editBookmarkAction->setEnabled(true);
   viewNormalAction->setEnabled(true);
