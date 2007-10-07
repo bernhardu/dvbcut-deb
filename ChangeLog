@@ -1,3 +1,13 @@
+2007-10-07  Sven Over  <svenover@svenover.de>
+
+	* src/dvbcut.h:
+	* src/dvbcut.cpp:
+	* src/eventlistitem.h:
+		Display output timecode and picture number.
+
+	* src/dvbcut.cpp:
+		Evaluate 'expfile' tag or attribute.
+
 2007-10-05  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/buffer.cpp:
