@@ -918,10 +918,12 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
          if(current!=lbi) delete current;
          current=next;
       }   
+      update_quick_picture_lookup_table();
       break;
 
     case 4:
       lb->clear();
+      update_quick_picture_lookup_table();
       break;
 
     case 5:
