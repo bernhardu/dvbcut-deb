@@ -354,6 +354,13 @@ index::save(int fd, std::string *errorstring, bool closeme) {
   int res = 0;
   int save = 0;
 
+  if (isatty(fd)) {
+    if (errorstring)
+      *errorstring += std::string("refusing to write index to a tty\n");
+    errno = EINVAL;
+    // Note: do NOT close it even if the caller said so
+    return -1;
+  }
   if (::writer(fd, (void*)p, len) < 0) {
     save = errno;
     if (errorstring)
