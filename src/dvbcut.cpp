@@ -1620,19 +1620,14 @@ void dvbcut::update_time_display()
   const index::picture &idx=(*mpg)[curpic];
   const pts_t pts=idx.getpts()-firstpts;
   
-  QString picnrstr=QString::number(curpic)+" "+IDX_PICTYPE[idx.getpicturetype()];
-  QString pictimestr=QString().sprintf("%02d:%02d:%02d.%03d",
-                                          int(pts/(3600*90000)),
-                                          int(pts/(60*90000))%60,
-                                          int(pts/90000)%60,
-                                          int(pts/90)%1000
-                                         );
+  int outpic=0;
+  pts_t outpts=0;
   
-   // find the entry in the quick_picture_lookup table that corresponds to curpic
-   quick_picture_lookup_t::iterator it=
-      std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),curpic,quick_picture_lookup_s::cmp_picture());
-  
-   if (it!=quick_picture_lookup.begin())
+    // find the entry in the quick_picture_lookup table that corresponds to curpic
+  quick_picture_lookup_t::iterator it=
+    std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),curpic,quick_picture_lookup_s::cmp_picture());
+   
+  if (it!=quick_picture_lookup.begin())
    {
      // curpic is not before the first entry of the table
      --it;
@@ -1641,16 +1636,28 @@ void dvbcut::update_time_display()
        // the corresponding entry says export_flag==true,
        // so this pic is after a START entry and is going to
        // be exported
-       picnrstr=QString("[")+QString::number(curpic-it->picture+it->outpicture)+"] "+picnrstr;
-     
-       const pts_t pts2=pts-it->pts+it->outpts;
-       pictimestr+=QString().sprintf(" [%02d:%02d:%02d.%03d]",
-                                          int(pts2/(3600*90000)),
-                                          int(pts2/(60*90000))%60,
-                                          int(pts2/90000)%60,
-                                          int(pts2/90)%1000
-                                         );     }
+       
+       outpic=curpic-it->picture+it->outpicture;
+       outpts=pts-it->pts+it->outpts;
+     }
+     else
+     {
+       outpic=it->outpicture;
+       outpts=it->outpts;
+     }
    }
+       
+  QString picnrstr=QString::number(outpic)+"/"+QString::number(curpic)+" "+IDX_PICTYPE[idx.getpicturetype()];
+  QString pictimestr=QString().sprintf("%02d:%02d:%02d.%03d/%02d:%02d:%02d.%03d",
+                                          int(outpts/(3600*90000)),
+                                          int(outpts/(60*90000))%60,
+                                          int(outpts/90000)%60,
+                                          int(outpts/90)%1000,
+                                          int(pts/(3600*90000)),
+                                          int(pts/(60*90000))%60,
+                                          int(pts/90000)%60,
+                                          int(pts/90)%1000
+                                         );
    
   picnrlabel->setText(picnrstr);
   pictimelabel->setText(pictimestr);
