@@ -1190,7 +1190,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   linslider->setEnabled(false);
   jogslider->setEnabled(false);
 
-  std::string prjfilename;
+  std::string prjfilename,expfilename;
   QDomDocument domdoc;
   {
     QFile infile(filename);
@@ -1215,7 +1215,6 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
           }
 	  // parse elements, new-style first
 	  QDomNode n;
-	  QString qs;
           filenames.clear();
           idxfilename.clear();
 	  for (n = domdoc.documentElement().firstChild(); !n.isNull(); n = n.nextSibling()) {
@@ -1223,26 +1222,36 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
 	    if (e.isNull())
 	      continue;
 	    if (e.tagName() == "mpgfile") {
-	      qs = e.attribute("path");
+	      QString qs = e.attribute("path");
 	      if (!qs.isEmpty())
 		filenames.push_back((const char*)qs);
 	    }
 	    else if (e.tagName() == "idxfile") {
-	      qs = e.attribute("path");
+	      QString qs = e.attribute("path");
 	      if (!qs.isEmpty())
 		idxfilename = (const char*)qs;
+	    }
+	    else if (e.tagName() == "expfile") {
+	      QString qs = e.attribute("path");
+	      if (!qs.isEmpty())
+		expfilename = (const char*)qs;
 	    }
 	  }
 	  // try old-style project file format
 	  if (filenames.empty()) {
-	    qs = docelem.attribute("mpgfile");
+	    QString qs = docelem.attribute("mpgfile");
 	    if (!qs.isEmpty())
 	      filenames.push_back((const char*)qs);
 	  }
 	  if (idxfilename.empty()) {
-	    qs = docelem.attribute("idxfile");
+	    QString qs = docelem.attribute("idxfile");
 	    if (!qs.isEmpty())
 	      idxfilename = (const char*)qs;
+	  }
+	  if (expfilename.empty()) {
+	    QString qs = docelem.attribute("expfile");
+	    if (!qs.isEmpty())
+	      expfilename = (const char*)qs;
 	  }
 	  // sanity check
 	  if (filenames.empty()) {
@@ -1386,7 +1395,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   mpgfilen=filenames;
   idxfilen=idxfilename;
   prjfilen=prjfilename;
-  expfilen.clear();
+  expfilen=expfilename;
   if (prjfilen.empty())
     addtorecentfiles(mpgfilen.front(),idxfilen);
   else
