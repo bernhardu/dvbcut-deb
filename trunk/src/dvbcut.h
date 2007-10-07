@@ -27,6 +27,7 @@
 #include "mpgfile.h"
 #include "dvbcutbase.h"
 #include "pts.h"
+#include "eventlistitem.h"
 
 class QProcess;
 class imageprovider;
@@ -106,6 +107,9 @@ protected:
   void make_canonical(std::string &filename);
   void make_canonical(std::list<std::string> &filenames);
 
+  // generic event item adder
+  void addEventListItem(int pic, EventListItem::eventtype type);
+
 public:
   ~dvbcut();
   dvbcut(QWidget *parent = 0, const char *name = 0, WFlags fl = WType_TopLevel|WDestructiveClose );
@@ -125,6 +129,7 @@ public slots:
   virtual void editChapter();
   virtual void editStop();
   virtual void editStart();
+  virtual void editSuggest();
   virtual void viewDifference();
   virtual void viewUnscaled();
   virtual void viewNormal();
