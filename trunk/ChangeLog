@@ -1,3 +1,8 @@
+2007-10-07  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/index.cpp:
+		Never write the (binary) index to a terminal.
+
 2007-10-07  Sven Over  <svenover@svenover.de>
 
 	* src/dvbcut.h:
