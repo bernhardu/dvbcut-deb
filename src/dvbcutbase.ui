@@ -313,7 +313,7 @@
         <action name="editStopAction"/>
         <action name="editChapterAction"/>
         <action name="editBookmarkAction"/>
-	<separator/>
+        <separator/>
         <action name="editSuggestAction"/>
     </item>
     <item text="View" name="viewMenu">
