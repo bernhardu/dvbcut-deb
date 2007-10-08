@@ -1609,6 +1609,15 @@ dvbcut::make_canonical(std::list<std::string> &filenames) {
   filenames = newlist;
 }
  
+inline static QString
+timestr(pts_t pts) {
+  return QString().sprintf("%02d:%02d:%02d.%03d",
+    int(pts/(3600*90000)),
+    int(pts/(60*90000))%60,
+    int(pts/90000)%60,
+    int(pts/90)%1000);
+}
+
 void dvbcut::update_time_display()
   {
   const index::picture &idx=(*mpg)[curpic];
@@ -1641,17 +1650,11 @@ void dvbcut::update_time_display()
      }
    }
        
-  QString picnrstr=QString::number(outpic)+"/"+QString::number(curpic)+" "+IDX_PICTYPE[idx.getpicturetype()];
-  QString pictimestr=QString().sprintf("%02d:%02d:%02d.%03d/%02d:%02d:%02d.%03d",
-                                          int(outpts/(3600*90000)),
-                                          int(outpts/(60*90000))%60,
-                                          int(outpts/90000)%60,
-                                          int(outpts/90)%1000,
-                                          int(pts/(3600*90000)),
-                                          int(pts/(60*90000))%60,
-                                          int(pts/90000)%60,
-                                          int(pts/90)%1000
-                                         );
+  QString picnrstr =
+    QString::number(curpic) + " " + IDX_PICTYPE[idx.getpicturetype()]
+    + "\n" + QString::number(outpic) + "  ";
+  QString pictimestr =
+    timestr(pts) + "\n" + timestr(outpts);
    
   picnrlabel->setText(picnrstr);
   pictimelabel->setText(pictimestr);
