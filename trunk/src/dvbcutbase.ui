@@ -444,7 +444,7 @@
             <string>Close</string>
         </property>
         <property name="accel">
-            <string>Q</string>
+            <string>Ctrl+Q</string>
         </property>
     </action>
     <action>
@@ -463,6 +463,9 @@
         <property name="menuText">
             <string>Play audio: last 2 seconds</string>
         </property>
+        <property name="accel">
+            <string>Shift+&gt;</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -479,6 +482,9 @@
         </property>
         <property name="menuText">
             <string>Play audio: next 2 seconds</string>
+        </property>
+        <property name="accel">
+            <string>&lt;</string>
         </property>
     </action>
     <action>
@@ -512,7 +518,7 @@
             <string>Stop</string>
         </property>
         <property name="accel">
-            <string>S</string>
+            <string>Q</string>
         </property>
     </action>
     <action>
@@ -593,6 +599,9 @@
         <property name="text">
             <string>Suggest markers</string>
         </property>
+        <property name="accel">
+            <string>M</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -632,6 +641,9 @@
         <property name="text">
             <string>Normal</string>
         </property>
+        <property name="accel">
+            <string>Ctrl+N</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -643,6 +655,9 @@
         <property name="text">
             <string>Unscaled</string>
         </property>
+        <property name="accel">
+            <string>Ctrl+U</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -653,6 +668,9 @@
         </property>
         <property name="text">
             <string>Show difference to current picture</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+D</string>
         </property>
     </action>
     <action>
@@ -668,6 +686,9 @@
         <property name="text">
             <string>Full size</string>
         </property>
+        <property name="accel">
+            <string>Ctrl+1</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -679,6 +700,9 @@
         <property name="text">
             <string>Quarter size</string>
         </property>
+        <property name="accel">
+            <string>Ctrl+4</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -689,6 +713,9 @@
         </property>
         <property name="text">
             <string>Half size</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+2</string>
         </property>
     </action>
     <action>
@@ -703,6 +730,9 @@
         </property>
         <property name="text">
             <string>Save Snapshot</string>
+        </property>
+        <property name="accel">
+            <string>G</string>
         </property>
     </action>
 </actions>

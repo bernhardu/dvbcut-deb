@@ -1,3 +1,8 @@
+2007-10-11  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcutbase.ui:
+		Add/change accelerators.
+
 2007-10-10  Michael Kreuzer  <michael-kreuzer@gmx.de>
 
 	* src/dvbcut.cpp:
