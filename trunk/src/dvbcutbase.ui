@@ -303,6 +303,7 @@
         <action name="fileOpenAction"/>
         <action name="fileSaveAction"/>
         <action name="fileSaveAsAction"/>
+        <action name="snapshotSaveAction"/>
         <separator/>
         <action name="fileExportAction"/>
         <separator/>
@@ -344,6 +345,7 @@
         <action name="fileOpenAction"/>
         <action name="fileSaveAction"/>
         <action name="fileSaveAsAction"/>
+        <action name="snapshotSaveAction"/>
     </toolbar>
     <toolbar dock="2">
         <property name="name">
@@ -689,6 +691,20 @@
             <string>Half size</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>snapshotSaveAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>image13</iconset>
+        </property>
+        <property name="text">
+            <string>Save Snapshot</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -729,6 +745,9 @@
     </image>
     <image name="image12">
         <data format="PNG" length="539">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000001e249444154388dc594bf6e13411087bf995927560402040d74e900512024c42bd0d0512221f10034888217a0e34ddca54993741469282841a24041427420127cf6ee0cc59d8d4f3efb1c37cce974da9bbd6f7ff3ef2422f8f0f14ba80a5d369966a69329a5383f7f9d01f0e4f1a3eecd0b96005485fbf7f6979c1ec1b8cae4ece4ec7c3dfdced52b9739383c893eb8f69d6c2aa80aa6f5d6dd9d010f1fdce1e0f024b606ab08664a32c5522d706f6fc88deb97b87b7b7f2dbc5731802c043ddc359229b76e5e5bab3c6d06aed37174fc9ea3e365ffbb4f9fe3d5cb67ad9cf782558588404578f1fc2900a5144ebffd6032cd4404a3d168f9bb4d15039809a5147e9ffdc1233053d4ba11bd8ac38388c023383faf185713722e0c873b84434477fdd6823d825c9ce241ce8e7bccd527333028eedb29aeaa52e792405518a48499528a1311947241f06cea8a07aa8a37ca5405096da9ef05fb42bec655c6bd56094df889b9c2648687b3aafe2d7035c92da78a80817b904c99798380ece08a5ab7e2d671b270352fe82c7af34e8446750fb87588d480791a9ba7aa2222f35ba51bb1d1806c63ff09bce657be6ae266b6b2dd887aed1ef33580bbd75dd1c05715af05de19fceb9d19b0b813d1b49c28311b0e0a4120b93bac0460a6bc7ef3766d6817b5bf762fef4119a5327f0000000049454e44ae426082</data>
+    </image>
+    <image name="image13">
+        <data format="PNG" length="895">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000034649444154388ded93cf6b245510c73fef75f7cc744fd6cdc6c9925fc45d4312300103eb25a0110f5ebd2f83785010f412043d08fe11dec4837791c57f40f0e2c143302ec9921c3271421cc3984c8699ee4ccf7bfdfa3d0f9b6967d7f8176841417575f5b7befdad2af8dfae4d8c825aad562d954a73d65a757979f987d6da3c5fbcb9b9f9200cc3ca78cef77d4f4ae90bf1142e49927ea3d17822b6b7b757161616deb2d63e0456009565d90f9ee7ed010ec05aeb2a95ca4bf57afd3d29a5b4d6e29c03c03927f2dc0a630520383bfb7df0fda3ef3ef3d7d7d73fadd7ebef0b21843106630c799e7f90e7f928462985d69ae1704818860821504aa194c26419da7aecb64a1c9d295ebd9bdf2907deb21f86e164a552115a6b00f23c27cb32b4d61863504a311c0e999f9f278a22acb5645946b55aa55c2ed36eb7b1cee11cdc99b054cbce65c638df5aebd234456b8dd69a2ccb9e014ed394a5a5258220e0f0f090c16080520a6b2dd3d3d3d46a35daed366fbc3c8114923f3b6072871fc731fbfbfbf4fbfd82ad73aef8fdb5b535cae532cd66937ebfcfeeee2f743a1d565656499204630c954a856e2f268a228cc971cee11b634892a42832c614c04110303737471cc7f8becf575f7fc393df86dc9eacf1eda32ff9f8c377f13c8fc5c545b22c23cf73468395ce39acb54572dc8320200882eb010ef9f1e763ee6d7dceeadb5f70555ae7f1e35fb1d63292b2d7eb11c7315a6bfc11c8a8c1b88fb6c25a4b1846ccdcbd45394af1ab9ac95b39b75f78112104c6185aad168d4603a514ad56eb29f0f36c8d310593388e29954a54ab553ef9e8217b8d9ff02f2abcb3758ff557561142e09c238ee3e27be06fe09ba4504a717070c0c6c6064992f0e6d616af3d48e8f57a0cd321e970481445f4fb7d3a9d4e7134802834be490ae71c4747479c9e9e025c0f38474a0fcff799989820cf734e4e4e18ddc135b89337818d1c406bcdcece0ecd66f399ad114230180c383e3ea6dbed22a5444a8910022104fed4d4945c5e5e264dd3428e7169c663a554c1caf33c7cdf67767696999999824cb7db15171717d237c6ec799ef77a1886de680bc6b761fcb9dbedfea3e978f3eb9bb832c61c89fbf7ef57a3285a96529647ca8f0d817fcbdd5403608cb93a3f3f6fdcf8f2bf697f015a83baa7c09980510000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -900,6 +919,12 @@
         <receiver>dvbcutbase</receiver>
         <slot>viewQuarterSize()</slot>
     </connection>
+    <connection>
+        <sender>snapshotSaveAction</sender>
+        <signal>activated()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>snapshotSave()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>fileOpen()</slot>
@@ -934,6 +959,7 @@
     <slot>viewFullSize()</slot>
     <slot>viewHalfSize()</slot>
     <slot>viewQuarterSize()</slot>
+    <slot>snapshotSave()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

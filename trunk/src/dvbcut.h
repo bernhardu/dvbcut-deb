@@ -76,6 +76,7 @@ protected:
   bool jogsliding;
   int jogmiddlepic;
   std::string prjfilen,idxfilen,expfilen;
+  QString picfilen;
   std::list<std::string> mpgfilen;
   QProcess *mplayer_process;
   bool mplayer_success;
@@ -123,6 +124,7 @@ public slots:
   virtual void fileOpen();
   virtual void fileSaveAs();
   virtual void fileSave();
+  virtual void snapshotSave();
   virtual void fileExport();
   virtual void fileClose();
   virtual void editBookmark();

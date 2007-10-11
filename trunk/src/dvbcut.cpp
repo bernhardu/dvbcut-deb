@@ -44,6 +44,7 @@
 #include <qcombobox.h>
 #include <qmenubar.h>
 #include <qsettings.h>
+#include <qregexp.h>
 
 #include "port.h"
 #include "dvbcut.h"
@@ -286,6 +287,64 @@ void dvbcut::fileSave()
   stream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
   stream << doc.toCString();
   outfile.close();
+}
+
+void dvbcut::snapshotSave()
+{
+  QString prefix;
+
+  if (picfilen.isEmpty()) {
+    if (!prjfilen.empty())
+      prefix = QString(prjfilen);
+    else if (!mpgfilen.empty() && !mpgfilen.front().empty())
+      prefix = QString(mpgfilen.front());
+
+    if (!prefix.isEmpty()) {
+      int lastdot = prefix.findRev('.');
+      int lastslash = prefix.findRev('/');
+      if (lastdot >= 0 && lastdot > lastslash)
+        prefix = prefix.left(lastdot);
+      picfilen = prefix + "_001.png";
+      int nr = 1;
+      while (QFileInfo(picfilen).exists())
+        picfilen = prefix + "_" + QString::number(++nr).rightJustify( 3, '0' ) + ".png";
+    }
+  }  
+
+  QString s = QFileDialog::getSaveFileName(
+    picfilen,
+    "Images (*.png)",
+    this,
+    "Save picture as...",
+    "Choose the name of the picture file" );
+
+  if (s.isEmpty())
+    return;
+
+  if (QFileInfo(s).exists() && question(
+      "File exists - dvbcut",
+      s + "\nalready exists. Overwrite?") !=
+      QMessageBox::Yes)
+    return;
+
+  QPixmap p;
+  if (imgp)
+    p = imgp->getimage(curpic,fine);
+  else
+    p = imageprovider(*mpg, new dvbcutbusy(this), false, viewscalefactor).getimage(curpic,fine);
+  p.save(s,"PNG");
+ 
+  int i = s.findRev(QRegExp("_\\d{3,3}\\.png$"));
+  if (i>0) {
+    bool ok;
+    int nr = s.mid(i+1,3).toInt(&ok,10);
+    if (ok)
+      picfilen = s.left(i) + "_" + QString::number(++nr).rightJustify( 3, '0' ) + ".png";
+    else
+      picfilen = s;
+  }
+  else
+    picfilen = s;
 }
 
 void dvbcut::fileExport()
@@ -676,6 +735,7 @@ void dvbcut::playPlay()
   fileOpenAction->setEnabled(false);
   fileSaveAction->setEnabled(false);
   fileSaveAsAction->setEnabled(false);
+  snapshotSaveAction->setEnabled(false);
   fileExportAction->setEnabled(false);
 
   showimage=false;
@@ -969,6 +1029,7 @@ void dvbcut::mplayer_exited()
   fileOpenAction->setEnabled(true);
   fileSaveAction->setEnabled(true);
   fileSaveAsAction->setEnabled(true);
+  snapshotSaveAction->setEnabled(true);
   fileExportAction->setEnabled(true);
 
   imagedisplay->releaseKeyboard();
@@ -1142,6 +1203,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   fileOpenAction->setEnabled(false);
   fileSaveAction->setEnabled(false);
   fileSaveAsAction->setEnabled(false);
+  snapshotSaveAction->setEnabled(false);
   // enable closing even if no file was loaded (mr)
   //fileCloseAction->setEnabled(false);
   fileExportAction->setEnabled(false);
@@ -1380,6 +1442,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   idxfilen=idxfilename;
   prjfilen=prjfilename;
   expfilen=expfilename;
+  picfilen=QString::null;
   if (prjfilen.empty())
     addtorecentfiles(mpgfilen.front(),idxfilen);
   else
@@ -1447,6 +1510,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   fileOpenAction->setEnabled(true);
   fileSaveAction->setEnabled(true);
   fileSaveAsAction->setEnabled(true);
+  snapshotSaveAction->setEnabled(true);
   fileCloseAction->setEnabled(true);
   fileExportAction->setEnabled(true);
   playPlayAction->setEnabled(true);
