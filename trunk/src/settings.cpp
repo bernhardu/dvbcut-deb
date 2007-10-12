@@ -52,11 +52,13 @@
 dvbcut_settings::dvbcut_settings() {
   setPath(DVBCUT_QSETTINGS_DOMAIN, DVBCUT_QSETTINGS_PRODUCT);
   beginGroup("/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT);
-  load_settings();
+  loaded = false;
 }
 
 dvbcut_settings::~dvbcut_settings() {
-  save_settings();
+  if (loaded) {
+    save_settings();
+  }
   endGroup();
 }
 
@@ -150,5 +152,14 @@ dvbcut_settings::save_settings() {
   endGroup();	// labels
 }
 
-// finally, the global settings
-dvbcut_settings settings;
+// private settings variable
+static dvbcut_settings mysettings;
+
+// access function (includes delayed loading)
+dvbcut_settings& settings() {
+  if (!mysettings.loaded) {
+    mysettings.load_settings();
+    mysettings.loaded = true;
+  }
+  return mysettings;
+}
