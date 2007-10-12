@@ -42,6 +42,8 @@ public:
   void load_settings();
   void save_settings();
 
+  bool loaded;
+
   QString lastdir;
   QString idxfilter;
   QString prjfilter;
@@ -65,6 +67,7 @@ public:
 
 };
 
-extern dvbcut_settings settings;
+// access function
+extern dvbcut_settings& settings();
 
 #endif // _DVBCUT_SETTINGS_H

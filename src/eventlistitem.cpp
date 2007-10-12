@@ -108,13 +108,13 @@ QString EventListItem::getstring() const
   {
   QString label;
   if (evtype==start)
-    label = settings.start_label;
+    label = settings().start_label;
   else if (evtype==stop)
-    label = settings.stop_label;
+    label = settings().stop_label;
   else if (evtype==chapter)
-    label = settings.chapter_label;
+    label = settings().chapter_label;
   else if (evtype==bookmark)
-    label = settings.bookmark_label;
+    label = settings().bookmark_label;
 
   return label + QString().sprintf("<br>%02d:%02d:%02d.%03d<br>%d (%c)",
                            int(pts/(3600*90000)),
