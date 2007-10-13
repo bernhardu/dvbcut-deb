@@ -22,9 +22,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
+#include <cstdlib>
+#include <cerrno>
+#include <cstring>
 #include <list>
 #include <utility>
 

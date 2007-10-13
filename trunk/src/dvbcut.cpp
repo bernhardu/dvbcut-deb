@@ -18,11 +18,11 @@
 
 /* $Id$ */
 
-#include <string.h>
-#include <errno.h>
-#include <math.h>
-#include <stdlib.h>
-#include <limits.h>
+#include <cstring>
+#include <cerrno>
+#include <cmath>
+#include <cstdlib>
+#include <climits>
 #include <memory>
 
 #include <qlabel.h>

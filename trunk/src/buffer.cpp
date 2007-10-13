@@ -23,14 +23,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
 #include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-// #include <stdio.h>
+#include <cstring>
+#include <cstdlib>
+// #include <cstdio>
 #include <stdint.h>
-#include <assert.h>
+#include <cassert>
 
 #include <string>
 #include <vector>

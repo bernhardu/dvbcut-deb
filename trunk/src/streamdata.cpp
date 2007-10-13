@@ -18,7 +18,7 @@
 
 /* $Id$ */
 
-#include <assert.h>
+#include <cassert>
 #include "streamdata.h"
 
 static const int mpegaudio_rates[]=
