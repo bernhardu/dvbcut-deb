@@ -68,7 +68,7 @@ HDRS = \
 OBJS = $(SRCS:.cpp=.o)
 
 CXX = g++
-CXXFLAGS = -O2 -Wall
+CXXFLAGS = -O2 -Wall -g
 CPPFLAGS = -I../ffmpeg/include -I../import -I/usr/local/include \
 	-I. -DQT3_SUPPORT -DHAVE_LIB_MAD -DHAVE_LIB_A52 -DHAVE_LIB_AO \
 	-I$(QTDIR)/include/Qt -I$(QTDIR)/include/QtCore \
@@ -79,7 +79,12 @@ LDLIBS = -lavformat -lavcodec -lavutil -lqt-mt -lmad -la52 -lao -lwinmm -lmpeg2
 
 all: ../bin/dvbcut.exe
 
-../bin/dvbcut.exe: ../ffmpeg/lib/libavcodec.a $(SRCS) $(OBJS)
+../bin/dvbcut.exe: dvbcut.exe
+	-rm -f $@
+	cp dvbcut.exe $@
+	strip $@
+
+dvbcut.exe: ../ffmpeg/lib/libavcodec.a $(SRCS) $(OBJS)
 	$(CXX) -o $@ $(LDFLAGS) $(OBJS) $(LDLIBS)
 
 OPT.ffmpeg = \
