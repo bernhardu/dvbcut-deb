@@ -20,8 +20,8 @@
 
 #include "pts.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 
 std::string ptsstring(pts_t pts)

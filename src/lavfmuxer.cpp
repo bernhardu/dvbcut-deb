@@ -22,7 +22,7 @@ extern "C" {
 #include <ffmpeg/avformat.h>
 #include <ffmpeg/avcodec.h>
 }
-#include <string.h>
+#include <cstring>
 #include <utility>
 #include <list>
 #include "avframe.h"

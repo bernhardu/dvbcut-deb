@@ -19,8 +19,8 @@
 /* $Id$ */
 
 #include <qimage.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include "avframe.h"
 
 #ifdef HAVE_LIB_SWSCALE

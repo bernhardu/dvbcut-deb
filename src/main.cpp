@@ -18,10 +18,10 @@
 
 /* $Id$ */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
+#include <cerrno>
 #include <string>
 #include <list>
 
