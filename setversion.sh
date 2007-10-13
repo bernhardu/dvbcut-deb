@@ -42,7 +42,7 @@ BUILT=`TZ=UTC date '+%Y-%m-%d %H:%M:%SZ'`
 getids() {
 	sed -ne 's,^[^ ]\+ \+\$Id: \(.*\) \$.*,\1,p' "$@" < /dev/null
 }
-set -- $(getids "$@" | sort +1n -2 +2 -4 +0 -1 | tail -1)
+set -- $(getids "$@" | sort -k 2n,2 -k 3,4 -k 1,1 | tail -1)
 NAME=$1
 REVISION=$2
 DATE=$3

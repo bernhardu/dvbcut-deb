@@ -18,13 +18,14 @@
 
 /* $Id$ */
 
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <strings.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <assert.h>
+#include <cassert>
 #include "mpegmuxer.h"
 
 #ifndef O_BINARY

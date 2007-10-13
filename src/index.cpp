@@ -67,7 +67,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   int fd=-1;
   bool usestdout=false;
   int pictureswritten=0;
-  dvbcut_off_t filesize;
+  dvbcut_off_t filesize=0;
 
   if (savefilename && savefilename[0]) {
     if (savefilename[0]=='-' && savefilename[1]==0) // use stdout
