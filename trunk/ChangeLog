@@ -1,3 +1,8 @@
+2007-10-13  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/Makefile.w32:
+		Build dvbcut with -g and place a stripped copy in bin.
+
 2007-10-12  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/settings.cpp:
