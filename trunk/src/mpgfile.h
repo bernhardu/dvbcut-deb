@@ -90,31 +90,31 @@ public:
     {
     return idx[idx.indexnr(i)];
     }
-  const int lastseqheader(int i) const
+  int lastseqheader(int i) const
     {
     while (i>0 && !idx[idx.indexnr(i)].getseqheader())
       --i;
     return i;
     }
-  const int lastiframe(int i) const
+  int lastiframe(int i) const
     {
     while (i>0 && !idx[idx.indexnr(i)].isiframe())
       --i;
     return i;
     }
-  const int nextseqheader(int i) const
+  int nextseqheader(int i) const
     {
     while (i+1<pictures && !idx[idx.indexnr(i)].getseqheader())
       ++i;
     return i;
     }
-  const int nextiframe(int i) const
+  int nextiframe(int i) const
     {
     while (i+1<pictures && !idx[idx.indexnr(i)].isiframe())
       ++i;
     return i;
     }
-  const int nextaspectdiscontinuity(int i) const
+  int nextaspectdiscontinuity(int i) const
     {
     if (i >= 0 && i < pictures)
       {

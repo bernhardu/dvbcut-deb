@@ -18,11 +18,12 @@
 
 /* $Id$ */
 
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <stdint.h>
-#include <errno.h>
+#include <cerrno>
 #include <unistd.h>
-#include <math.h>
+#include <cmath>
 
 #include <list>
 #include <utility>
@@ -554,10 +555,12 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
           }
           if (!mux.putpacket(VIDEOSTREAM,vsd->getdata(),picsize,vidpts,viddts,
                              idx[streampic].isiframe() ? MUXER_FLAG_KEY:0  ))
+            {
             if (log)
               log->printwarning("putpacket(streampic=%d) returned false",streampic);
             else
               fprintf(stderr,"WARN: putpacket(streampic=%d) returned false\n",streampic);
+            }
         }
 
         vsd->discard(picsize);

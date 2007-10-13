@@ -250,7 +250,7 @@ public:
     {
     return curpos;
     }
-  const unsigned int getitemlistsize() const
+  unsigned int getitemlistsize() const
     {
     return itemlistsize;
     }
