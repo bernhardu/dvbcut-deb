@@ -1725,11 +1725,8 @@ void dvbcut::update_time_display()
   QString curtime =
     QString(QChar(IDX_PICTYPE[idx.getpicturetype()]))
     + " " + timestr(pts);
-  QString outtime =
-    QString(QChar(IDX_PICTYPE[(*mpg)[outpic].getpicturetype()]))
-    + " " + timestr(outpts);
   pictimelabel->setText(curtime);
-  pictimelabel2->setText(outtime);
+  pictimelabel2->setText(timestr(outpts));
   goinput->setText(QString::number(curpic));
   goinput2->setText(QString::number(outpic));
 

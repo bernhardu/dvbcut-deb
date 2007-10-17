@@ -1,6 +1,11 @@
 2007-10-17  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:
+		Remove picture type on the right.
+
+2007-10-17  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
 	* src/dvbcutbase.ui:
 		New layout for the label/input area.
 
