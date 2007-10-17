@@ -1,3 +1,9 @@
+2007-10-17  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
+	* src/dvbcutbase.ui:
+		New layout for the label/input area.
+
 2007-10-13  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.w32:

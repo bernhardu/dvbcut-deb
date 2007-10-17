@@ -721,6 +721,8 @@ void dvbcut::playPlay()
   jogslider->setEnabled(false);
   gobutton->setEnabled(false);
   goinput->setEnabled(false);
+  gobutton2->setEnabled(false);
+  goinput2->setEnabled(false);
 
 #ifdef HAVE_LIB_AO
 
@@ -991,7 +993,7 @@ void dvbcut::clickedgo()
     linslider->setValue(n);
     fine=false;
   }
-  goinput->clear();
+  //goinput->clear();
 
 }
 
@@ -1015,6 +1017,8 @@ void dvbcut::mplayer_exited()
   jogslider->setEnabled(true);
   gobutton->setEnabled(true);
   goinput->setEnabled(true);
+  //gobutton2->setEnabled(true);
+  //goinput2->setEnabled(true);
 
 #ifdef HAVE_LIB_AO
 
@@ -1192,7 +1196,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   imagedisplay->setMinimumSize(QSize(0,0));
   imagedisplay->setPixmap(QPixmap());
   pictimelabel->clear();
-  picnrlabel->clear();
+  pictimelabel2->clear();
   linslider->setValue(0);
   jogslider->setValue(0);
 
@@ -1230,9 +1234,11 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   eventlist->setEnabled(false);
   imagedisplay->setEnabled(false);
   pictimelabel->setEnabled(false);
-  picnrlabel->setEnabled(false);
+  pictimelabel2->setEnabled(false);
   goinput->setEnabled(false);
   gobutton->setEnabled(false);
+  goinput2->setEnabled(false);
+  gobutton2->setEnabled(false);
   linslider->setEnabled(false);
   jogslider->setEnabled(false);
 
@@ -1536,9 +1542,11 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   eventlist->setEnabled(true);
   imagedisplay->setEnabled(true);
   pictimelabel->setEnabled(true);
-  picnrlabel->setEnabled(true);
+  pictimelabel2->setEnabled(true);
   goinput->setEnabled(true);
   gobutton->setEnabled(true);
+  //goinput2->setEnabled(true);
+  //gobutton2->setEnabled(true);
   linslider->setEnabled(true);
   jogslider->setEnabled(true);
 
@@ -1714,14 +1722,16 @@ void dvbcut::update_time_display()
      }
    }
        
-  QString picnrstr =
-    QString::number(curpic) + " " + IDX_PICTYPE[idx.getpicturetype()]
-    + "\n" + QString::number(outpic) + "  ";
-  QString pictimestr =
-    timestr(pts) + "\n" + timestr(outpts);
-   
-  picnrlabel->setText(picnrstr);
-  pictimelabel->setText(pictimestr);
+  QString curtime =
+    QString(QChar(IDX_PICTYPE[idx.getpicturetype()]))
+    + " " + timestr(pts);
+  QString outtime =
+    QString(QChar(IDX_PICTYPE[(*mpg)[outpic].getpicturetype()]))
+    + " " + timestr(outpts);
+  pictimelabel->setText(curtime);
+  pictimelabel2->setText(outtime);
+  goinput->setText(QString::number(curpic));
+  goinput2->setText(QString::number(outpic));
 
   }
 
