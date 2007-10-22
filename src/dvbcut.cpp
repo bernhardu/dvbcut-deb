@@ -657,16 +657,25 @@ void dvbcut::editStart()
 
 void dvbcut::editSuggest()
 {
-  int pic = 0;
-  while ((pic = mpg->nextaspectdiscontinuity(pic)) >= 0)
+  int pic = 0, found=0;
+  while ((pic = mpg->nextaspectdiscontinuity(pic)) >= 0) {
     addEventListItem(pic, EventListItem::bookmark);
+    found++;
+  }
+  if(!found)  
+    fprintf(stderr,"No aspect ratio changes detected!\n");   
 }
 
 void dvbcut::editImport()
 {
-  int *bookmark = mpg->getbookmarks();
-  while(bookmark && *bookmark)
-    addEventListItem(*bookmark++, EventListItem::bookmark);
+  int found=0;
+  std::vector<int> bookmarks = mpg->getbookmarks();
+  for (std::vector<int>::iterator b = bookmarks.begin(); b != bookmarks.end(); ++b) {   
+    addEventListItem(*b, EventListItem::bookmark);
+    found++;
+  }
+  if(!found)  
+    fprintf(stderr,"No valid bookmarks available/found!\n");
 }
 
 void dvbcut::viewDifference()

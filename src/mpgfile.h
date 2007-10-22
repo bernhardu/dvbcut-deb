@@ -65,9 +65,10 @@ public:
     {
     return false;
     }
-  virtual int *getbookmarks()
+  virtual std::vector<int> getbookmarks()
     {
-    return NULL;
+    std::vector<int> pic_bookmarks; 
+    return pic_bookmarks;
     }
 
   int getinitialoffset() const
