@@ -29,6 +29,15 @@ tsfile::tsfile(inbuffer &b, int initial_offset) : mpgfile(b, initial_offset)
   for(unsigned int i=0;i<8192;++i)
     streamnumber[i]=-1;
 
+  // check the "header" for receiver specific bookmarks
+  const uint8_t *header = (const uint8_t*) buf.data();
+  const char *model[6]={"???","TF4000","TF5000","TF5010","TF5000c","TF5010c"};
+  int irc;
+  if((irc=isTOPFIELD(header, initial_offset))>0)
+    fprintf(stderr,"Found Topfield %s header with %d bookmarks\n",model[irc/100],irc%100);  
+  //else
+  //  fprintf(stderr,"Unknown, corrupted or no proprietary TS header at all, IRC=%d\n",irc);
+
   // Find video PID and audio PID(s)
   buf.providedata(buf.getsize(), initialoffset);
   if (check_si_tables())
@@ -239,6 +248,102 @@ int tsfile::probe(inbuffer &buf) {
       return ts;
   }
   return -1;
+}
+
+// test for Topfield TF4000PVR & TF5xxxPVR and read bookmarks from the proprietary header
+// return codes: <type>*100+<number of bookmarks> or 
+//               -1: header far to short for topfield/bookmarks, -2: magic mismatch, -3: version mismatch                                              
+int tsfile::isTOPFIELD(const uint8_t *header, int len) {  
+  unsigned int magic, version, unit=0;
+  unsigned int frequency, symbolrate, modulation;
+  int boff=len, off=0, type=0, hlen=0, verbose=0;
+
+  // initialize bookmark array! 
+  byte_bookmarks[0] = 0;
+  bytes = true;
+  
+  // just in case there's a corrupted TS packet at the beginning
+  if(verbose) fprintf(stderr,"Header length: %d\n",len);
+  if(len<TSPACKETSIZE) return -1;
+
+  // identify the specific header via the magic number 'TFrc'
+  magic = (header[0]<<24)|(header[1]<<16)|(header[2]<<8)|header[3];
+  if(magic==TF5XXXPVR_MAGIC) {           // all newer models of type TF5???PVR and TF6???PVR
+      hlen = TF5XXXPVR_LEN;
+      unit = (1<<9)*TSPACKETSIZE;
+      // There are 2 different versions, one with 4 bytes larger ServiceInfoStructure (UK models?)
+      version = (header[4]<<8)|header[5];
+      if(verbose) fprintf(stderr,"magic: %x version: %x\n",magic,version);
+      if(version==TF5000PVR_VERSION) {  
+        off = 0;  
+        boff = TF5000PVR_POS;
+        type = 2;
+      } else if(version==TF5010PVR_VERSION) {
+        off = 4;
+        boff = TF5010PVR_POS;
+        type = 3;
+      } else 
+        return -3;          
+      // DVB-C boxes have a 4bytes smaller TransponderInfoStructure... grmbl!!!
+      // And there's no identifier or version number to indicate this... arghhhh!! 
+      // ==> check a few transponder parameters (which are stored at different positions if DVB-S or -T!?!) 
+      frequency = (header[52+off]<<24)|(header[53+off]<<16)|(header[54+off]<<8)|header[55+off];
+      symbolrate = (header[56+off]<<8)|header[57+off];
+      modulation = header[62+off];
+      if(verbose) fprintf(stderr,"DVB-C? freq=%d symb=%d mod=%d\n",frequency,symbolrate,modulation);
+      if(frequency>=47000 && frequency<=862000 && symbolrate>=2000 && symbolrate<=30000 && modulation<=4) {
+        boff-=4;
+        type+=2;
+      }  
+  } else { 
+      // the old TF4000PVR don't writes a simple magic/version number at the beginning...
+      // but start/stop time (MJD/hour/time) ==> check for consistency!
+      // start can be equal to stop (if recording is COPY/CUT), but should be year 2000+ (MJD=51543)!
+      version = (header[4]<<24)|(header[5]<<16)|(header[6]<<8)|header[7];
+      unsigned int duration = (header[8]<<8)|header[9]; // in minutes
+      unsigned int servicetype = (header[12]<<8)|header[13]; // 0:TV, 1:Radio
+      unsigned int polarity = header[53]; // 0x80, 0x08, 0x88, 0x00 (hi/lo, hor/ver)
+      frequency = (header[54]<<8)|header[55];
+      symbolrate = (header[56]<<8)|header[57];
+      if(verbose) fprintf(stderr,"TF4000? start=%x stop=%x dur=%d serv=%d freq=%d symb=%d pol=%d\n",
+                                        magic,version,duration,servicetype,frequency,symbolrate,polarity);
+      if(magic<=version && (magic>>16)>51543 && 
+         header[2]<24 && header[3]<60 && header[6]<24 && header[7]<60 &&
+         duration>0 && duration<1440 && servicetype==0 &&    // up to one full day TV recording should be enough!
+         frequency>=10000 && frequency<=13000 &&             // there's only a DVB-S device, AFAIK!
+         symbolrate>=2000 && symbolrate<=30000 && (polarity&0x77)==0) {
+        // the above should be sufficient... together with the required length of the header!
+        hlen = TF4000PVR_LEN;
+        unit = (1<<17);
+        boff = TF4000PVR_POS;
+        type = 1;
+      } else 
+        return -2;
+  }    
+   
+  // OK,... we identified a receiver model!
+  int bnum = 0; 
+  //if(len>=hlen) // discard ALL (slightly) to small headers...? No, only require enough space for the bookmarks...
+  if(len>=boff+4*MAX_BOOKMARKS) { 
+      // Seems to be a Topfield TF4000PVR/TF5xxxPVR TS-header with 576/3760bytes total length
+      // and up to 64 bookmarks (BUT can be shorter/corrupted due to COPY/CUT-procedure on reveiver)
+      unsigned int bookmark;
+      do {
+          bookmark = (header[boff]<<24)|(header[boff+1]<<16)|(header[boff+2]<<8)|header[boff+3];
+          // bookmark is stored in 128 resp. 94kbyte units
+          byte_bookmarks[bnum] = bookmark*unit;
+          if(verbose && bookmark) fprintf(stderr,"BOOKMARK[%d] = %lld\n",bnum,byte_bookmarks[bnum]);
+          bnum++;
+          boff+=4;
+      }  
+      while(bookmark && bnum<MAX_BOOKMARKS);
+      // add a terminating zero marker!   
+      if(bnum==MAX_BOOKMARKS) byte_bookmarks[bnum] = 0;
+      else bnum--;
+  } else // receiver model identified but header to short!
+      fprintf(stderr,"Header probabely corrupted (%dbytes to short), discarding bookmarks!\n",hlen-len);
+
+  return type*100+bnum;
 }
 
 size_t

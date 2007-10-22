@@ -1,3 +1,14 @@
+2007-10-22  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/dvbcutbase.ui:
+	* src/index.h:
+	* src/mpgfile.h:
+	* src/tsfile.cpp:
+	* src/tsfile.h:
+		Import bookmarks from Topfield receivers (code by Ralph Glasstetter).
+
 2007-10-17  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:

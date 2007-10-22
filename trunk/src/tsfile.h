@@ -26,6 +26,18 @@
 #define TSPACKETSIZE (188)
 #define TSSYNCBYTE (0x47)
 
+// stuff to identify proprietary (topfield) headers and find bookmarks
+// ==> magic (&version) number, position of bookmarks, length of header
+#define TF5XXXPVR_MAGIC (0x54467263)
+#define TF5XXXPVR_LEN (20*TSPACKETSIZE)
+#define TF5000PVR_VERSION (0x5000)
+#define TF5000PVR_POS (1400)
+#define TF5010PVR_VERSION (0x5010)
+#define TF5010PVR_POS (1404)
+#define TF4000PVR_LEN (3*TSPACKETSIZE)
+#define TF4000PVR_POS (216)
+#define MAX_BOOKMARKS (64)
+
 /**
 @author Sven Over
 */
@@ -90,6 +102,14 @@ protected:
   bool check_si_tables();
   size_t get_si_table(uint8_t*, size_t,  size_t&, int, int);
 
+  int isTOPFIELD(const uint8_t*, int);  
+  // indicates type of read bookmarks (frame numbers or byte positions)
+  bool bytes;
+  // to store the bookmarks in byte positions (terminated by a zero-bookmark)
+  dvbcut_off_t byte_bookmarks[MAX_BOOKMARKS+1];
+  // to store the bookmarks in frame numbers (terminated by a zero-bookmark)
+  int pic_bookmarks[MAX_BOOKMARKS+1];
+
 public:
   tsfile(inbuffer &b, int initial_offset);
 
@@ -101,6 +121,17 @@ public:
   }
   virtual bool istransportstream() {
     return true;
+  }
+  virtual int *getbookmarks() {
+    if(bytes) {
+      int pic, nbp=0,nbb=0;
+      while(byte_bookmarks[nbb])
+        if((pic = getpictureatposition(byte_bookmarks[nbb++])) >= 0) 
+          pic_bookmarks[nbp++] = pic;
+      pic_bookmarks[nbp] = 0;
+      bytes = false;
+    } 
+    return pic_bookmarks;
   }
 
 };

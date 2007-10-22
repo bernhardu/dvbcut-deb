@@ -132,6 +132,7 @@ public slots:
   virtual void editStop();
   virtual void editStart();
   virtual void editSuggest();
+  virtual void editImport();
   virtual void viewDifference();
   virtual void viewUnscaled();
   virtual void viewNormal();

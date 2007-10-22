@@ -612,6 +612,14 @@ void dvbcut::fileClose()
 
 void dvbcut::addEventListItem(int pic, EventListItem::eventtype type)
 {
+  //check if requested EventListItem is already in list to avoid doubles!
+  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+    if (item->rtti()==EventListItem::RTTI()) {
+      EventListItem *eli=(EventListItem*)item;
+      if (pic==eli->getpicture() && type==eli->geteventtype()) 
+        return;
+    }
+
   QPixmap p;
   if (imgp && imgp->rtti() == IMAGEPROVIDER_STANDARD)
     p = imgp->getimage(pic);
@@ -652,6 +660,13 @@ void dvbcut::editSuggest()
   int pic = 0;
   while ((pic = mpg->nextaspectdiscontinuity(pic)) >= 0)
     addEventListItem(pic, EventListItem::bookmark);
+}
+
+void dvbcut::editImport()
+{
+  int *bookmark = mpg->getbookmarks();
+  while(bookmark && *bookmark)
+    addEventListItem(*bookmark++, EventListItem::bookmark);
 }
 
 void dvbcut::viewDifference()
@@ -932,7 +947,8 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
   popup.insertItem("Delete",2);
   popup.insertItem("Delete others",3);
   popup.insertItem("Delete all",4);
-  popup.insertItem("Display difference from this picture",5);
+  popup.insertItem("Delete all bookmarks",5);
+  popup.insertItem("Display difference from this picture",6);
 
   QListBox *lb=lbi->listBox();
   QListBoxItem *first=lb->firstItem(),*current,*next;
@@ -970,6 +986,16 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
       break;
 
     case 5:
+      current=first;
+      while(current) {
+        next=current->next();
+        const EventListItem &eli_current=*static_cast<const EventListItem*>(current);
+        if(eli_current.geteventtype()==EventListItem::bookmark) delete current;
+        current=next;
+      }   
+      break;
+
+    case 6:
       if (imgp)
         delete imgp;
       imgp=new differenceimageprovider(*mpg,eli.getpicture(),new dvbcutbusy(this),false,viewscalefactor);
@@ -1218,6 +1244,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   editStartAction->setEnabled(false);
   editStopAction->setEnabled(false);
   editSuggestAction->setEnabled(false);
+  editImportAction->setEnabled(false);
   editChapterAction->setEnabled(false);
   editBookmarkAction->setEnabled(false);
 
@@ -1512,7 +1539,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   }
 
   update_quick_picture_lookup_table();
-    
+
   fileOpenAction->setEnabled(true);
   fileSaveAction->setEnabled(true);
   fileSaveAsAction->setEnabled(true);
@@ -1525,6 +1552,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   editStartAction->setEnabled(true);
   editStopAction->setEnabled(true);
   editSuggestAction->setEnabled(true);
+  editImportAction->setEnabled(true);
   editChapterAction->setEnabled(true);
   editBookmarkAction->setEnabled(true);
   viewNormalAction->setEnabled(true);
