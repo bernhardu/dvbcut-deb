@@ -65,6 +65,10 @@ public:
     {
     return false;
     }
+  virtual int *getbookmarks()
+    {
+    return NULL;
+    }
 
   int getinitialoffset() const
     {
@@ -126,6 +130,42 @@ public:
 	}
       }
     return -1;
+    }
+  int getpictureatposition(dvbcut_off_t position) const
+    {  
+    // binary search for the picture at nearest file position (in bytes)
+    int firstpic=0, lastpic=pictures-1;
+    int first=idx.indexnr(firstpic), mid, last=idx.indexnr(lastpic);
+    dvbcut_off_t firstpos=idx[first].getpos();
+    dvbcut_off_t lastpos=idx[last].getpos();
+    dvbcut_off_t midpos; 
+
+    if(position<firstpos || position>lastpos) return -1;
+
+    while( last-first > 1 )
+    {
+      mid = (first + last)/2;
+      midpos = idx[mid].getpos(); 
+        
+      if(position > midpos) {
+        first = mid;
+        firstpos = midpos;
+      } else if(position < midpos) {
+        last = mid;
+        lastpos = midpos;
+      } else { // equality
+        first = mid;
+        firstpos = midpos;
+        last = mid;
+        lastpos = midpos;
+      }  
+    }
+    
+    // index of picture at nearest file position
+    int ind = (position-firstpos)<(lastpos-position) ? first : last;
+
+    // get the corresponding picture number
+    return idx.picturenr(ind);
     }
   AVCodecContext *getavcc(int str)
     {

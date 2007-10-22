@@ -373,6 +373,7 @@
         <action name="editBookmarkAction"/>
         <separator/>
         <action name="editSuggestAction"/>
+        <action name="editImportAction"/>
     </item>
     <item text="View" name="viewMenu">
         <action name="viewNormalAction"/>
@@ -662,6 +663,20 @@
     </action>
     <action>
         <property name="name">
+            <cstring>editImportAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Import markers</string>
+        </property>
+        <property name="accel">
+            <string>I</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
             <cstring>fileNewAction</cstring>
         </property>
         <property name="iconSet">
@@ -899,6 +914,12 @@
         <slot>editSuggest()</slot>
     </connection>
     <connection>
+        <sender>editImportAction</sender>
+        <signal>activated()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>editImport()</slot>
+    </connection>
+    <connection>
         <sender>eventlist</sender>
         <signal>doubleClicked(QListBoxItem*)</signal>
         <receiver>dvbcutbase</receiver>
@@ -1023,6 +1044,7 @@
     <slot>editChapter()</slot>
     <slot>editBookmark()</slot>
     <slot>editSuggest()</slot>
+    <slot>editImport()</slot>
     <slot>doubleclickedeventlist(QListBoxItem *)</slot>
     <slot>eventlistcontextmenu(QListBoxItem *, const QPoint &amp;)</slot>
     <slot>clickedgo()</slot>

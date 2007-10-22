@@ -141,10 +141,18 @@ public:
     int seq=pic;
     while (seq > 0 && !p[seq].getseqheader())
       --seq;
-    pic=pic-seq;
+    pic-=seq;
     while(seq < pictures && p[seq].getsequencenumber()!=pic)
       ++seq;
     return seq;
+    }
+  int picturenr(int ind) const  // the reverse function
+    {
+    int pic=p[ind].getsequencenumber();
+    while (ind > 0 && !p[ind].getseqheader())
+      --ind;
+    pic+=ind-skipfirst;
+    return pic;
     }
   const picture &operator[](unsigned int i) const
     {
