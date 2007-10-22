@@ -1,6 +1,17 @@
 2007-10-22  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:
+		Display a message when setting markers failed.
+
+	* src/mpgfile.h:
+	* src/tsfile.cpp:
+	* src/tsfile.h:
+		Let getbookmarks() return a std::vector
+		(patches by Ralph Glasstetter).
+
+2007-10-22  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
 	* src/dvbcut.h:
 	* src/dvbcutbase.ui:
 	* src/index.h:

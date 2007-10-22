@@ -36,7 +36,7 @@
 #define TF5010PVR_POS (1404)
 #define TF4000PVR_LEN (3*TSPACKETSIZE)
 #define TF4000PVR_POS (216)
-#define MAX_BOOKMARKS (64)
+#define TF_MAX_BOOKMARKS (64)
 
 /**
 @author Sven Over
@@ -103,12 +103,9 @@ protected:
   size_t get_si_table(uint8_t*, size_t,  size_t&, int, int);
 
   int isTOPFIELD(const uint8_t*, int);  
-  // indicates type of read bookmarks (frame numbers or byte positions)
-  bool bytes;
-  // to store the bookmarks in byte positions (terminated by a zero-bookmark)
-  dvbcut_off_t byte_bookmarks[MAX_BOOKMARKS+1];
-  // to store the bookmarks in frame numbers (terminated by a zero-bookmark)
-  int pic_bookmarks[MAX_BOOKMARKS+1];
+  bool bytes;                               // indicates type of read bookmarks 
+  std::vector<dvbcut_off_t> byte_bookmarks; // to store the bookmarks in byte positions 
+  std::vector<int> pic_bookmarks;           // to store the bookmarks in frame numbers 
 
 public:
   tsfile(inbuffer &b, int initial_offset);
@@ -122,13 +119,13 @@ public:
   virtual bool istransportstream() {
     return true;
   }
-  virtual int *getbookmarks() {
+  virtual std::vector<int> getbookmarks() {
     if(bytes) {
-      int pic, nbp=0,nbb=0;
-      while(byte_bookmarks[nbb])
-        if((pic = getpictureatposition(byte_bookmarks[nbb++])) >= 0) 
-          pic_bookmarks[nbp++] = pic;
-      pic_bookmarks[nbp] = 0;
+      // convert byte positions to frame numbers if not already done/stored
+      int pic;
+      for (std::vector<dvbcut_off_t>::iterator b = byte_bookmarks.begin(); b != byte_bookmarks.end(); ++b) 
+        if((pic = getpictureatposition(*b)) >= 0) 
+          pic_bookmarks.push_back(pic);
       bytes = false;
     } 
     return pic_bookmarks;

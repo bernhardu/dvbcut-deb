@@ -258,8 +258,7 @@ int tsfile::isTOPFIELD(const uint8_t *header, int len) {
   unsigned int frequency, symbolrate, modulation;
   int boff=len, off=0, type=0, hlen=0, verbose=0;
 
-  // initialize bookmark array! 
-  byte_bookmarks[0] = 0;
+  // this routine stores bookmarks as byte positions! 
   bytes = true;
   
   // just in case there's a corrupted TS packet at the beginning
@@ -324,22 +323,20 @@ int tsfile::isTOPFIELD(const uint8_t *header, int len) {
   // OK,... we identified a receiver model!
   int bnum = 0; 
   //if(len>=hlen) // discard ALL (slightly) to small headers...? No, only require enough space for the bookmarks...
-  if(len>=boff+4*MAX_BOOKMARKS) { 
+  if(len>=boff+4*TF_MAX_BOOKMARKS) { 
       // Seems to be a Topfield TF4000PVR/TF5xxxPVR TS-header with 576/3760bytes total length
       // and up to 64 bookmarks (BUT can be shorter/corrupted due to COPY/CUT-procedure on reveiver)
-      unsigned int bookmark;
-      do {
-          bookmark = (header[boff]<<24)|(header[boff+1]<<16)|(header[boff+2]<<8)|header[boff+3];
+      dvbcut_off_t bookmark;
+      while ((bookmark=(header[boff]<<24)|(header[boff+1]<<16)|(header[boff+2]<<8)|header[boff+3])
+              && bnum<TF_MAX_BOOKMARKS) {
           // bookmark is stored in 128 resp. 94kbyte units
-          byte_bookmarks[bnum] = bookmark*unit;
-          if(verbose && bookmark) fprintf(stderr,"BOOKMARK[%d] = %lld\n",bnum,byte_bookmarks[bnum]);
+          bookmark*=unit;
+          if(verbose) fprintf(stderr,"BOOKMARK[%d] = %lld\n",bnum,bookmark);
+          // fill bookmark vector with byte positions
+          byte_bookmarks.push_back(bookmark);
           bnum++;
           boff+=4;
       }  
-      while(bookmark && bnum<MAX_BOOKMARKS);
-      // add a terminating zero marker!   
-      if(bnum==MAX_BOOKMARKS) byte_bookmarks[bnum] = 0;
-      else bnum--;
   } else // receiver model identified but header to short!
       fprintf(stderr,"Header probabely corrupted (%dbytes to short), discarding bookmarks!\n",hlen-len);
 
