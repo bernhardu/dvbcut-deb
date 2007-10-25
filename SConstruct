@@ -59,6 +59,17 @@ for v in ("CXX","LINK"):
 
 conf=Configure(env)
 
+### libintl.h
+
+if (not env.GetOption('clean')):
+  if (conf.CheckCHeader('libintl.h', '<>')):
+    conf.env.Append(CPPDEFINES="HAVE_LIBINTL_H")
+
+### LIBINTL
+
+if (not env.GetOption('clean')):
+  conf.CheckLib('intl', 'gettext', 'libintl.h', 'C++')
+
 ### LIBAO
 
 if (not env.GetOption('clean')):

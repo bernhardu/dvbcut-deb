@@ -1067,6 +1067,9 @@
         <slot>snapshotSave()</slot>
     </connection>
 </connections>
+<includes>
+    <include location="local" impldecl="in implementation">gettext.h</include>
+</includes>
 <slots>
     <slot>fileOpen()</slot>
     <slot>linslidervalue(int)</slot>

@@ -55,7 +55,7 @@ SRCS = \
 	main.cpp mpegmuxer.cpp mpgfile.cpp playaudio.cpp \
 	progressstatusbar.cpp progresswindow.cpp psfile.cpp \
 	pts.cpp streamdata.cpp tsfile.cpp settings.cpp $(MOC) $(UIC) \
-	../import/stdlib.cpp
+	gettext.cpp ../import/stdlib.cpp
 
 HDRS = \
 	avframe.h buffer.h busyindicator.h defines.h \
@@ -63,7 +63,7 @@ HDRS = \
 	exception.h exportdialog.h imageprovider.h index.h lavfmuxer.h \
 	logoutput.h mpegmuxer.h mpgfile.h muxer.h playaudio.h port.h \
 	progressstatusbar.h progresswindow.h psfile.h pts.h settings.h \
-	stream.h streamdata.h streamhandle.h tsfile.h types.h
+	stream.h streamdata.h streamhandle.h tsfile.h types.h gettext.h
 
 OBJS = $(SRCS:.cpp=.o)
 

@@ -1,5 +1,27 @@
 2007-10-25  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* SConstruct:
+		Search for libintl and <libintl.h>.
+
+	* src/Makefile.w32:
+	* src/SConscript:
+		Add gettext.{cpp,h}.
+ 
+	* src/dvbcutbase.ui:
+	* src/exportdialogbase.ui:
+	* src/mplayererrorbase.ui:
+	* src/progresswindowbase.ui:
+		Make uic include "gettext.h".
+
+	* src/gettext.cpp:
+	* src/gettext.h:
+		New files providing hooks for gettext().
+
+	* src/main.cpp:
+		Add i18n framework.
+
+2007-10-25  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* src/main.cpp:
 		Add missing newlines.
 

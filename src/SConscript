@@ -6,6 +6,7 @@ sources="""
   eventlistitem.cpp
   exception.cpp
   exportdialog.cpp
+  gettext.cpp
   imageprovider.cpp
   index.cpp
   lavfmuxer.cpp
@@ -51,6 +52,8 @@ idfiles="""
   exportdialog.cpp
   exportdialog.h
   exportdialogbase.ui
+  gettext.cpp
+  gettext.h
   imageprovider.cpp
   imageprovider.h
   index.cpp
