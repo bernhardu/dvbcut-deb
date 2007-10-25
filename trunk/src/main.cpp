@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cerrno>
+#include <clocale>
 #include <string>
 #include <list>
 
@@ -39,6 +40,8 @@ extern "C" {
 #include "dvbcut.h"
 #include "mpgfile.h"
 #include "index.h"
+
+#include "gettext.h"
 
 #include "version.h"
 
@@ -77,6 +80,8 @@ main(int argc, char *argv[]) {
   std::vector<int> cutlist;
   int i;
 
+  setlocale(LC_ALL, "");
+  textdomain("dvbcut");
   /*
    * process arguments
    */

@@ -63,6 +63,9 @@
         <slot>clickedcancel()</slot>
     </connection>
 </connections>
+<includes>
+    <include location="local" impldecl="in implementation">gettext.h</include>
+</includes>
 <slots>
     <slot>setprogress(int)</slot>
     <slot>clickedcancel()</slot>

@@ -187,6 +187,9 @@
         <slot>fileselector()</slot>
     </connection>
 </connections>
+<includes>
+    <include location="local" impldecl="in implementation">gettext.h</include>
+</includes>
 <slots>
     <slot>fileselector()</slot>
 </slots>

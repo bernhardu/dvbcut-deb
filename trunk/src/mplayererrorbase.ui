@@ -80,5 +80,8 @@
         <slot>accept()</slot>
     </connection>
 </connections>
+<includes>
+    <include location="local" impldecl="in implementation">gettext.h</include>
+</includes>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
