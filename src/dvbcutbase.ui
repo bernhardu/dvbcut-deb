@@ -374,6 +374,7 @@
         <separator/>
         <action name="editSuggestAction"/>
         <action name="editImportAction"/>
+        <action name="editConvertAction"/>
     </item>
     <item text="View" name="viewMenu">
         <action name="viewNormalAction"/>
@@ -607,7 +608,7 @@
             <iconset>image9</iconset>
         </property>
         <property name="text">
-            <string>Set end marker</string>
+            <string>Set stop marker</string>
         </property>
         <property name="accel">
             <string>N</string>
@@ -655,7 +656,7 @@
             <bool>false</bool>
         </property>
         <property name="text">
-            <string>Suggest markers</string>
+            <string>Suggest bookmarks</string>
         </property>
         <property name="accel">
             <string>M</string>
@@ -669,10 +670,24 @@
             <bool>false</bool>
         </property>
         <property name="text">
-            <string>Import markers</string>
+            <string>Import bookmarks</string>
         </property>
         <property name="accel">
             <string>I</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>editConvertAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Convert bookmarks</string>
+        </property>
+        <property name="accel">
+            <string>T</string>
         </property>
     </action>
     <action>
@@ -920,6 +935,12 @@
         <slot>editImport()</slot>
     </connection>
     <connection>
+        <sender>editConvertAction</sender>
+        <signal>activated()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>editConvert()</slot>
+    </connection>
+    <connection>
         <sender>eventlist</sender>
         <signal>doubleClicked(QListBoxItem*)</signal>
         <receiver>dvbcutbase</receiver>
@@ -942,6 +963,18 @@
         <signal>returnPressed()</signal>
         <receiver>dvbcutbase</receiver>
         <slot>clickedgo()</slot>
+    </connection>
+    <connection>
+        <sender>gobutton2</sender>
+        <signal>clicked()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>clickedgo2()</slot>
+    </connection>
+    <connection>
+        <sender>goinput2</sender>
+        <signal>returnPressed()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>clickedgo2()</slot>
     </connection>
     <connection>
         <sender>playPlayAction</sender>
@@ -1045,9 +1078,11 @@
     <slot>editBookmark()</slot>
     <slot>editSuggest()</slot>
     <slot>editImport()</slot>
+    <slot>editConvert()</slot>
     <slot>doubleclickedeventlist(QListBoxItem *)</slot>
     <slot>eventlistcontextmenu(QListBoxItem *, const QPoint &amp;)</slot>
     <slot>clickedgo()</slot>
+    <slot>clickedgo2()</slot>
     <slot>playPlay()</slot>
     <slot>playStop()</slot>
     <slot>playAudio1()</slot>

@@ -40,19 +40,29 @@ extern "C" {
 #include "mpgfile.h"
 #include "index.h"
 
+#include "version.h"
+
+#define VERSION_STRING	"dvbcut " VERSION "/" REVISION
+
 static char *argv0;
 
 void
 usage_exit(int rv=1) {
   fprintf(stderr,
-    "Usage:\n"
+    "Usage ("VERSION_STRING"):\n"
     "  %s -generateidx [-idx <indexfilename>] [<mpgfilename> ...]\n"
-    "  %s -batch <prjfilename> | <mpgfilename> ...\n\n",
+    "  %s -batch [ -cut AR|TS|<list> ] <prjfilename> | <mpgfilename> ...\n\n",
     argv0, argv0);
   fprintf(stderr,
     "If no input files are specified, `dvbcut -generateidx' reads from\n"
     "standard input.  By default, it also writes the index to standard\n"
     "output, but you can specify another destination with `-idx'.\n\n");
+  fprintf(stderr,
+    "In batch mode you can use `-cut' to create automatically alternating\n"
+    "START/STOP cut markers for each found aspect ratio change (AR), for\n"
+    "the bookmarks imported from the input transport stream (TS) or for\n"
+    "a given list of frame numbers (you can use ',-|;:/' as separators).\n" 
+    "Without any (valid) cut markers the whole file will be converted!\n\n");
   fprintf(stderr,
     "Options may be abbreviated as long as they remain unambiguous.\n\n");
   exit(rv);
@@ -63,7 +73,8 @@ main(int argc, char *argv[]) {
   argv0=argv[0];
   bool generateidx=false;
   bool batchmode=false;
-  std::string idxfilename;
+  std::string idxfilename, cut;
+  std::vector<int> cutlist;
   int i;
 
   /*
@@ -81,7 +92,14 @@ main(int argc, char *argv[]) {
       generateidx = true;
     else if (strncmp(argv[i], "-idx", n) == 0 && ++i < argc)
       idxfilename = argv[i];
-    else
+    else if (strncmp(argv[i], "-cut", n) == 0 && ++i < argc) {
+      cut=argv[i];
+      char *pch=strtok(argv[i],",-|;:/");     
+      while(pch) {
+         cutlist.push_back(atoi(pch));  
+         pch=strtok(NULL,",-|;:/");                 
+      }
+    } else
       usage_exit();
   }
 
@@ -173,6 +191,21 @@ main(int argc, char *argv[]) {
     if (filenames.empty())	// must provide at least one filename
       usage_exit();
     main->open(filenames,idxfilename);
+    if(!cut.empty()) {
+      if(cut=="AR") {
+          main->editSuggest();
+          main->editConvert();             
+      } else if(cut=="TS") {
+          main->editImport();     
+          main->editConvert();             
+      } else if(cutlist.size()>1) { 
+          // just one entry entry makes no sense and/or can be a typo (atoi() returned 0)! 
+          main->addStartStopItems(cutlist);
+          if(cutlist.size()%2) 
+            fprintf(stderr,"*** Cut list contained an odd number of entries, discarded last one! ***");    
+      } else
+        fprintf(stderr,"*** Problems parsing parameter provided with option `-cut'! ***");    
+    }  
     main->fileExport();
     rv = 0;
   }
