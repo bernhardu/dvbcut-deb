@@ -1813,6 +1813,7 @@ void dvbcut::update_time_display()
   
   int outpic=0;
   pts_t outpts=0;
+  QChar mark = ' ';
   
   // find the entry in the quick_picture_lookup table that corresponds to curpic
   quick_picture_lookup_t::iterator it=
@@ -1830,6 +1831,7 @@ void dvbcut::update_time_display()
        
        outpic=curpic-it->picture+it->outpicture;
        outpts=pts-it->pts+it->outpts;
+       mark = '*';
      }
      else
      {
@@ -1841,8 +1843,10 @@ void dvbcut::update_time_display()
   QString curtime =
     QString(QChar(IDX_PICTYPE[idx.getpicturetype()]))
     + " " + timestr(pts);
+  QString outtime =
+    QString(mark) + " " + timestr(outpts);
   pictimelabel->setText(curtime);
-  pictimelabel2->setText(timestr(outpts));
+  pictimelabel2->setText(outtime);
   goinput->setText(QString::number(curpic));
   goinput2->setText(QString::number(outpic));
 

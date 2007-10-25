@@ -202,9 +202,9 @@ main(int argc, char *argv[]) {
           // just one entry entry makes no sense and/or can be a typo (atoi() returned 0)! 
           main->addStartStopItems(cutlist);
           if(cutlist.size()%2) 
-            fprintf(stderr,"*** Cut list contained an odd number of entries, discarded last one! ***");    
+            fprintf(stderr,"*** Cut list contained an odd number of entries, discarded last one! ***\n");    
       } else
-        fprintf(stderr,"*** Problems parsing parameter provided with option `-cut'! ***");    
+        fprintf(stderr,"*** Problems parsing parameter provided with option `-cut'! ***\n");    
     }  
     main->fileExport();
     rv = 0;
