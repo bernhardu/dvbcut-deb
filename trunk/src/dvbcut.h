@@ -57,6 +57,13 @@ public:
         return lhs<rhs.picture;
       }
     };
+    struct cmp_outpicture
+    {
+      bool operator()(int lhs, const quick_picture_lookup_s &rhs) const
+      {
+        return lhs<rhs.outpicture;
+      }
+    };
   };
   typedef std::vector<quick_picture_lookup_s> quick_picture_lookup_t;
   
@@ -118,6 +125,7 @@ public:
   void setbusy(bool b=true);
   void batchmode(bool b=true) { nogui = b; }
   // static dvbcut *New(std::string filename=std::string(), std::string idxfilename=std::string());
+  void addStartStopItems(std::vector<int>);
 
 public slots:
   virtual void fileNew();
@@ -133,6 +141,7 @@ public slots:
   virtual void editStart();
   virtual void editSuggest();
   virtual void editImport();
+  virtual void editConvert();
   virtual void viewDifference();
   virtual void viewUnscaled();
   virtual void viewNormal();
@@ -151,6 +160,7 @@ public slots:
   virtual void mplayer_exited();
   virtual void mplayer_readstdout();
   virtual void clickedgo();
+  virtual void clickedgo2();
   virtual void updateimagedisplay();
   virtual void audiotrackchosen(int id);
   virtual void loadrecentfile(int id);

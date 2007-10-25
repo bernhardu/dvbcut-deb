@@ -1,3 +1,13 @@
+2007-10-25  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/dvbcutbase.ui:
+	* src/eventlistitem.h:
+	* src/main.cpp:
+		Add bookmark conversion and the -cut option
+		(patches by Ralph Glasstetter).
+
 2007-10-22  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:

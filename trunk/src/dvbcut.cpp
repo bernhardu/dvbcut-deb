@@ -45,6 +45,7 @@
 #include <qmenubar.h>
 #include <qsettings.h>
 #include <qregexp.h>
+#include <qstatusbar.h>
 
 #include "port.h"
 #include "dvbcut.h"
@@ -663,7 +664,7 @@ void dvbcut::editSuggest()
     found++;
   }
   if(!found)  
-    fprintf(stderr,"No aspect ratio changes detected!\n");   
+    statusBar()->message(QString("*** No aspect ratio changes detected! ***"));   
 }
 
 void dvbcut::editImport()
@@ -675,7 +676,45 @@ void dvbcut::editImport()
     found++;
   }
   if(!found)  
-    fprintf(stderr,"No valid bookmarks available/found!\n");
+    statusBar()->message(QString("*** No valid bookmarks available/found! ***"));
+}
+
+void dvbcut::editConvert()
+{
+  int found=0;
+  std::vector<int> cutlist;
+  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+    if (item->rtti()==EventListItem::RTTI()) {
+      EventListItem *eli=(EventListItem*)item;
+      if (eli->geteventtype()==EventListItem::bookmark) {
+         cutlist.push_back(eli->getpicture());
+         delete item;       
+         found++;
+      } 
+    } 
+  if(found) {
+    addStartStopItems(cutlist);
+    update_quick_picture_lookup_table();
+
+    if(found%2) 
+      statusBar()->message(QString("*** No matching stop marker!!! ***"));
+  }  
+  else
+    statusBar()->message(QString("*** No bookmarks to convert! ***"));  
+}
+
+void dvbcut::addStartStopItems(std::vector<int> cutlist)
+{
+   // take list of frame numbers and set alternating START/STOP markers
+  EventListItem::eventtype type=EventListItem::start;
+  for (std::vector<int>::iterator it = cutlist.begin(); it != cutlist.end(); ++it) {   
+    addEventListItem(*it, type);
+    if(type==EventListItem::start) 
+      type=EventListItem::stop;
+    else 
+      type=EventListItem::start;  
+  }
+  update_quick_picture_lookup_table();
 }
 
 void dvbcut::viewDifference()
@@ -948,8 +987,8 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
     return;
   if (lbi->rtti()!=EventListItem::RTTI())
     return;
-  const EventListItem &eli=*static_cast<const EventListItem*>(lbi);
-
+  // is it a problem to have no "const EventListItem &eli=..."? Needed for seteventtype()...! 
+  EventListItem &eli=*static_cast<const EventListItem*>(lbi);
 
   QPopupMenu popup(eventlist);
   popup.insertItem("Go to",1);
@@ -957,7 +996,11 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
   popup.insertItem("Delete others",3);
   popup.insertItem("Delete all",4);
   popup.insertItem("Delete all bookmarks",5);
-  popup.insertItem("Display difference from this picture",6);
+  popup.insertItem("Convert to start marker",6);
+  popup.insertItem("Convert to stop marker",7);
+  popup.insertItem("Convert to chapter marker",8);
+  popup.insertItem("Convert to bookmark",9);
+  popup.insertItem("Display difference from this picture",10);
 
   QListBox *lb=lbi->listBox();
   QListBoxItem *first=lb->firstItem(),*current,*next;
@@ -1005,6 +1048,22 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
       break;
 
     case 6:
+      eli.seteventtype(EventListItem::start);
+      break;
+
+    case 7: 
+      eli.seteventtype(EventListItem::stop);
+      break; 
+
+    case 8:
+      eli.seteventtype(EventListItem::chapter);
+      break;
+
+    case 9: 
+      eli.seteventtype(EventListItem::bookmark);
+      break; 
+
+    case 10:
       if (imgp)
         delete imgp;
       imgp=new differenceimageprovider(*mpg,eli.getpicture(),new dvbcutbusy(this),false,viewscalefactor);
@@ -1022,14 +1081,32 @@ void dvbcut::clickedgo()
   QString text=goinput->text();
   text.stripWhiteSpace();
   bool okay=false;
-  int n=text.toInt(&okay,0);
+  int inpic=text.toInt(&okay,0);
   if (okay) {
     fine=true;
-    linslider->setValue(n);
+    linslider->setValue(inpic);
     fine=false;
   }
   //goinput->clear();
+}
 
+void dvbcut::clickedgo2()
+{
+  QString text=goinput2->text();
+  text.stripWhiteSpace();
+  bool okay=false;
+  int inpic, outpic=text.toInt(&okay,0);
+  if (okay) {
+    // find the entry in the quick_picture_lookup table that corresponds to given output picture
+    quick_picture_lookup_t::iterator it=
+      std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),outpic,quick_picture_lookup_s::cmp_outpicture());
+    --it;
+    inpic=outpic-it->outpicture+it->picture;   
+    fine=true;
+    linslider->setValue(inpic);
+    fine=false;
+  }
+  //goinput2->clear();
 }
 
 void dvbcut::mplayer_exited()
@@ -1052,8 +1129,8 @@ void dvbcut::mplayer_exited()
   jogslider->setEnabled(true);
   gobutton->setEnabled(true);
   goinput->setEnabled(true);
-  //gobutton2->setEnabled(true);
-  //goinput2->setEnabled(true);
+  gobutton2->setEnabled(true);
+  goinput2->setEnabled(true);
 
 #ifdef HAVE_LIB_AO
 
@@ -1252,10 +1329,11 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   audiotrackpopup->clear();
   editStartAction->setEnabled(false);
   editStopAction->setEnabled(false);
-  editSuggestAction->setEnabled(false);
-  editImportAction->setEnabled(false);
   editChapterAction->setEnabled(false);
   editBookmarkAction->setEnabled(false);
+  editSuggestAction->setEnabled(false);
+  editImportAction->setEnabled(false);
+  editConvertAction->setEnabled(false);
 
 #ifdef HAVE_LIB_AO
 
@@ -1560,10 +1638,11 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   playStopAction->setEnabled(false);
   editStartAction->setEnabled(true);
   editStopAction->setEnabled(true);
-  editSuggestAction->setEnabled(true);
-  editImportAction->setEnabled(true);
   editChapterAction->setEnabled(true);
   editBookmarkAction->setEnabled(true);
+  editSuggestAction->setEnabled(true);
+  editImportAction->setEnabled(true);
+  editConvertAction->setEnabled(true);
   viewNormalAction->setEnabled(true);
   viewUnscaledAction->setEnabled(true);
   viewDifferenceAction->setEnabled(true);
@@ -1582,8 +1661,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   pictimelabel2->setEnabled(true);
   goinput->setEnabled(true);
   gobutton->setEnabled(true);
-  //goinput2->setEnabled(true);
-  //gobutton2->setEnabled(true);
+  goinput2->setEnabled(true);
+  gobutton2->setEnabled(true);
   linslider->setEnabled(true);
   jogslider->setEnabled(true);
 
@@ -1735,7 +1814,7 @@ void dvbcut::update_time_display()
   int outpic=0;
   pts_t outpts=0;
   
-    // find the entry in the quick_picture_lookup table that corresponds to curpic
+  // find the entry in the quick_picture_lookup table that corresponds to curpic
   quick_picture_lookup_t::iterator it=
     std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),curpic,quick_picture_lookup_s::cmp_picture());
    

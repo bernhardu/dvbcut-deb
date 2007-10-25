@@ -50,6 +50,11 @@ public:
     {
     return evtype;
     }
+  void seteventtype(enum eventtype type)
+    {
+    evtype=type;
+    return;
+    }
 
   int	 height( const QListBox *lb ) const;
   int	 width( const QListBox *lb )  const;
