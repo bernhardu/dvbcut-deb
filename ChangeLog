@@ -1,3 +1,18 @@
+2007-10-29  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/main.cpp:
+	* src/dvbcutbase.ui:
+		Allow timestamps in input fields, added -exp option. 
+		-exp/-cut/-idx options overrule project file defaults.
+		Add specific "Delete"-entries to marker context menu. 
+		Fixed bugs with quick_picture_lookuptable.
+
+	* src/pts.cpp:
+	* src/pts.h:
+		Function to convert formatted timestamps to pts_t
+
 2007-10-25  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* SConstruct:
@@ -91,7 +106,7 @@
 	* src/dvbcutbase.ui:
 		Add/change accelerators.
 
-2007-10-10  Michael Kreuzer  <michael-kreuzer@gmx.de>
+2007-10-10  Michael Kreuzer  <michael-kreuzer@gmx.de>  (mr)
 
 	* src/dvbcut.cpp:
 	* src/dvbcut.h:

@@ -53,8 +53,8 @@ void
 usage_exit(int rv=1) {
   fprintf(stderr,
     "Usage ("VERSION_STRING"):\n"
-    "  %s -generateidx [-idx <indexfilename>] [<mpgfilename> ...]\n"
-    "  %s -batch [ -cut AR|TS|<list> ] <prjfilename> | <mpgfilename> ...\n\n",
+    "  %s -generateidx [-idx <idxfilename>] [<mpgfilename> ...]\n"
+    "  %s -batch [-cut AR|TS|<list>] [-exp <expfilename>] <prjfilename> | <mpgfilename> ...\n\n",
     argv0, argv0);
   fprintf(stderr,
     "If no input files are specified, `dvbcut -generateidx' reads from\n"
@@ -64,7 +64,7 @@ usage_exit(int rv=1) {
     "In batch mode you can use `-cut' to create automatically alternating\n"
     "START/STOP cut markers for each found aspect ratio change (AR), for\n"
     "the bookmarks imported from the input transport stream (TS) or for\n"
-    "a given list of frame numbers (you can use ',-|;:/' as separators).\n" 
+    "a given list of frame numbers / time stamps (use ',-|;' as separators).\n" 
     "Without any (valid) cut markers the whole file will be converted!\n\n");
   fprintf(stderr,
     "Options may be abbreviated as long as they remain unambiguous.\n\n");
@@ -76,8 +76,8 @@ main(int argc, char *argv[]) {
   argv0=argv[0];
   bool generateidx=false;
   bool batchmode=false;
-  std::string idxfilename, cut;
-  std::vector<int> cutlist;
+  std::string idxfilename, expfilename;
+  std::vector<std::string> cutlist;
   int i;
 
   setlocale(LC_ALL, "");
@@ -97,15 +97,17 @@ main(int argc, char *argv[]) {
       generateidx = true;
     else if (strncmp(argv[i], "-idx", n) == 0 && ++i < argc)
       idxfilename = argv[i];
+    else if (strncmp(argv[i], "-exp", n) == 0 && ++i < argc)
+      expfilename = argv[i];
     else if (strncmp(argv[i], "-cut", n) == 0 && ++i < argc) {
-      cut=argv[i];
-      char *pch=strtok(argv[i],",-|;:/");     
+      char *pch = strtok(argv[i],",-|;");
       while(pch) {
-         cutlist.push_back(atoi(pch));  
-         pch=strtok(NULL,",-|;:/");                 
-      }
-    } else
-      usage_exit();
+        if(strlen(pch))
+          cutlist.push_back((std::string)pch);    
+        pch = strtok(NULL,",-|;");                 
+      } 
+    } else 
+      usage_exit(); 
   }
 
   /*
@@ -195,18 +197,24 @@ main(int argc, char *argv[]) {
   if (batchmode) {
     if (filenames.empty())	// must provide at least one filename
       usage_exit();
-    main->open(filenames,idxfilename);
-    if(!cut.empty()) {
-      if(cut=="AR") {
+    main->open(filenames,idxfilename,expfilename);
+    if(!cutlist.empty()) {
+      if(cutlist.front()=="AR") {
           main->editSuggest();
           main->editConvert();             
-      } else if(cut=="TS") {
+      } else if(cutlist.front()=="TS") {
           main->editImport();     
           main->editConvert();             
       } else if(cutlist.size()>1) { 
-          // just one entry entry makes no sense and/or can be a typo (atoi() returned 0)! 
-          main->addStartStopItems(cutlist);
-          if(cutlist.size()%2) 
+          // just one entry makes no sense and/or can be a typo!
+          std::vector<int> piclist;
+          for (unsigned int j=0; j<cutlist.size(); j++)                   
+            if(cutlist[j].find(':')!=std::string::npos || cutlist[j].find('.')!=std::string::npos) 
+              piclist.push_back(string2pts(cutlist[j])/main->getTimePerFrame()); // pts divided by 3600(PAL) or 3003(NTSC)
+            else
+              piclist.push_back(atoi(cutlist[j].c_str()));                       // integers are treated as frame numbers!
+          main->addStartStopItems(piclist);
+          if(piclist.size()%2) 
             fprintf(stderr,"*** Cut list contained an odd number of entries, discarded last one! ***\n");    
       } else
         fprintf(stderr,"*** Problems parsing parameter provided with option `-cut'! ***\n");    
@@ -218,7 +226,7 @@ main(int argc, char *argv[]) {
     main->show();
 
     if (!filenames.empty())
-      main->open(filenames,idxfilename);
+      main->open(filenames,idxfilename,expfilename);
 
     if (main) {
       a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
