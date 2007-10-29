@@ -38,5 +38,6 @@ static inline pts_t ptsreference(pts_t t, pts_t reference)
   }
 
 std::string ptsstring(pts_t pts);
+pts_t string2pts(std::string);
 
 #endif

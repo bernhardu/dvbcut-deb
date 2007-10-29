@@ -705,7 +705,19 @@ void dvbcut::editConvert()
 
 void dvbcut::addStartStopItems(std::vector<int> cutlist)
 {
-   // take list of frame numbers and set alternating START/STOP markers
+  // take list of frame numbers and set alternating START/STOP markers
+
+  // make sure list is sorted... 
+  sort(cutlist.begin(),cutlist.end());
+
+  // ...AND there are no old START/STOP pairs!!!
+  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+    if (item->rtti()==EventListItem::RTTI()) {
+      EventListItem *eli=(EventListItem*)item;
+      if (eli->geteventtype()==EventListItem::start || eli->geteventtype()==EventListItem::stop) 
+         delete item;       
+    } 
+
   EventListItem::eventtype type=EventListItem::start;
   for (std::vector<int>::iterator it = cutlist.begin(); it != cutlist.end(); ++it) {   
     addEventListItem(*it, type);
@@ -714,6 +726,7 @@ void dvbcut::addStartStopItems(std::vector<int> cutlist)
     else 
       type=EventListItem::start;  
   }
+  
   update_quick_picture_lookup_table();
 }
 
@@ -995,15 +1008,18 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
   popup.insertItem("Delete",2);
   popup.insertItem("Delete others",3);
   popup.insertItem("Delete all",4);
-  popup.insertItem("Delete all bookmarks",5);
-  popup.insertItem("Convert to start marker",6);
-  popup.insertItem("Convert to stop marker",7);
-  popup.insertItem("Convert to chapter marker",8);
-  popup.insertItem("Convert to bookmark",9);
-  popup.insertItem("Display difference from this picture",10);
+  popup.insertItem("Delete all start/stops",5);
+  popup.insertItem("Delete all chapters",6);
+  popup.insertItem("Delete all bookmarks",7);
+  popup.insertItem("Convert to start marker",8);
+  popup.insertItem("Convert to stop marker",9);
+  popup.insertItem("Convert to chapter marker",10);
+  popup.insertItem("Convert to bookmark",11);
+  popup.insertItem("Display difference from this picture",12);
 
   QListBox *lb=lbi->listBox();
   QListBoxItem *first=lb->firstItem(),*current,*next;
+  EventListItem::eventtype cmptype=EventListItem::none, cmptype2=EventListItem::none;
 
   switch (popup.exec(point)) {
     case 1:
@@ -1016,8 +1032,7 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
       {
       EventListItem::eventtype type=eli.geteventtype();
       delete lbi;
-      
-      if (type==EventListItem::start or type==EventListItem::stop)
+      if (type==EventListItem::start || type==EventListItem::stop)
         update_quick_picture_lookup_table();
       }
       break;
@@ -1038,32 +1053,42 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
       break;
 
     case 5:
+      cmptype=EventListItem::start;
+      cmptype2=EventListItem::stop;
+    case 6:
+      if(cmptype==EventListItem::none) cmptype=EventListItem::chapter;
+    case 7:
+      if(cmptype==EventListItem::none) cmptype=EventListItem::bookmark;
       current=first;
       while(current) {
         next=current->next();
         const EventListItem &eli_current=*static_cast<const EventListItem*>(current);
-        if(eli_current.geteventtype()==EventListItem::bookmark) delete current;
+        if(eli_current.geteventtype()==cmptype || eli_current.geteventtype()==cmptype2) 
+          delete current;
         current=next;
-      }   
+      }       
+      if (cmptype==EventListItem::start) update_quick_picture_lookup_table();
       break;
-
-    case 6:
-      eli.seteventtype(EventListItem::start);
-      break;
-
-    case 7: 
-      eli.seteventtype(EventListItem::stop);
-      break; 
 
     case 8:
-      eli.seteventtype(EventListItem::chapter);
+      eli.seteventtype(EventListItem::start);
+      update_quick_picture_lookup_table();
       break;
 
     case 9: 
-      eli.seteventtype(EventListItem::bookmark);
+      eli.seteventtype(EventListItem::stop);
+      update_quick_picture_lookup_table();
       break; 
 
     case 10:
+      eli.seteventtype(EventListItem::chapter);
+      break;
+
+    case 11: 
+      eli.seteventtype(EventListItem::bookmark);
+      break; 
+
+    case 12:
       if (imgp)
         delete imgp;
       imgp=new differenceimageprovider(*mpg,eli.getpicture(),new dvbcutbusy(this),false,viewscalefactor);
@@ -1081,7 +1106,13 @@ void dvbcut::clickedgo()
   QString text=goinput->text();
   text.stripWhiteSpace();
   bool okay=false;
-  int inpic=text.toInt(&okay,0);
+  int inpic;
+  if(text.contains(':') || text.contains('.')) {
+    okay=true;
+    inpic=string2pts(text)/getTimePerFrame();
+  }
+  else
+    inpic=text.toInt(&okay,0);
   if (okay) {
     fine=true;
     linslider->setValue(inpic);
@@ -1095,8 +1126,14 @@ void dvbcut::clickedgo2()
   QString text=goinput2->text();
   text.stripWhiteSpace();
   bool okay=false;
-  int inpic, outpic=text.toInt(&okay,0);
-  if (okay) {
+  int inpic, outpic;
+  if(text.contains(':') || text.contains('.')) {
+    okay=true;
+    outpic=string2pts(text)/getTimePerFrame();
+  }
+  else
+    outpic=text.toInt(&okay,0);
+  if (okay && !quick_picture_lookup.empty()) {
     // find the entry in the quick_picture_lookup table that corresponds to given output picture
     quick_picture_lookup_t::iterator it=
       std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),outpic,quick_picture_lookup_s::cmp_outpicture());
@@ -1255,7 +1292,7 @@ void dvbcut::loadrecentfile(int id)
 // **************************************************************************
 // ***  public functions
 
-void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
+void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std::string expfilename)
 {
   if (filenames.empty()) {
     QStringList fn = QFileDialog::getOpenFileNames(
@@ -1356,7 +1393,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
   linslider->setEnabled(false);
   jogslider->setEnabled(false);
 
-  std::string prjfilename,expfilename;
+  std::string prjfilename;
   QDomDocument domdoc;
   {
     QFile infile(filename);
@@ -1382,7 +1419,11 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
 	  // parse elements, new-style first
 	  QDomNode n;
           filenames.clear();
+      if(!nogui) {    
+          // in batch mode CLI-switches have priority!              
           idxfilename.clear();
+          expfilename.clear();
+      }    
 	  for (n = domdoc.documentElement().firstChild(); !n.isNull(); n = n.nextSibling()) {
 	    QDomElement e = n.toElement();
 	    if (e.isNull())
@@ -1392,12 +1433,12 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
 	      if (!qs.isEmpty())
 		filenames.push_back((const char*)qs);
 	    }
-	    else if (e.tagName() == "idxfile") {
+	    else if (e.tagName() == "idxfile" && idxfilename.empty()) {
 	      QString qs = e.attribute("path");
 	      if (!qs.isEmpty())
 		idxfilename = (const char*)qs;
 	    }
-	    else if (e.tagName() == "expfile") {
+	    else if (e.tagName() == "expfile" && expfilename.empty()) {           
 	      QString qs = e.attribute("path");
 	      if (!qs.isEmpty())
 		expfilename = (const char*)qs;
@@ -1569,6 +1610,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
     addtorecentfiles(prjfilen);
 
   firstpts=(*mpg)[0].getpts();
+  timeperframe=(*mpg)[1].getpts()-(*mpg)[0].getpts();
 
   double fps=27.e6/double(mpgfile::frameratescr[(*mpg)[0].getframerate()]);
   linslider->setMaxValue(pictures-1);
@@ -1617,7 +1659,14 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename)
       else
         continue;
       bool okay=false;
-      int picnum=e.attribute("picture","-1").toInt(&okay,0);
+      int picnum;
+      QString str=e.attribute("picture","-1");
+      if(str.contains(':') || str.contains('.')) {
+        okay=true;
+        picnum=string2pts(str)/getTimePerFrame();
+      }
+      else
+        picnum=str.toInt(&okay,0);
       if (okay && picnum>=0 && picnum<pictures) {
         new EventListItem(eventlist,imgp->getimage(picnum),evt,picnum,(*mpg)[picnum].getpicturetype(),(*mpg)[picnum].getpts()-firstpts);
         qApp->processEvents();
@@ -1823,11 +1872,11 @@ void dvbcut::update_time_display()
    {
      // curpic is not before the first entry of the table
      --it;
-     if (it->export_flag)
+     if (it->export_flag && it!=(quick_picture_lookup.end()-1))
      {
        // the corresponding entry says export_flag==true,
        // so this pic is after a START entry and is going to
-       // be exported
+       // be exported (But ONLY if it's not the last entry!).
        
        outpic=curpic-it->picture+it->outpicture;
        outpts=pts-it->pts+it->outpts;

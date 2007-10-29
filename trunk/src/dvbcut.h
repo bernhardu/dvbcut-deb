@@ -78,6 +78,7 @@ protected:
   int curpic;
   double alpha;
   pts_t firstpts;
+  int timeperframe;
   bool showimage;
   bool fine;
   bool jogsliding;
@@ -121,11 +122,13 @@ protected:
 public:
   ~dvbcut();
   dvbcut(QWidget *parent = 0, const char *name = 0, WFlags fl = WType_TopLevel|WDestructiveClose );
-  void open(std::list<std::string> filenames=std::list<std::string>(), std::string idxfilename=std::string());
+  void open(std::list<std::string> filenames=std::list<std::string>(), 
+            std::string idxfilename=std::string(), std::string expfilename=std::string());
   void setbusy(bool b=true);
   void batchmode(bool b=true) { nogui = b; }
   // static dvbcut *New(std::string filename=std::string(), std::string idxfilename=std::string());
   void addStartStopItems(std::vector<int>);
+  int getTimePerFrame() { return timeperframe>0 && timeperframe<5000 ? timeperframe : 3003; };
 
 public slots:
   virtual void fileNew();
