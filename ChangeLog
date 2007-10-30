@@ -1,6 +1,12 @@
 2007-10-30  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
 	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+		New quick_picture_lookup_table (also used for export)!
+		
+2007-10-30  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* src/dvbcut.cpp:
 	* src/settings.cpp:
 	* src/settings.h:
 		Automatically add missing start/stop markers at BOF/EOF, 
@@ -22,7 +28,7 @@
 
 	* src/pts.cpp:
 	* src/pts.h:
-		Function to convert formatted timestamps to pts_t
+		Function to convert formatted timestamps to pts_t.
 
 2007-10-25  Michael Riepe  <too-tired@users.sourceforge.net>
 
