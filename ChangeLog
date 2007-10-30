@@ -1,3 +1,14 @@
+2007-10-30  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* src/dvbcut.cpp:
+	* src/settings.cpp:
+	* src/settings.h:
+		Automatically add missing start/stop markers at BOF/EOF, 
+		configurable via "start_bof"/"stop_eof" in settings file.
+
+	* src/main.cpp:
+		Improved checking of cut list.
+
 2007-10-29  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
 	* src/dvbcut.cpp:
@@ -424,10 +435,10 @@
 		Centralize option handling.
 		Pass inbuffer to mpgfile::open().
  
- 	* src/mpgfile.h:
- 	* src/mpgfile.cpp:
- 		Create mpgfile from inbuffer, not from filename.
- 		Use a reference to a single inbuffer.
+	* src/mpgfile.h:
+	* src/mpgfile.cpp:
+		Create mpgfile from inbuffer, not from filename.
+		Use a reference to a single inbuffer.
 
 2007-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
 

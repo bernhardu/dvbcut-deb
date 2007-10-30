@@ -456,15 +456,21 @@ void dvbcut::fileExport()
   // starting export, switch source to sequential mode
   buf.setsequential(true);
 
-  int startpic=-1, stoppic=-1;
+  int startpic, stoppic;
   int totalpics=0;
+  
+  if(settings().start_bof) 
+    startpic=0;
+  else
+    startpic=-1;
 
   for(QListBoxItem *lbi=eventlist->firstItem();lbi;lbi=lbi->next())
     if (lbi->rtti()==EventListItem::RTTI()) {
       EventListItem &eli=(EventListItem&)*lbi;
       switch (eli.geteventtype()) {
 	case EventListItem::start:
-	  if (startpic<0) {
+	  if ((settings().start_bof && startpic<=0) || 
+          (!settings().start_bof && startpic<0)) {
 	    startpic=eli.getpicture();
 	  }
 	  break;
@@ -479,23 +485,32 @@ void dvbcut::fileExport()
 	  break;
       }
     }
+  // stop event missing after start (or no start/stop at all)
+  if(settings().stop_eof && startpic>=0) {
+    stoppic=pictures-1;
+    totalpics+=stoppic-startpic;
+  }
 
   int savedpic=0;
   long long savedtime=0;
-  pts_t startpts=0, stoppts=0;
+  pts_t startpts=(*mpg)[0].getpts(), stoppts;
   std::list<pts_t> chapterlist;
   chapterlist.push_back(0);
-  startpic=-1;
 
   if (totalpics > 0) {
-    // at least one START/STOP marker pair was found!
+    if(settings().start_bof) 
+      startpic=0;
+    else
+      startpic=-1;
+
     for(QListBoxItem *lbi=eventlist->firstItem();lbi && (nogui || !prgwin->cancelled());lbi=lbi->next())
       if (lbi->rtti()==EventListItem::RTTI()) {
 	EventListItem &eli=(EventListItem&)*lbi;
 
 	switch (eli.geteventtype()) {
 	  case EventListItem::start:
-	    if (startpic<0) {
+	    if ((settings().start_bof && startpic<=0) || 
+            (!settings().start_bof && startpic<0)) {
 	      startpic=eli.getpicture();
 	      startpts=(*mpg)[startpic].getpts();
 	    }
@@ -523,21 +538,16 @@ void dvbcut::fileExport()
 	    break;
 	}
       }
-  }
-  else if (nogui) {
-    // batch conversion with no START/STOP pair given at all! 
-    startpic=0; 
-    startpts=(*mpg)[startpic].getpts();   
-    // last picture is missing! ==> Indexer has to add a (invisible) dummy frame at the end... 
-    stoppic=pictures-1;
-    stoppts=(*mpg)[stoppic].getpts();
-    savedpic=0;
-    totalpics=stoppic-startpic;
-    fprintf(stderr,"Exporting %d pictures: %s .. %s\n",
-		   stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
-    mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,log);
-    savedpic=stoppic-startpic;
-    savedtime=stoppts-startpts;
+
+    if(settings().stop_eof && startpic>=0) {
+      stoppic=pictures-1;
+      stoppts=(*mpg)[stoppic].getpts();
+      log->printheading("Exporting %d pictures: %s .. %s",
+			stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
+      mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,log);
+      savedpic+=stoppic-startpic;
+      savedtime+=stoppts-startpts;
+    }
   }
 
   mux.reset();
@@ -1904,17 +1914,25 @@ void dvbcut::update_time_display()
 void dvbcut::update_quick_picture_lookup_table() {
   quick_picture_lookup.clear();
     
-  int startpic=-1;
-  int outpics=0;
-  pts_t startpts=0;
-  pts_t outpts=0;
+  int startpic, stoppic, outpics=0;
+  pts_t startpts, stoppts, outpts=0;
+  
+  if(settings().start_bof) {
+    startpic=0;
+    startpts=(*mpg)[0].getpts()-firstpts; 
+  }
+  else {
+    startpic=-1;
+    startpts=0; 
+  }
   
   for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
     if (item->rtti()==EventListItem::RTTI()) {
     const EventListItem &eli=*static_cast<const EventListItem*>(item);
     switch (eli.geteventtype()) {
       case EventListItem::start:
-        if (startpic<0) {
+	    if ((settings().start_bof && startpic<=0) || 
+            (!settings().start_bof && startpic<0)) {
           startpic=eli.getpicture();
           startpts=eli.getpts();
           
@@ -1923,19 +1941,35 @@ void dvbcut::update_quick_picture_lookup_table() {
         break;
       case EventListItem::stop:
         if (startpic>=0) {
-          int stoppic=eli.getpicture();
-          pts_t stoppts=eli.getpts();
+          // add a virtual START marker at BOF if missing
+          if(quick_picture_lookup.empty()) 
+            quick_picture_lookup.push_back(quick_picture_lookup_s(startpic,true,startpts,outpics,outpts));
+
+          stoppic=eli.getpicture();
+          stoppts=eli.getpts();
           
           outpics+=stoppic-startpic;
           outpts+=stoppts-startpts;
-          startpic=-1;
           quick_picture_lookup.push_back(quick_picture_lookup_s(stoppic,false,stoppts,outpics,outpts));
+          startpic=-1;
         }
         break;
       default:
         break;
       }
     }
+
+  if(settings().stop_eof && startpic>=0) {
+    if(quick_picture_lookup.empty())  // also missing START marker!
+      quick_picture_lookup.push_back(quick_picture_lookup_s(startpic,true,startpts,outpics,outpts));
+
+    // add a virtual STOP marker at EOF if missing
+    stoppic=pictures-1;
+    stoppts=(*mpg)[stoppic].getpts()-firstpts;
+    outpics+=stoppic-startpic;
+    outpts+=stoppts-startpts;
+    quick_picture_lookup.push_back(quick_picture_lookup_s(stoppic,false,stoppts,outpics,outpts)); 
+  }
   
   update_time_display();
   }

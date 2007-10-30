@@ -109,6 +109,8 @@ dvbcut_settings::load_settings() {
     chapter_label = readEntry("/chapter", DVBCUT_DEFAULT_CHAPTER_LABEL);
     bookmark_label = readEntry("/bookmark", DVBCUT_DEFAULT_BOOKMARK_LABEL);
   endGroup();	// labels
+  start_bof = readBoolEntry("/start_bof", true);
+  stop_eof = readBoolEntry("/stop_eof", true);
 }
 
 void
@@ -150,6 +152,8 @@ dvbcut_settings::save_settings() {
     writeEntry("/chapter", chapter_label);
     writeEntry("/bookmark", bookmark_label);
   endGroup();	// labels
+  writeEntry("/start_bof", start_bof);
+  writeEntry("/stop_eof", stop_eof);
 }
 
 // private settings variable

@@ -205,19 +205,31 @@ main(int argc, char *argv[]) {
       } else if(cutlist.front()=="TS") {
           main->editImport();     
           main->editConvert();             
-      } else if(cutlist.size()>1) { 
-          // just one entry makes no sense and/or can be a typo!
-          std::vector<int> piclist;
-          for (unsigned int j=0; j<cutlist.size(); j++)                   
-            if(cutlist[j].find(':')!=std::string::npos || cutlist[j].find('.')!=std::string::npos) 
-              piclist.push_back(string2pts(cutlist[j])/main->getTimePerFrame()); // pts divided by 3600(PAL) or 3003(NTSC)
-            else
-              piclist.push_back(atoi(cutlist[j].c_str()));                       // integers are treated as frame numbers!
-          main->addStartStopItems(piclist);
+      } else { 
+          std::vector<int> piclist, prob_item, prob_pos;
+          unsigned int pos, j;
+          for (j=0; j<cutlist.size(); j++)
+            if((pos=cutlist[j].find_first_not_of("0123456789:./"))==std::string::npos) {                 
+              if(cutlist[j].find_first_of(":./")!=std::string::npos) 
+                piclist.push_back(string2pts(cutlist[j])/main->getTimePerFrame()); // pts divided by 3600(PAL) or 3003(NTSC)
+              else
+                piclist.push_back(atoi(cutlist[j].c_str()));                       // integers are treated as frame numbers!
+            } else {
+              prob_item.push_back(j);
+              prob_pos.push_back(pos);
+            }  
           if(piclist.size()%2) 
-            fprintf(stderr,"*** Cut list contained an odd number of entries, discarded last one! ***\n");    
-      } else
-        fprintf(stderr,"*** Problems parsing parameter provided with option `-cut'! ***\n");    
+            fprintf(stderr,"*** Cut list contains an odd number of entries! ***\n");    
+          if(!prob_item.empty()) {
+            fprintf(stderr,"*** Problems parsing parameter provided with option `-cut'! ***\n");    
+            for (j=0; j<prob_item.size(); j++) {
+              fprintf(stderr,"    '%s' ==> discarded!\n",cutlist[prob_item[j]].c_str());
+              for (i=0; i<5+prob_pos[j]; i++) fprintf(stderr," ");
+              fprintf(stderr,"^\n");
+            }  
+          }  
+          main->addStartStopItems(piclist);
+      }  
     }  
     main->fileExport();
     rv = 0;
