@@ -39,14 +39,15 @@ class dvbcut: public dvbcutbase
 public:
   struct quick_picture_lookup_s
   {
-    int picture;
-    bool export_flag;
-    pts_t pts;
+    int startpicture;
+    pts_t startpts;
+    int stoppicture;
+    pts_t stoppts;
     int outpicture;
     pts_t outpts;
 
-    quick_picture_lookup_s(int _picture, bool _export_flag, pts_t _pts, int _outpicture, pts_t _outpts) :
-      picture(_picture), export_flag(_export_flag), pts(_pts), outpicture(_outpicture), outpts(_outpts)
+    quick_picture_lookup_s(int _startpicture, pts_t _startpts, int _stoppicture, pts_t _stoppts, int _outpicture, pts_t _outpts) :
+      startpicture(_startpicture), startpts(_startpts), stoppicture(_stoppicture), stoppts(_stoppts), outpicture(_outpicture), outpts(_outpts)
     {
     }
 
@@ -54,7 +55,7 @@ public:
     {
       bool operator()(int lhs, const quick_picture_lookup_s &rhs) const
       {
-        return lhs<rhs.picture;
+        return lhs<rhs.startpicture;
       }
     };
     struct cmp_outpicture
@@ -69,6 +70,7 @@ public:
   
 protected:
   quick_picture_lookup_t quick_picture_lookup;
+  std::list<pts_t> chapterlist;
 
   QPopupMenu *audiotrackpopup,*recentfilespopup;
   int audiotrackmenuid;

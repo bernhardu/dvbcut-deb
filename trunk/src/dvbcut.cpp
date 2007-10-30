@@ -456,98 +456,21 @@ void dvbcut::fileExport()
   // starting export, switch source to sequential mode
   buf.setsequential(true);
 
-  int startpic, stoppic;
-  int totalpics=0;
-  
-  if(settings().start_bof) 
-    startpic=0;
-  else
-    startpic=-1;
+  int startpic, stoppic, savedpic=0;
+  pts_t startpts=(*mpg)[0].getpts(), stoppts, savedtime=0;
 
-  for(QListBoxItem *lbi=eventlist->firstItem();lbi;lbi=lbi->next())
-    if (lbi->rtti()==EventListItem::RTTI()) {
-      EventListItem &eli=(EventListItem&)*lbi;
-      switch (eli.geteventtype()) {
-	case EventListItem::start:
-	  if ((settings().start_bof && startpic<=0) || 
-          (!settings().start_bof && startpic<0)) {
-	    startpic=eli.getpicture();
-	  }
-	  break;
-	case EventListItem::stop:
-	  if (startpic>=0) {
-	    stoppic=eli.getpicture();
-	    totalpics+=stoppic-startpic;
-	    startpic=-1;
-	  }
-	  break;
-	default:
-	  break;
-      }
-    }
-  // stop event missing after start (or no start/stop at all)
-  if(settings().stop_eof && startpic>=0) {
-    stoppic=pictures-1;
-    totalpics+=stoppic-startpic;
-  }
+  for(unsigned int num=0; num<quick_picture_lookup.size(); num++) {
+      startpic=quick_picture_lookup[num].startpicture;
+      startpts=quick_picture_lookup[num].startpts;
+      stoppic=quick_picture_lookup[num].stoppicture;
+      stoppts=quick_picture_lookup[num].stoppts;
+      
+      log->printheading("%d. Exporting %d pictures: %s .. %s",
+			num+1,stoppic-startpic,ptsstring(startpts).c_str(),ptsstring(stoppts).c_str());
+      mpg->savempg(*mux,startpic,stoppic,savedpic,quick_picture_lookup.back().outpicture,log);
 
-  int savedpic=0;
-  long long savedtime=0;
-  pts_t startpts=(*mpg)[0].getpts(), stoppts;
-  std::list<pts_t> chapterlist;
-  chapterlist.push_back(0);
-
-  if (totalpics > 0) {
-    if(settings().start_bof) 
-      startpic=0;
-    else
-      startpic=-1;
-
-    for(QListBoxItem *lbi=eventlist->firstItem();lbi && (nogui || !prgwin->cancelled());lbi=lbi->next())
-      if (lbi->rtti()==EventListItem::RTTI()) {
-	EventListItem &eli=(EventListItem&)*lbi;
-
-	switch (eli.geteventtype()) {
-	  case EventListItem::start:
-	    if ((settings().start_bof && startpic<=0) || 
-            (!settings().start_bof && startpic<0)) {
-	      startpic=eli.getpicture();
-	      startpts=(*mpg)[startpic].getpts();
-	    }
-	    break;
-	  case EventListItem::stop:
-	    if (startpic>=0) {
-	      stoppic=eli.getpicture();
-	      stoppts=(*mpg)[stoppic].getpts();
-	      log->printheading("Exporting %d pictures: %s .. %s",
-				stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
-	      mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,log);
-	      savedpic+=stoppic-startpic;
-	      savedtime+=stoppts-startpts;
-	      startpic=-1;
-	    }
-	    break;
-	  case EventListItem::chapter:
-	    if (startpic==-1)
-	      chapterlist.push_back(savedtime);
-	    else
-	      chapterlist.push_back((*mpg)[eli.getpicture()].getpts()-startpts+savedtime);
-	    break;
-	  case EventListItem::none:
-	  case EventListItem::bookmark:
-	    break;
-	}
-      }
-
-    if(settings().stop_eof && startpic>=0) {
-      stoppic=pictures-1;
-      stoppts=(*mpg)[stoppic].getpts();
-      log->printheading("Exporting %d pictures: %s .. %s",
-			stoppic-startpic,ptsstring(startpts-firstpts).c_str(),ptsstring(stoppts-firstpts).c_str());
-      mpg->savempg(*mux,startpic,stoppic,savedpic,totalpics,log);
-      savedpic+=stoppic-startpic;
-      savedtime+=stoppts-startpts;
-    }
+      savedpic=quick_picture_lookup[num].outpicture;
+      savedtime=quick_picture_lookup[num].outpts;
   }
 
   mux.reset();
@@ -570,7 +493,7 @@ void dvbcut::fileExport()
       if (*it != lastch) {
         lastch=*it;
         // formatting the chapter string
-        if(nchar>0) {
+        if (nchar>0) {
           nchar++; 
           chapterstring+=",";
         }  
@@ -587,7 +510,7 @@ void dvbcut::fileExport()
   }
   // simple dvdauthor xml file with chapter marks
   std::string filename,destname;
-  if(expfilen.rfind("/")<expfilen.length()) 
+  if (expfilen.rfind("/")<expfilen.length()) 
     filename=expfilen.substr(expfilen.rfind("/")+1);
   else 
     filename=expfilen;
@@ -650,6 +573,7 @@ void dvbcut::editBookmark()
 void dvbcut::editChapter()
 {
   addEventListItem(curpic, EventListItem::chapter);
+  update_quick_picture_lookup_table();
 }
 
 
@@ -673,7 +597,7 @@ void dvbcut::editSuggest()
     addEventListItem(pic, EventListItem::bookmark);
     found++;
   }
-  if(!found)  
+  if (!found)  
     statusBar()->message(QString("*** No aspect ratio changes detected! ***"));   
 }
 
@@ -685,7 +609,7 @@ void dvbcut::editImport()
     addEventListItem(*b, EventListItem::bookmark);
     found++;
   }
-  if(!found)  
+  if (!found)  
     statusBar()->message(QString("*** No valid bookmarks available/found! ***"));
 }
 
@@ -702,11 +626,10 @@ void dvbcut::editConvert()
          found++;
       } 
     } 
-  if(found) {
+  if (found) {
     addStartStopItems(cutlist);
-    update_quick_picture_lookup_table();
 
-    if(found%2) 
+    if (found%2) 
       statusBar()->message(QString("*** No matching stop marker!!! ***"));
   }  
   else
@@ -731,7 +654,7 @@ void dvbcut::addStartStopItems(std::vector<int> cutlist)
   EventListItem::eventtype type=EventListItem::start;
   for (std::vector<int>::iterator it = cutlist.begin(); it != cutlist.end(); ++it) {   
     addEventListItem(*it, type);
-    if(type==EventListItem::start) 
+    if (type==EventListItem::start) 
       type=EventListItem::stop;
     else 
       type=EventListItem::start;  
@@ -966,11 +889,11 @@ void dvbcut::jogslidervalue(int v)
   */ 
   if (v>0) {
     relpic=int(exp(alpha*v)-settings().jog_offset);
-    if(relpic<0) relpic=0;
+    if (relpic<0) relpic=0;
   }  
   else if (v<0) {
     relpic=-int(exp(-alpha*v)-settings().jog_offset);
-    if(relpic>0) relpic=0;
+    if (relpic>0) relpic=0;
   }  
 
   int newpic=jogmiddlepic+relpic;
@@ -1042,8 +965,7 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
       {
       EventListItem::eventtype type=eli.geteventtype();
       delete lbi;
-      if (type==EventListItem::start || type==EventListItem::stop)
-        update_quick_picture_lookup_table();
+      if (type!=EventListItem::bookmark) update_quick_picture_lookup_table();
       }
       break;
 
@@ -1051,7 +973,7 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
       current=first;
       while(current) {
          next=current->next();
-         if(current!=lbi) delete current;
+         if (current!=lbi) delete current;
          current=next;
       }   
       update_quick_picture_lookup_table();
@@ -1066,18 +988,18 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
       cmptype=EventListItem::start;
       cmptype2=EventListItem::stop;
     case 6:
-      if(cmptype==EventListItem::none) cmptype=EventListItem::chapter;
+      if (cmptype==EventListItem::none) cmptype=EventListItem::chapter;
     case 7:
-      if(cmptype==EventListItem::none) cmptype=EventListItem::bookmark;
+      if (cmptype==EventListItem::none) cmptype=EventListItem::bookmark;
       current=first;
       while(current) {
         next=current->next();
         const EventListItem &eli_current=*static_cast<const EventListItem*>(current);
-        if(eli_current.geteventtype()==cmptype || eli_current.geteventtype()==cmptype2) 
+        if (eli_current.geteventtype()==cmptype || eli_current.geteventtype()==cmptype2) 
           delete current;
         current=next;
       }       
-      if (cmptype==EventListItem::start) update_quick_picture_lookup_table();
+      if (cmptype!=EventListItem::bookmark) update_quick_picture_lookup_table();
       break;
 
     case 8:
@@ -1092,6 +1014,7 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
 
     case 10:
       eli.seteventtype(EventListItem::chapter);
+      update_quick_picture_lookup_table();
       break;
 
     case 11: 
@@ -1117,7 +1040,7 @@ void dvbcut::clickedgo()
   text.stripWhiteSpace();
   bool okay=false;
   int inpic;
-  if(text.contains(':') || text.contains('.')) {
+  if (text.contains(':') || text.contains('.')) {
     okay=true;
     inpic=string2pts(text)/getTimePerFrame();
   }
@@ -1137,7 +1060,7 @@ void dvbcut::clickedgo2()
   text.stripWhiteSpace();
   bool okay=false;
   int inpic, outpic;
-  if(text.contains(':') || text.contains('.')) {
+  if (text.contains(':') || text.contains('.')) {
     okay=true;
     outpic=string2pts(text)/getTimePerFrame();
   }
@@ -1148,7 +1071,7 @@ void dvbcut::clickedgo2()
     quick_picture_lookup_t::iterator it=
       std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),outpic,quick_picture_lookup_s::cmp_outpicture());
     --it;
-    inpic=outpic-it->outpicture+it->picture;   
+    inpic=outpic-it->outpicture+it->stoppicture;   
     fine=true;
     linslider->setValue(inpic);
     fine=false;
@@ -1429,11 +1352,11 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	  // parse elements, new-style first
 	  QDomNode n;
           filenames.clear();
-      if(!nogui) {    
-          // in batch mode CLI-switches have priority!              
-          idxfilename.clear();
-          expfilename.clear();
-      }    
+	  if (!nogui) {    
+	    // in batch mode CLI-switches have priority!              
+	    idxfilename.clear();
+	    expfilename.clear();
+	  }    
 	  for (n = domdoc.documentElement().firstChild(); !n.isNull(); n = n.nextSibling()) {
 	    QDomElement e = n.toElement();
 	    if (e.isNull())
@@ -1671,7 +1594,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
       bool okay=false;
       int picnum;
       QString str=e.attribute("picture","-1");
-      if(str.contains(':') || str.contains('.')) {
+      if (str.contains(':') || str.contains('.')) {
         okay=true;
         picnum=string2pts(str)/getTimePerFrame();
       }
@@ -1882,18 +1805,16 @@ void dvbcut::update_time_display()
    {
      // curpic is not before the first entry of the table
      --it;
-     if (it->export_flag && it!=(quick_picture_lookup.end()-1))
+     if (curpic < it->stoppicture)
      {
-       // the corresponding entry says export_flag==true,
-       // so this pic is after a START entry and is going to
-       // be exported (But ONLY if it's not the last entry!).
-       
-       outpic=curpic-it->picture+it->outpicture;
-       outpts=pts-it->pts+it->outpts;
+       // curpic is between (START and STOP[ pics of the current entry
+       outpic=curpic-it->stoppicture+it->outpicture;
+       outpts=pts-it->stoppts+it->outpts;
        mark = '*';
      }
      else
      {
+       // curpic is after the STOP-1 pic of the current entry
        outpic=it->outpicture;
        outpts=it->outpts;
      }
@@ -1912,12 +1833,18 @@ void dvbcut::update_time_display()
   }
 
 void dvbcut::update_quick_picture_lookup_table() {
-  quick_picture_lookup.clear();
+  // that's the (only) place where the event list should be scanned for  
+  // the exported pictures ranges, i.e. for START/STOP/CHAPTER markers!
+  quick_picture_lookup.clear(); 
+  chapterlist.clear();
+  
+  chapterlist.push_back(0);
     
   int startpic, stoppic, outpics=0;
   pts_t startpts, stoppts, outpts=0;
+  bool realzero=false;
   
-  if(settings().start_bof) {
+  if (settings().start_bof) {
     startpic=0;
     startpts=(*mpg)[0].getpts()-firstpts; 
   }
@@ -1931,46 +1858,47 @@ void dvbcut::update_quick_picture_lookup_table() {
     const EventListItem &eli=*static_cast<const EventListItem*>(item);
     switch (eli.geteventtype()) {
       case EventListItem::start:
-	    if ((settings().start_bof && startpic<=0) || 
-            (!settings().start_bof && startpic<0)) {
+	if (startpic<0 || (settings().start_bof && startpic==0 && !realzero)) {
           startpic=eli.getpicture();
           startpts=eli.getpts();
-          
-          quick_picture_lookup.push_back(quick_picture_lookup_s(startpic,true,startpts,outpics,outpts));
+          if (startpic==0)
+	    realzero=true;        
         }
         break;
       case EventListItem::stop:
         if (startpic>=0) {
-          // add a virtual START marker at BOF if missing
-          if(quick_picture_lookup.empty()) 
-            quick_picture_lookup.push_back(quick_picture_lookup_s(startpic,true,startpts,outpics,outpts));
-
           stoppic=eli.getpicture();
-          stoppts=eli.getpts();
-          
+          stoppts=eli.getpts();        
           outpics+=stoppic-startpic;
           outpts+=stoppts-startpts;
-          quick_picture_lookup.push_back(quick_picture_lookup_s(stoppic,false,stoppts,outpics,outpts));
+          
+          quick_picture_lookup.push_back(quick_picture_lookup_s(startpic,startpts,stoppic,stoppts,outpics,outpts));
+
           startpic=-1;
         }
         break;
+      case EventListItem::chapter:
+	if (startpic<=0)
+	  chapterlist.push_back(outpts);
+	else
+	  chapterlist.push_back(eli.getpts()-startpts+outpts);
+	break;
       default:
         break;
       }
     }
 
-  if(settings().stop_eof && startpic>=0) {
-    if(quick_picture_lookup.empty())  // also missing START marker!
-      quick_picture_lookup.push_back(quick_picture_lookup_s(startpic,true,startpts,outpics,outpts));
-
-    // add a virtual STOP marker at EOF if missing
+  // last item in list was a (real or virtual) START
+  if (settings().stop_eof && startpic>=0) {
+    // create a new export range by adding a virtual STOP marker at EOF 
     stoppic=pictures-1;
     stoppts=(*mpg)[stoppic].getpts()-firstpts;
     outpics+=stoppic-startpic;
     outpts+=stoppts-startpts;
-    quick_picture_lookup.push_back(quick_picture_lookup_s(stoppic,false,stoppts,outpics,outpts)); 
+    
+    quick_picture_lookup.push_back(quick_picture_lookup_s(startpic,startpts,stoppic,stoppts,outpics,outpts)); 
   }
   
   update_time_display();
-  }
+}
 
