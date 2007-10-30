@@ -64,6 +64,8 @@ public:
   QString stop_label;
   QString chapter_label;
   QString bookmark_label;
+  bool start_bof;
+  bool stop_eof;
 
 };
 
