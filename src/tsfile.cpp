@@ -544,6 +544,9 @@ tsfile::check_si_tables() {
 	    break;
 	  case 0x03:	// MPEG-1 audio
 	  case 0x04:	// MPEG-2 audio
+	  case 0x81:	// legacy AC-3 audio
+	  case 0x83:	// legacy LPCM audio
+	  case 0x85:	// legacy DTS audio
 	    apids.push_back(std::pair<int, int>(stream_type, pid));
 	    break;
 	  case 0x06:	// PES packets containing private data
@@ -572,10 +575,15 @@ tsfile::check_si_tables() {
 	  case 0x04:
 	    t = streamtype::mpegaudio;
 	    break;
+	  case 0x81:	// legacy AC-3 audio
 	  case 0x16a:	// AC-3 descriptor
 	    t = streamtype::ac3audio;
 	    break;
 	  /* in the future, maybe also:
+	  case 0x83:	// legacy LPCM audio
+	    t = streamtype::pcmaudio;
+	    break;
+	  case 0x85:	// legacy DTS audio
 	  case 0x173:	// DTS audio descriptor
 	    t = streamtype::dtsaudio;
 	    break;

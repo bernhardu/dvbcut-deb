@@ -1,3 +1,8 @@
+2007-11-03  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/tsfile.cpp:
+		Detect legacy audio stream types.
+
 2007-10-30  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
 	* src/dvbcut.cpp:
