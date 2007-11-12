@@ -79,7 +79,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
       streamhandle sh(mpg.getinitialoffset());
       streamdata *sd=sh.newstream(astr,mpg.getstreamtype(astr),mpg.istransportstream());
 
-      while (sh.fileposition < (mpg.getinitialoffset()+4<<20)) {
+      while (sh.fileposition < mpg.getinitialoffset()+(4<<20)) {
 	if (mpg.streamreader(sh)<=0)
 	  break;
 
