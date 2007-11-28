@@ -111,6 +111,17 @@ dvbcut_settings::load_settings() {
   endGroup();	// labels
   start_bof = readBoolEntry("/start_bof", true);
   stop_eof = readBoolEntry("/stop_eof", true);
+  beginGroup("/snapshots");
+    snapshot_type = readEntry("/type", "PNG");
+    snapshot_quality = readNumEntry("/quality", -1);
+    snapshot_prefix = readEntry("/prefix", "");
+    snapshot_delimiter = readEntry("/delimiter", "_");
+    snapshot_first = readNumEntry("/first", 1);
+    snapshot_width = readNumEntry("/width", 3);
+    snapshot_extension = readEntry("/extension", "png");
+    snapshot_range = readNumEntry("/range", 0);
+    snapshot_samples = readNumEntry("/samples", 1);
+  endGroup();	// snapshots
 }
 
 void
@@ -154,6 +165,17 @@ dvbcut_settings::save_settings() {
   endGroup();	// labels
   writeEntry("/start_bof", start_bof);
   writeEntry("/stop_eof", stop_eof);
+  beginGroup("/snapshots");
+    writeEntry("/type", snapshot_type);
+    writeEntry("/quality", snapshot_quality);
+    writeEntry("/prefix", snapshot_prefix);
+    writeEntry("/delimiter", snapshot_delimiter);
+    writeEntry("/first", snapshot_first);
+    writeEntry("/width", snapshot_width);
+    writeEntry("/extension", snapshot_extension);
+    writeEntry("/range", snapshot_range);
+    writeEntry("/samples", snapshot_samples);
+  endGroup();	// snapshots
 }
 
 // private settings variable

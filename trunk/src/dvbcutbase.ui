@@ -361,6 +361,7 @@
         <action name="fileSaveAction"/>
         <action name="fileSaveAsAction"/>
         <action name="snapshotSaveAction"/>
+        <action name="chapterSnapshotsSaveAction"/>
         <separator/>
         <action name="fileExportAction"/>
         <separator/>
@@ -822,6 +823,20 @@
             <string>G</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>chapterSnapshotsSaveAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Save Chapter Snapshots</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+G</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -1066,6 +1081,12 @@
         <receiver>dvbcutbase</receiver>
         <slot>snapshotSave()</slot>
     </connection>
+    <connection>
+        <sender>chapterSnapshotsSaveAction</sender>
+        <signal>activated()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>chapterSnapshotsSave()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">gettext.h</include>
@@ -1107,6 +1128,7 @@
     <slot>viewHalfSize()</slot>
     <slot>viewQuarterSize()</slot>
     <slot>snapshotSave()</slot>
+    <slot>chapterSnapshotsSave()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

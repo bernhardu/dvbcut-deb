@@ -66,6 +66,15 @@ public:
   QString bookmark_label;
   bool start_bof;
   bool stop_eof;
+  QString snapshot_type;
+  QString snapshot_prefix;
+  QString snapshot_delimiter;
+  QString snapshot_extension;
+  int snapshot_quality;
+  int snapshot_first;
+  int snapshot_width;
+  int snapshot_range;
+  int snapshot_samples;
 
 };
 
