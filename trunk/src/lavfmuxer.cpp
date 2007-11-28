@@ -120,7 +120,11 @@ lavfmuxer::~lavfmuxer()
     if (fileopened) {
       av_write_trailer(avfc);
       if (!(fmt->flags & AVFMT_NOFILE))
+#if LIBAVFORMAT_VERSION_INT >= ((52<<16)+(0<<8)+0)
+        url_fclose(avfc->pb);
+#else
         url_fclose(&avfc->pb);
+#endif
       }
 
     av_free(avfc);
