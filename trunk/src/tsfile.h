@@ -27,16 +27,19 @@
 #define TSSYNCBYTE (0x47)
 
 // stuff to identify proprietary (topfield) headers and find bookmarks
-// ==> magic (&version) number, position of bookmarks, length of header
+// ==> magic ('TFrc') &version number, position of bookmarks, length of header, max number of bookmarks
 #define TF5XXXPVR_MAGIC (0x54467263)
 #define TF5XXXPVR_LEN (20*TSPACKETSIZE)
+#define TF5XXXPVR_MAX (64)
 #define TF5000PVR_VERSION (0x5000)
 #define TF5000PVR_POS (1400)
 #define TF5010PVR_VERSION (0x5010)
 #define TF5010PVR_POS (1404)
 #define TF4000PVR_LEN (3*TSPACKETSIZE)
 #define TF4000PVR_POS (216)
-#define TF_MAX_BOOKMARKS (64)
+#define TF7700HDPVR_LEN (2636)
+#define TF7700HDPVR_MAX (48)
+#define TF7700HDPVR_POS (1040)
 
 /**
 @author Sven Over
@@ -102,10 +105,13 @@ protected:
   bool check_si_tables();
   size_t get_si_table(uint8_t*, size_t,  size_t&, int, int);
 
-  int isTOPFIELD(const uint8_t*, int);  
-  bool bytes;                               // indicates type of read bookmarks 
-  std::vector<dvbcut_off_t> byte_bookmarks; // to store the bookmarks in byte positions 
-  std::vector<int> pic_bookmarks;           // to store the bookmarks in frame numbers 
+  int isTOPFIELD(const uint8_t*, int, std::string);  
+  int isTF7700HDPVR(std::string);  
+  enum bookmarktype { none, byte, time, pic };
+  bookmarktype bmtype;                      // indicates type of read bookmarks 
+  std::vector<int> pic_bookmarks;           // to store the bookmarks as frame numbers (returned by getbookmarks)
+  std::vector<dvbcut_off_t> byte_bookmarks; // to store the bookmarks as byte positions 
+  std::vector<pts_t> time_bookmarks;        // to store the bookmarks as time stamps
 
 public:
   tsfile(inbuffer &b, int initial_offset);
@@ -120,13 +126,20 @@ public:
     return true;
   }
   virtual std::vector<int> getbookmarks() {
-    if(bytes) {
+    if(bmtype==byte) {
       // convert byte positions to frame numbers if not already done/stored
-      int pic;
+      int picnr;
       for (std::vector<dvbcut_off_t>::iterator b = byte_bookmarks.begin(); b != byte_bookmarks.end(); ++b) 
-        if((pic = getpictureatposition(*b)) >= 0) 
-          pic_bookmarks.push_back(pic);
-      bytes = false;
+        if((picnr = getpictureatposition(*b)) >= 0) 
+          pic_bookmarks.push_back(picnr);
+      bmtype = pic;
+    } else if(bmtype==time) {
+      // convert pts positions to frame numbers if not already done/stored
+      int picnr;
+      for (std::vector<dvbcut_off_t>::iterator b = time_bookmarks.begin(); b != time_bookmarks.end(); ++b) 
+        if((picnr = getpictureattime(*b)) >= 0) 
+          pic_bookmarks.push_back(picnr);
+      bmtype = pic;
     } 
     return pic_bookmarks;
   }

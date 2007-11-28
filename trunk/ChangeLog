@@ -1,3 +1,17 @@
+2007-11-24  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+        * src/tsfile.cpp
+        * src/tsfile.h
+                Import bookmarks from new Topfield TF7700HDPVR
+
+        * src/mpgfile.cpp
+        * src/mpgfile.h
+                readfile() to read (small) files to memory
+
+        * src/buffer.cpp
+        * src/buffer.h
+                Store filename in files structure
+		
 2007-11-12  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/lavfmuxer.cpp:

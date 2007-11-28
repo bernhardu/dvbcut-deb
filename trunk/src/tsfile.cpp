@@ -31,12 +31,13 @@ tsfile::tsfile(inbuffer &b, int initial_offset) : mpgfile(b, initial_offset)
 
   // check the "header" for receiver specific bookmarks
   const uint8_t *header = (const uint8_t*) buf.data();
-  const char *model[6]={"???","TF4000","TF5000","TF5010","TF5000c","TF5010c"};
+  const char *model[7]={"???","TF4000","TF5000","TF5010","TF5000c","TF5010c","TF7700"};
   int irc;
-  if((irc=isTOPFIELD(header, initial_offset))>0)
-    fprintf(stderr,"Found Topfield %s header with %d bookmarks\n",model[irc/100],irc%100);  
-  //else
-  //  fprintf(stderr,"Unknown, corrupted or no proprietary TS header at all, IRC=%d\n",irc);
+  bmtype = none;  
+  if((irc=isTOPFIELD(header, initial_offset, buf.getfilename(0)))>0)
+    fprintf(stderr,"Found Topfield %s recording (%d bytes header, %d bookmarks)\n",model[irc/100],initial_offset,irc%100);  
+  else 
+    fprintf(stderr,"Analyzed transport stream, %d bytes of initial data (IRC=%d)\n",initial_offset,irc);
 
   // Find video PID and audio PID(s)
   buf.providedata(buf.getsize(), initialoffset);
@@ -253,16 +254,19 @@ int tsfile::probe(inbuffer &buf) {
 // test for Topfield TF4000PVR & TF5xxxPVR and read bookmarks from the proprietary header
 // return codes: <type>*100+<number of bookmarks> or 
 //               -1: header far to short for topfield/bookmarks, -2: magic mismatch, -3: version mismatch                                              
-int tsfile::isTOPFIELD(const uint8_t *header, int len) {  
+int 
+tsfile::isTOPFIELD(const uint8_t *header, int len, std::string recfile) {  
   unsigned int magic, version, unit=0;
   unsigned int frequency, symbolrate, modulation;
-  int boff=len, off=0, type=0, hlen=0, verbose=0;
+  int boff=len, off=0, type=0, hlen=0, verbose=0, irc;
 
-  // this routine stores bookmarks as byte positions! 
-  bytes = true;
+  if(verbose) fprintf(stderr,"Header length of %s: %d\n",recfile.c_str(),len);
   
-  // just in case there's a corrupted TS packet at the beginning
-  if(verbose) fprintf(stderr,"Header length: %d\n",len);
+  // topfield receiver with additional info file?
+  if((irc=isTF7700HDPVR(recfile))>0) return irc;
+  else if(verbose) fprintf(stderr,"No TF7700HDPVR! IRC=%d\n",irc);
+
+  // just in case there's a corrupted TS packet at the beginning 
   if(len<TSPACKETSIZE) return -1;
 
   // identify the specific header via the magic number 'TFrc'
@@ -323,12 +327,12 @@ int tsfile::isTOPFIELD(const uint8_t *header, int len) {
   // OK,... we identified a receiver model!
   int bnum = 0; 
   //if(len>=hlen) // discard ALL (slightly) to small headers...? No, only require enough space for the bookmarks...
-  if(len>=boff+4*TF_MAX_BOOKMARKS) { 
+  if(len>=boff+4*TF5XXXPVR_MAX) { 
       // Seems to be a Topfield TF4000PVR/TF5xxxPVR TS-header with 576/3760bytes total length
       // and up to 64 bookmarks (BUT can be shorter/corrupted due to COPY/CUT-procedure on reveiver)
       dvbcut_off_t bookmark;
       while ((bookmark=(header[boff]<<24)|(header[boff+1]<<16)|(header[boff+2]<<8)|header[boff+3])
-              && bnum<TF_MAX_BOOKMARKS) {
+              && bnum<TF5XXXPVR_MAX) {
           // bookmark is stored in 128 resp. 94kbyte units
           bookmark*=unit;
           if(verbose) fprintf(stderr,"BOOKMARK[%d] = %lld\n",bnum,bookmark);
@@ -340,7 +344,69 @@ int tsfile::isTOPFIELD(const uint8_t *header, int len) {
   } else // receiver model identified but header to short!
       fprintf(stderr,"Header probabely corrupted (%dbytes to short), discarding bookmarks!\n",hlen-len);
 
+  // this routine stores bookmarks as byte positions! 
+  bmtype = byte;
+  
   return type*100+bnum;
+}
+
+// newest topfield receivers (i.e. TF7700HDPVR) with additional ADD-file instead of a TS-header
+int 
+tsfile::isTF7700HDPVR(std::string recfile) {  
+  int verbose=0;
+  std::string addfile;
+  
+  // contruct the expected file name of the additonal info file
+  if (!recfile.empty()) {
+    int lastdot = recfile.rfind('.');
+    int lastslash = recfile.rfind('/');
+    if (lastdot >= 0 && lastdot >= lastslash)
+      addfile = recfile.substr(0,lastdot) + ".add";
+    else
+      return -20;  
+  } else
+    return -10;  
+
+  uint8_t *buffer;  
+  ssize_t len = readfile(addfile, &buffer);
+  if(len<0) return -30;
+
+  /* the whole file (normally 2636 bytes) is now loaded in the memory buffer. */
+
+  int bnum = 0, boff = TF7700HDPVR_POS+4*TF7700HDPVR_MAX, unit=90000; 
+  // there has to be space for up to 48 bookmarks magic number!
+  if(len>=boff+4) { 
+      // is it a topfield file?
+      unsigned int magic = (buffer[boff]<<24)|(buffer[boff+1]<<16)|(buffer[boff+2]<<8)|buffer[boff+3];
+      if(magic!=TF5XXXPVR_MAGIC) {
+        free(buffer);
+        return -40;
+      }
+      else if(verbose) fprintf(stderr,"Found Topfield ADD-file: %s\n",addfile.c_str());
+      
+      boff = TF7700HDPVR_POS;
+      pts_t bookmark;
+      // changed byte order compared to old receivers!?!
+      while ((bookmark=(buffer[boff+3]<<24)|(buffer[boff+2]<<16)|(buffer[boff+1]<<8)|buffer[boff])
+              && bnum<TF7700HDPVR_MAX) {
+          if(verbose) fprintf(stderr,"BOOKMARK[%d] = %lld\n",bnum,bookmark);
+          // bookmark is stored in seconds now, but we'll use full pts!
+          bookmark*=unit;
+          // fill bookmark vector with times
+          time_bookmarks.push_back(bookmark);
+          bnum++;
+          boff+=4;
+      }  
+  } else // receiver model identified but file to short!
+      fprintf(stderr,"ADD-File probabely corrupted (%dbytes to short), discarding bookmarks!\n",TF7700HDPVR_LEN-len);
+
+  // terminate
+  free(buffer);
+
+  // this routine stores bookmarks as times! 
+  bmtype = time;
+  
+  return 600+bnum;
 }
 
 size_t
