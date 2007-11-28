@@ -149,6 +149,7 @@ protected:
     dvbcut_off_t end;
     bool closeme;
     int fd;
+    std::string name;
   };
   std::vector<infile> files;
   bool eof;
@@ -165,7 +166,7 @@ protected:
 public:
   inbuffer(unsigned int _size, unsigned int mmapsize = 0);
   ~inbuffer();
-  bool open(int fd, std::string *errmsg = 0, bool closeme = false);
+  bool open(int fd, std::string *errmsg = 0, bool closeme = false, std::string filename="");
   bool open(std::string filename, std::string *errmsg = 0);
   void reset();
 
@@ -191,6 +192,7 @@ public:
   dvbcut_off_t getfilesize() const { return filesize; }
   dvbcut_off_t getfilepos() const { return pos + readpos; }
   int getfilenum(dvbcut_off_t offset, dvbcut_off_t &fileoff);
+  std::string getfilename(int filenum);
   void setsequential(bool flag) { sequential = flag; }
 };
 

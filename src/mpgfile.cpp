@@ -803,3 +803,39 @@ void mpgfile::fixtimecode(uint8_t *buf, int len, pts_t pts)
   buf[6] = (ss<<5) & 0xe0 | (pp>>1) & 0x1f;
   buf[7] |= (pp<<7) & 0x80;
 }
+  
+// general purpose utility function to 
+// read a binary file to memory for further processing  
+// ATTENTION: BE SURE YOU HAVE ENOUGH!!! */
+ssize_t mpgfile::readfile(std::string filename, uint8_t **buffer) {
+
+  FILE *pFile;
+  size_t len, lSize;
+
+  pFile = fopen(filename.c_str() , "rb");
+  if (pFile==NULL) return -1;
+
+  // obtain file size
+  fseek (pFile , 0 , SEEK_END);
+  lSize = ftell(pFile);
+  rewind(pFile);
+
+  // allocate memory to contain the whole file
+  *buffer = (uint8_t*) malloc(sizeof(uint8_t)*lSize);
+  if (buffer == NULL) {
+    fclose(pFile);
+    return -2;
+  }
+
+  // copy the file into the buffer
+  len = fread(*buffer, 1, lSize, pFile);
+  if (len != lSize) {
+    fclose(pFile);
+    free(buffer);
+    return -3;
+  }
+  
+  fclose(pFile);
+  return len;
+
+}

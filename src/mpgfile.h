@@ -168,6 +168,16 @@ public:
     // get the corresponding picture number
     return idx.picturenr(ind);
     }
+  int getpictureattime(pts_t time) const
+    {    
+    int first=idx.indexnr(0), second=idx.indexnr(1);
+    pts_t firstpts=idx[first].getpts(), secondpts=idx[second].getpts();
+
+    int timeperframe=secondpts-firstpts;
+    timeperframe = timeperframe>0 && timeperframe<5000 ? timeperframe : 3003;
+
+    return time/timeperframe;     
+    }
   AVCodecContext *getavcc(int str)
     {
     return s[str].avcc;
@@ -203,6 +213,7 @@ public:
   void recodevideo(muxer &mux, int start, int stop, pts_t offset,
                    int progresspics=0, int progresstotal=0, logoutput *log=0);
   void fixtimecode(uint8_t *buf, int len, pts_t pts);
+  ssize_t readfile(std::string filename, uint8_t **buffer);
 
   dvbcut_off_t getfilesize()
     {

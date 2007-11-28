@@ -176,7 +176,7 @@ inbuffer::open(std::string filename, std::string *errmsg) {
       *errmsg = filename + ": open: " + strerror(errno);
     return false;
   }
-  if (!open(fd, errmsg, true)) {
+  if (!open(fd, errmsg, true, filename)) {
     if (errmsg)
       *errmsg = filename + ": " + *errmsg;
     return false;
@@ -185,10 +185,11 @@ inbuffer::open(std::string filename, std::string *errmsg) {
 }
 
 bool
-inbuffer::open(int fd, std::string *errmsg, bool closeme) {
+inbuffer::open(int fd, std::string *errmsg, bool closeme, std::string filename) {
   infile f;
 
   f.fd = fd;
+  f.name = filename;
   f.closeme = closeme;
   if (pipe_mode) {
     // no more files please!
@@ -482,6 +483,12 @@ inbuffer::getfilenum(dvbcut_off_t offset, dvbcut_off_t &fileoff) {
   }
   return -1;
 }
+  
+std::string 
+inbuffer::getfilename(int filenum) {
+  return files.at(filenum).name;
+}
+
 
 // OUTBUFFER ****************************************************************
 
