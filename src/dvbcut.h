@@ -121,6 +121,10 @@ protected:
   // generic event item adder
   void addEventListItem(int pic, EventListItem::eventtype type);
 
+  // save given (or current) picture (or select the best from a given number of samples inside a range)
+  void snapshotSave(std::vector<int> piclist, int range=0, int samples=1);
+  int chooseBestPicture(int startpic, int range, int smaples);
+
 public:
   ~dvbcut();
   dvbcut(QWidget *parent = 0, const char *name = 0, WFlags fl = WType_TopLevel|WDestructiveClose );
@@ -138,6 +142,7 @@ public slots:
   virtual void fileSaveAs();
   virtual void fileSave();
   virtual void snapshotSave();
+  virtual void chapterSnapshotsSave();
   virtual void fileExport();
   virtual void fileClose();
   virtual void editBookmark();
