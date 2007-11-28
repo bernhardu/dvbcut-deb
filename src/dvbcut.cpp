@@ -534,6 +534,35 @@ void dvbcut::fileExport()
     expd->hide();
   }
 
+  int child_pid = -1;
+  int pipe_fds[2];
+
+#ifndef __WIN32__
+  // check for piped output
+  if (expfilen[0] == '|') {
+    if (::pipe(pipe_fds) < 0)
+      return;
+    child_pid = fork();
+    if (child_pid == 0) {
+      ::close(pipe_fds[1]);
+      if (pipe_fds[0] != STDIN_FILENO) {
+	dup2(pipe_fds[0], STDIN_FILENO);
+      }
+      //fprintf(stderr, "Executing %s\n", expfilen.c_str()+1);
+      for (int fd=0; fd<256; ++fd)
+	if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
+	  ::close(fd);
+      execl("/bin/sh", "sh", "-c", expfilen.c_str()+1, (char *)0);
+      _exit(127);
+    }
+    ::close(pipe_fds[0]);
+    if (child_pid < 0) {
+      ::close(pipe_fds[1]);
+      return;
+    }
+  } else
+#endif
+
   if (QFileInfo(expfilen).exists() && question(
       "File exists - dvbcut",
       expfilen+"\nalready exists. "
@@ -561,23 +590,33 @@ void dvbcut::fileExport()
     if (expd->audiolist->isSelected(a))
       audiostreammask|=1u<<a;
 
+  std::string out_file = (child_pid < 0) ? expfilen :
+    std::string("pipe:") + (const char*)QString::number(pipe_fds[1]);
+
   switch(settings().export_format) {
     case 1:
-      mux=std::auto_ptr<muxer>(new mpegmuxer(audiostreammask,*mpg,expfilen.c_str(),false,0));
+      mux=std::auto_ptr<muxer>(new mpegmuxer(audiostreammask,*mpg,out_file.c_str(),false,0));
       break;
     case 2:
-      mux=std::auto_ptr<muxer>(new lavfmuxer("dvd",audiostreammask,*mpg,expfilen.c_str()));
+      mux=std::auto_ptr<muxer>(new lavfmuxer("dvd",audiostreammask,*mpg,out_file.c_str()));
       break;
     case 3:
-      mux=std::auto_ptr<muxer>(new lavfmuxer("mpegts",audiostreammask,*mpg,expfilen.c_str()));
+      mux=std::auto_ptr<muxer>(new lavfmuxer("mpegts",audiostreammask,*mpg,out_file.c_str()));
       break;
     case 0:
     default:
-      mux=std::auto_ptr<muxer>(new mpegmuxer(audiostreammask,*mpg,expfilen.c_str()));
+      mux=std::auto_ptr<muxer>(new mpegmuxer(audiostreammask,*mpg,out_file.c_str()));
       break;
   }
 
   if (!mux->ready()) {
+#ifndef __WIN32__
+    if (child_pid > 0) {
+      ::close(pipe_fds[1]);
+      int wstatus;
+      while (waitpid(child_pid, &wstatus, 0)==-1 && errno==EINTR);
+    }
+#endif
     log->printerror("Unable to set up muxer!");
     if (nogui)
       delete log;
@@ -609,6 +648,13 @@ void dvbcut::fileExport()
   }
 
   mux.reset();
+#ifndef __WIN32__
+  if (child_pid > 0) {
+    ::close(pipe_fds[1]);
+    int wstatus;
+    while (waitpid(child_pid, &wstatus, 0)==-1 && errno==EINTR);
+  }
+#endif
 
   log->printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
 		    int(savedtime/(3600*90000)),

@@ -1,3 +1,12 @@
+2007-11-28  Wolfram Gloger  <video06@malloc.de> (mr)
+
+	* src/dvbcut.cpp:
+	* src/mpegmuxer.cpp:
+		Allow output to a pipe.
+
+	* src/port.h:
+		Include <sys/wait.h> on Unix/Linux.
+ 
 2007-11-26  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
 	* src/dvbcutbase.ui
