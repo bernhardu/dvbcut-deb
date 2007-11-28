@@ -22,6 +22,9 @@
 #define _DVBCUT_PORT_H
 
 #include <sys/types.h>
+#ifndef __WIN32__
+#include <sys/wait.h>
+#endif
 #include <stdint.h>
 
 typedef int64_t dvbcut_off_t;

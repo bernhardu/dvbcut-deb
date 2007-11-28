@@ -137,7 +137,10 @@ mpegmuxer::mpegmuxer(uint32_t audiostreammask, mpgfile &mpg, const char *filenam
   allbuffers*=1.05; // 5% assumed muxing overhead
   ptsoffset=pts_t(90000.*(allbuffers/50./muxrate))+90;
 
-  fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY,0666);
+  if (!strncmp(filename, "pipe:", 5))
+    fd = atoi(filename+5);
+  else
+    fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY,0666);
   }
 
 mpegmuxer::~mpegmuxer()
