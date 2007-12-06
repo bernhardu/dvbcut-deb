@@ -510,6 +510,12 @@ void dvbcut::fileExport()
   expd->muxercombo->insertItem("MPEG program stream (DVBCUT multiplexer)");
   expd->muxercombo->insertItem("MPEG program stream/DVD (libavformat)");
   expd->muxercombo->insertItem("MPEG transport stream (libavformat)");
+#ifndef __WIN32__
+  // add possible user configured pipe commands 
+  int pipe_items_start=expd->muxercombo->count();
+  for (unsigned int i = 0; i < settings().pipe_command.size(); ++i)
+    expd->muxercombo->insertItem(settings().pipe_label[i]);
+#endif
 
   if (settings().export_format < 0
       || settings().export_format >= expd->muxercombo->count())
@@ -534,12 +540,69 @@ void dvbcut::fileExport()
     expd->hide();
   }
 
+  // create usable chapter lists 
+  std::string chapterstring, chaptercolumn;
+  if (!chapterlist.empty()) {
+    int nchar=0;
+    char chapter[16];
+    pts_t lastch=-1;
+    for(std::list<pts_t>::const_iterator it=chapterlist.begin();
+        it!=chapterlist.end();++it)
+      if (*it != lastch) {
+        lastch=*it;
+        // formatting the chapter string
+        if (nchar>0) {
+          nchar++; 
+          chapterstring+=",";
+          chaptercolumn+="\n";
+        }  
+        nchar+=sprintf(chapter,"%02d:%02d:%02d.%03d",
+                       int(lastch/(3600*90000)),
+                       int(lastch/(60*90000))%60,
+                       int(lastch/90000)%60,
+                       int(lastch/90)%1000	);
+        // append chapter marks to lists for plain text / dvdauthor xml-file         
+        chapterstring+=chapter;
+        chaptercolumn+=chapter;
+      }
+  }
+
   int child_pid = -1;
   int pipe_fds[2];
 
 #ifndef __WIN32__
   // check for piped output
-  if (expfilen[0] == '|') {
+  std::string expcmd;
+  size_t pos;
+  int ip=settings().export_format-pipe_items_start; 
+  if(ip>=0) {
+    if (settings().pipe_command[ip].find('|')==-1) 
+      expcmd = "|"+std::string(settings().pipe_command[ip].ascii());
+    else 
+      expcmd = std::string(settings().pipe_command[ip].ascii());
+       
+    if ((pos=expcmd.find("%OUTPUT%"))!=std::string::npos)
+      expcmd.replace(pos,8,expfilen);  
+  } else 
+    expcmd = expfilen;
+
+  // chapter tag can also be used with input field pipes!
+  if ((pos=expcmd.find("%CHAPTERS%"))!=std::string::npos)
+    expcmd.replace(pos,10,chapterstring);  
+
+  if ((pos=expcmd.find('|'))!=std::string::npos) {
+    pos++;   
+    size_t end=expcmd.find(' ',pos);  
+    //if (!QFileInfo(expcmd.substr(pos,end-pos)).exists() ||
+    //    !QFileInfo(expcmd.substr(pos,end-pos)).isExecutable()) {
+    // better test if command is found in $PATH, so one don't needs to give the full path name
+    std::string which="which "+expcmd.substr(pos,end-pos)+" >/dev/null";
+    int irc = system(which.c_str());
+    if(irc!=0) { 
+      critical("Command not found - dvbcut","Problems with piped output to:\n"+expcmd.substr(pos,end-pos));
+      return; 
+    }       
+
     if (::pipe(pipe_fds) < 0)
       return;
     child_pid = fork();
@@ -548,11 +611,11 @@ void dvbcut::fileExport()
       if (pipe_fds[0] != STDIN_FILENO) {
 	dup2(pipe_fds[0], STDIN_FILENO);
       }
-      //fprintf(stderr, "Executing %s\n", expfilen.c_str()+1);
+      //fprintf(stderr, "Executing %s\n", expcmd.c_str()+pos);
       for (int fd=0; fd<256; ++fd)
 	if (fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
 	  ::close(fd);
-      execl("/bin/sh", "sh", "-c", expfilen.c_str()+1, (char *)0);
+      execl("/bin/sh", "sh", "-c", expcmd.c_str()+pos, (char *)0);
       _exit(127);
     }
     ::close(pipe_fds[0]);
@@ -562,7 +625,6 @@ void dvbcut::fileExport()
     }
   } else
 #endif
-
   if (QFileInfo(expfilen).exists() && question(
       "File exists - dvbcut",
       expfilen+"\nalready exists. "
@@ -593,7 +655,15 @@ void dvbcut::fileExport()
   std::string out_file = (child_pid < 0) ? expfilen :
     std::string("pipe:") + (const char*)QString::number(pipe_fds[1]);
 
-  switch(settings().export_format) {
+  int expfmt;
+#ifndef __WIN32__
+  if (ip>=0)
+    expfmt=settings().pipe_format[ip];
+  else  
+#endif
+    expfmt=settings().export_format;
+
+  switch(expfmt) {
     case 1:
       mux=std::auto_ptr<muxer>(new mpegmuxer(audiostreammask,*mpg,out_file.c_str(),false,0));
       break;
@@ -648,13 +718,6 @@ void dvbcut::fileExport()
   }
 
   mux.reset();
-#ifndef __WIN32__
-  if (child_pid > 0) {
-    ::close(pipe_fds[1]);
-    int wstatus;
-    while (waitpid(child_pid, &wstatus, 0)==-1 && errno==EINTR);
-  }
-#endif
 
   log->printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
 		    int(savedtime/(3600*90000)),
@@ -662,33 +725,48 @@ void dvbcut::fileExport()
 		    int(savedtime/90000)%60,
 		    int(savedtime/90)%1000	);
 
-  std::string chapterstring;
-  if (!chapterlist.empty()) {
-    int nchar=0;
-    char chapter[16];
-    log->print("");
-    log->printheading("Chapter list");
-    pts_t lastch=-1;
-    for(std::list<pts_t>::const_iterator it=chapterlist.begin();
-        it!=chapterlist.end();++it)
-      if (*it != lastch) {
-        lastch=*it;
-        // formatting the chapter string
-        if (nchar>0) {
-          nchar++; 
-          chapterstring+=",";
-        }  
-        nchar+=sprintf(chapter,"%02d:%02d:%02d.%03d",
-                       int(lastch/(3600*90000)),
-                       int(lastch/(60*90000))%60,
-                       int(lastch/90000)%60,
-                       int(lastch/90)%1000	);
-        // normal output as before
-	log->print(chapter);
-        // append chapter marks to a comma separated list for dvdauthor xml-file         
-        chapterstring+=chapter;
-      }
+#ifndef __WIN32__
+  if (child_pid > 0) {
+    ::close(pipe_fds[1]);
+    int wstatus;
+    while (waitpid(child_pid, &wstatus, 0)==-1 && errno==EINTR);
   }
+
+  // do some post processing if requested
+  if (ip>=0 && !settings().pipe_post[ip].isEmpty()) {
+    expcmd = std::string(settings().pipe_post[ip].ascii());
+       
+    if ((pos=expcmd.find("%OUTPUT%"))!=std::string::npos)
+      expcmd.replace(pos,8,expfilen);  
+
+    pos=expcmd.find(' ');  
+    std::string which="which "+expcmd.substr(0,pos)+" >/dev/null";
+
+    log->print("");
+    log->printheading("Performing post processing");
+    int irc = system(which.c_str());
+
+    if(irc!=0) { 
+      critical("Command not found - dvbcut","Problems with post processing command:\n"+expcmd.substr(0,pos));
+      log->print("Command not found!");
+    } else {      
+      int irc = system(expcmd.c_str());
+      if(irc!=0) { 
+        critical("Post processing error - dvbcut","Post processing command:\n"+
+                 expcmd+"\n returned non-zero exit code: " +QString::number(irc));
+        log->print("Command reported some problems... please check!");
+      } 
+      //else      
+      //  log->print("Everything seems to be OK...");
+    }
+  }   
+#endif
+
+  // print plain list of chapter marks
+  log->print("");
+  log->printheading("Chapter list");
+  log->print(chaptercolumn.c_str());
+
   // simple dvdauthor xml file with chapter marks
   std::string filename,destname;
   if (expfilen.rfind("/")<expfilen.length()) 
@@ -2063,9 +2141,7 @@ void dvbcut::update_quick_picture_lookup_table() {
         }
         break;
       case EventListItem::chapter:
-	if (startpic<=0)
-	  chapterlist.push_back(outpts);
-	else
+	if (startpic>=0)
 	  chapterlist.push_back(eli.getpts()-startpts+outpts);
 	break;
       default:
