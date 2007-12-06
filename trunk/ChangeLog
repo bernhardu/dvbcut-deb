@@ -1,3 +1,8 @@
+2007-12-06  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcutbase.ui:
+		Use zero margin.
+
 2007-11-28  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/lavfmuxer.cpp:
