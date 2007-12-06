@@ -1,3 +1,12 @@
+2007-12-06  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* src/settings.cpp:
+	* src/settings.h:
+		New pipe command settings.
+
+	* src/dvbcut.cpp:
+		Improved pipe command.
+ 
 2007-12-06  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcutbase.ui:

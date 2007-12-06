@@ -75,6 +75,10 @@ public:
   int snapshot_width;
   int snapshot_range;
   int snapshot_samples;
+  std::vector<QString> pipe_command;
+  std::vector<QString> pipe_post;
+  std::vector<QString> pipe_label;
+  std::vector<int> pipe_format;
 
 };
 

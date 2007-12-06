@@ -49,6 +49,22 @@
 #define DVBCUT_DEFAULT_BOOKMARK_LABEL \
 	"<font color=\"darkblue\">BOOKMARK</font>"
 
+#define DVBCUT_DEFAULT_PIPE_COMMAND \
+        "|dvdauthor -t -c '%CHAPTERS%' -v mpeg2 -o %OUTPUT% -"
+#define DVBCUT_DEFAULT_PIPE_POST \
+        "dvdauthor -o %OUTPUT% -T"
+#define DVBCUT_DEFAULT_PIPE_LABEL \
+        "DVD-Video titleset (dvdauthor)"
+#define DVBCUT_DEFAULT_PIPE_FORMAT (0)
+/* ok,... for time consuming conversions one does not save any time processing the piped output... but just as an example. ;-) 
+#define DVBCUT_DEFAULT_PIPE_COMMAND \
+        "|ffmpeg -f mpeg2video -i - -f avi -vcodec mpeg4 -b 1200k -g 250 -bf 2 -acodec libmp3lame -ab 128k -ar 44100 %OUTPUT%"
+#define DVBCUT_DEFAULT_PIPE_POST ""
+#define DVBCUT_DEFAULT_PIPE_LABEL \
+        "MPEG-4/ASP (ffmpeg)"
+#define DVBCUT_DEFAULT_PIPE_FORMAT (1)
+*/
+
 dvbcut_settings::dvbcut_settings() {
   setPath(DVBCUT_QSETTINGS_DOMAIN, DVBCUT_QSETTINGS_PRODUCT);
   beginGroup("/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT);
@@ -122,6 +138,33 @@ dvbcut_settings::load_settings() {
     snapshot_range = readNumEntry("/range", 0);
     snapshot_samples = readNumEntry("/samples", 1);
   endGroup();	// snapshots
+  beginGroup("/pipe");
+    pipe_command.clear();
+    pipe_post.clear();
+    pipe_label.clear();
+    pipe_format.clear();
+    beginGroup("/0");
+      QString command = readEntry("/command", DVBCUT_DEFAULT_PIPE_COMMAND);
+      QString post = readEntry("/post", DVBCUT_DEFAULT_PIPE_POST);
+      QString label = readEntry("/label", DVBCUT_DEFAULT_PIPE_LABEL);
+      int format = readNumEntry("/format", DVBCUT_DEFAULT_PIPE_FORMAT);
+    endGroup();	// 0
+    unsigned int i = 0;
+    while(!command.isEmpty() && !label.isEmpty()) {
+      if(format<0 || format>3) format = 0;
+      pipe_command.push_back(command);
+      pipe_post.push_back(post);
+      pipe_label.push_back(label);
+      pipe_format.push_back(format);
+      QString key = "/" + QString::number(++i);
+      beginGroup(key);
+	command = readEntry("/command");
+	post = readEntry("/post");
+	label = readEntry("/label");
+	format = readNumEntry("/format", 0);
+      endGroup();	// key
+    }
+  endGroup();	// pipe
 }
 
 void
@@ -176,6 +219,17 @@ dvbcut_settings::save_settings() {
     writeEntry("/range", snapshot_range);
     writeEntry("/samples", snapshot_samples);
   endGroup();	// snapshots
+  beginGroup("/pipe");
+    for (unsigned int i = 0; i < pipe_command.size(); ++i) {
+      QString key = "/" + QString::number(i);
+      beginGroup(key);
+	writeEntry("/command", pipe_command[i]);
+	writeEntry("/post", pipe_post[i]);
+	writeEntry("/label", pipe_label[i]);
+	writeEntry("/format", pipe_format[i]);
+      endGroup();	// key
+    }
+  endGroup();	// pipe
 }
 
 // private settings variable
