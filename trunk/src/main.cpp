@@ -54,7 +54,7 @@ usage_exit(int rv=1) {
   fprintf(stderr,
     "Usage ("VERSION_STRING"):\n"
     "  %s -generateidx [-idx <idxfilename>] [<mpgfilename> ...]\n"
-    "  %s -batch [-cut AR|TS|<list>] [-exp <expfilename>] <prjfilename> | <mpgfilename> ...\n\n",
+    "  %s -batch [-cut AR|TS|<list>] [-exp <expfilename>] [-format <num>] <prjfilename> | <mpgfilename> ...\n\n",
     argv0, argv0);
   fprintf(stderr,
     "If no input files are specified, `dvbcut -generateidx' reads from\n"
@@ -67,6 +67,9 @@ usage_exit(int rv=1) {
     "a given list of frame numbers / time stamps (use ',-|;' as separators).\n" 
     "Without any (valid) cut markers the whole file will be converted!\n\n");
   fprintf(stderr,
+    "The -exp switch specifies the name of the exported file, with -format\n"
+    "the default export format (0=MPEG program stream/DVD) can be canged.\n\n");
+  fprintf(stderr,
     "Options may be abbreviated as long as they remain unambiguous.\n\n");
   exit(rv);
 }
@@ -76,8 +79,10 @@ main(int argc, char *argv[]) {
   argv0=argv[0];
   bool generateidx=false;
   bool batchmode=false;
+  int exportformat=0;
   std::string idxfilename, expfilename;
   std::vector<std::string> cutlist;
+  std::list<std::string> filenames;
   int i;
 
   setlocale(LC_ALL, "");
@@ -85,29 +90,38 @@ main(int argc, char *argv[]) {
   /*
    * process arguments
    */
-  for (i = 1; i < argc && argv[i][0] == '-'; ++i) {
-    size_t n = strlen(argv[i]);
-    if (n == 2 && argv[i][1] == '-') {	// POSIX argument separator
-      ++i;
-      break;
-    }
-    else if (strncmp(argv[i], "-batch", n) == 0)
-      batchmode = true;
-    else if (strncmp(argv[i], "-generateidx", n) == 0)
-      generateidx = true;
-    else if (strncmp(argv[i], "-idx", n) == 0 && ++i < argc)
-      idxfilename = argv[i];
-    else if (strncmp(argv[i], "-exp", n) == 0 && ++i < argc)
-      expfilename = argv[i];
-    else if (strncmp(argv[i], "-cut", n) == 0 && ++i < argc) {
-      char *pch = strtok(argv[i],",-|;");
-      while(pch) {
-        if(strlen(pch))
-          cutlist.push_back((std::string)pch);    
-        pch = strtok(NULL,",-|;");                 
-      } 
-    } else 
-      usage_exit(); 
+  for (i = 1; i < argc; ++i) {
+    if (argv[i][0] == '-') {
+      // process switches / options
+      size_t n = strlen(argv[i]);
+      if (n == 2 && argv[i][1] == '-') {	// POSIX argument separator
+        ++i;
+        break;
+      }
+      else if (strncmp(argv[i], "-batch", n) == 0)
+        batchmode = true;
+      else if (strncmp(argv[i], "-generateidx", n) == 0)
+        generateidx = true;
+      else if (strncmp(argv[i], "-idx", n) == 0 && ++i < argc)
+        idxfilename = argv[i];
+      else if (strncmp(argv[i], "-exp", n) == 0 && ++i < argc)
+        expfilename = argv[i];
+      else if (strncmp(argv[i], "-format", n) == 0 && ++i < argc)
+        exportformat = atoi(argv[i]);
+      else if (strncmp(argv[i], "-cut", n) == 0 && ++i < argc) {
+        char *pch = strtok(argv[i],",-|;");
+        while(pch) {
+          if(strlen(pch))
+            cutlist.push_back((std::string)pch);    
+          pch = strtok(NULL,",-|;");                 
+        } 
+      } else 
+        usage_exit(); 
+    } else
+      // process input files 
+      // (that way files also can come first / options last and 
+      // argument processing only happens once and only in this loop!)
+      filenames.push_back(std::string(argv[i])); 
   }
 
   /*
@@ -124,18 +138,17 @@ main(int argc, char *argv[]) {
     std::string errormessage;
     inbuffer buf(8 << 20, 128 << 20);
     bool okay = true;
-    if (i >= argc) {
+    if (filenames.empty()) {
       // no filenames given, read from stdin
       okay = buf.open(STDIN_FILENO, &errormessage);
     }
     else {
-      mpgfilename = argv[i];	// use first one (for now)
+      mpgfilename = filenames.front();  // use first one (for now) 
       if (idxfilename.empty())
-	idxfilename = mpgfilename + ".idx";
-      while (okay && i < argc) {
-	okay = buf.open(argv[i], &errormessage);
-	++i;
-      }
+        idxfilename = mpgfilename + ".idx"; 
+      for(std::list<std::string>::iterator it = filenames.begin(); 
+                                    okay && it != filenames.end(); it++)	
+	okay = buf.open(*it, &errormessage);
     }
     if (!okay) {
       fprintf(stderr, "%s: %s\n", argv0, errormessage.c_str());
@@ -183,16 +196,11 @@ main(int argc, char *argv[]) {
 #endif // HAVE_LIB_AO
 
   av_register_all();
-  std::list<std::string> filenames;
 
   int rv=1;
   dvbcut *main=new dvbcut;
   main->batchmode(batchmode);
-
-  while (i < argc) {
-    filenames.push_back(std::string(argv[i]));
-    ++i;
-  }
+  main->setexportformat(exportformat);
 
   if (batchmode) {
     if (filenames.empty())	// must provide at least one filename

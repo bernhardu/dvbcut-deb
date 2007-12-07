@@ -97,11 +97,12 @@ protected:
   int viewscalefactor;
   int currentaudiotrack;
   bool nogui;
+  int exportformat; 
 
 protected:
   //   QPixmap getpixmap(int picture, bool allgop=false);
   void exportvideo(const char *fmt);
-  void addtorecentfiles(const std::string &filename, const std::string &idxfilename=std::string());
+  void addtorecentfiles(const std::list<std::string> &filenames, const std::string &idxfilename=std::string());
   void setviewscalefactor(int factor);
 
   // special event handling (mouse wheel)
@@ -132,6 +133,7 @@ public:
             std::string idxfilename=std::string(), std::string expfilename=std::string());
   void setbusy(bool b=true);
   void batchmode(bool b=true) { nogui = b; }
+  void setexportformat(int ef=0) { exportformat = ef; }
   // static dvbcut *New(std::string filename=std::string(), std::string idxfilename=std::string());
   void addStartStopItems(std::vector<int>);
   int getTimePerFrame() { return timeperframe>0 && timeperframe<5000 ? timeperframe : 3003; };

@@ -506,7 +506,7 @@ void dvbcut::fileExport()
   }
 
   std::auto_ptr<exportdialog> expd(new exportdialog(expfilen,this));
-  expd->muxercombo->insertItem("DVD (DVBCUT multiplexer)");
+  expd->muxercombo->insertItem("MPEG program stream/DVD (DVBCUT multiplexer)");
   expd->muxercombo->insertItem("MPEG program stream (DVBCUT multiplexer)");
   expd->muxercombo->insertItem("MPEG program stream/DVD (libavformat)");
   expd->muxercombo->insertItem("MPEG transport stream (libavformat)");
@@ -527,18 +527,21 @@ void dvbcut::fileExport()
     expd->audiolist->setSelected(a,true);
   }
 
+  int expfmt = 0;
   if (!nogui) {
     expd->show();
     if (!expd->exec())
       return;
 
     settings().export_format = expd->muxercombo->currentItem();
+    expfmt = expd->muxercombo->currentItem();
 
     expfilen=(const char *)(expd->filenameline->text());
     if (expfilen.empty())
       return;
     expd->hide();
-  }
+  } else if (exportformat > 0 && exportformat < expd->muxercombo->count()) 
+    expfmt = exportformat;  
 
   // create usable chapter lists 
   std::string chapterstring, chaptercolumn;
@@ -574,8 +577,9 @@ void dvbcut::fileExport()
   // check for piped output
   std::string expcmd;
   size_t pos;
-  int ip=settings().export_format-pipe_items_start; 
+  int ip=expfmt-pipe_items_start; 
   if(ip>=0) {
+    expfmt=settings().pipe_format[ip];
     if (settings().pipe_command[ip].find('|')==-1) 
       expcmd = "|"+std::string(settings().pipe_command[ip].ascii());
     else 
@@ -654,14 +658,6 @@ void dvbcut::fileExport()
 
   std::string out_file = (child_pid < 0) ? expfilen :
     std::string("pipe:") + (const char*)QString::number(pipe_fds[1]);
-
-  int expfmt;
-#ifndef __WIN32__
-  if (ip>=0)
-    expfmt=settings().pipe_format[ip];
-  else  
-#endif
-    expfmt=settings().export_format;
 
   switch(expfmt) {
     case 1:
@@ -1279,6 +1275,7 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
 
     case 11: 
       eli.seteventtype(EventListItem::bookmark);
+      update_quick_picture_lookup_table();
       break; 
 
     case 12:
@@ -1468,19 +1465,20 @@ void dvbcut::audiotrackchosen(int id)
 void dvbcut::abouttoshowrecentfiles()
 {
   recentfilespopup->clear();
-  int id=0;
-  for(std::vector<std::pair<std::string,std::string> >::iterator it=settings().recentfiles.begin();
-      it!=settings().recentfiles.end();++it)
-    recentfilespopup->insertItem(it->first,id++);
+  QString menuitem;
+  for(unsigned int id=0; id<settings().recentfiles.size(); id++) {
+    menuitem=QString(settings().recentfiles[id].first.front());
+    if(settings().recentfiles[id].first.size()>1)
+      menuitem += " ... (+" + QString::number(settings().recentfiles[id].first.size()-1) + ")";
+    recentfilespopup->insertItem(menuitem,(signed)id);    
+  }   
 }
 
 void dvbcut::loadrecentfile(int id)
 {
   if (id<0 || id>=(signed)settings().recentfiles.size())
     return;
-  std::list<std::string> dummy_list;
-  dummy_list.push_back(settings().recentfiles[id].first);
-  open(dummy_list, settings().recentfiles[id].second);
+  open(settings().recentfiles[(unsigned)id].first, settings().recentfiles[(unsigned)id].second);
 }
 
 // **************************************************************************
@@ -1800,9 +1798,12 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   expfilen=expfilename;
   picfilen=QString::null;
   if (prjfilen.empty())
-    addtorecentfiles(mpgfilen.front(),idxfilen);
-  else
-    addtorecentfiles(prjfilen);
+    addtorecentfiles(mpgfilen,idxfilen);
+  else {
+    std::list<std::string> dummy_list;
+    dummy_list.push_back(prjfilen);
+    addtorecentfiles(dummy_list);
+  }
 
   firstpts=(*mpg)[0].getpts();
   timeperframe=(*mpg)[1].getpts()-(*mpg)[0].getpts();
@@ -1926,17 +1927,18 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 // **************************************************************************
 // ***  protected functions
 
-void dvbcut::addtorecentfiles(const std::string &filename, const std::string &idxfilename)
+void dvbcut::addtorecentfiles(const std::list<std::string> &filenames, const std::string &idxfilename)
 {
 
-  for(std::vector<std::pair<std::string,std::string> >::iterator it=settings().recentfiles.begin();
+  for(std::vector<std::pair<std::list<std::string>,std::string> >::iterator it=settings().recentfiles.begin();
       it!=settings().recentfiles.end();)
-    if (it->first==filename)
+    // checking the size and the first/last filename should be enough... but maybe I'm to lazy! ;-)
+    if (it->first.size()==filenames.size() && it->first.front()==filenames.front() && it->first.back()==filenames.back())
       it=settings().recentfiles.erase(it);
-  else
-    ++it;
+    else
+      ++it;
 
-  settings().recentfiles.insert(settings().recentfiles.begin(),std::pair<std::string,std::string>(filename,idxfilename));
+  settings().recentfiles.insert(settings().recentfiles.begin(),std::pair<std::list<std::string>,std::string>(filenames,idxfilename));
 
   while (settings().recentfiles.size()>settings().recentfiles_max)
     settings().recentfiles.pop_back();
