@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include <qstringlist.h>
+
 #include <assert.h>
 
 #include "defines.h"
@@ -109,14 +111,36 @@ dvbcut_settings::load_settings() {
   beginGroup("/recentfiles");
     recentfiles_max = readNumEntry("/max", 5);
     recentfiles.clear();
+    std::list<std::string> filenames;
+    QStringList keys = entryList("/");
     for (unsigned int i = 0; i < recentfiles_max; ++i) {
       QString key = "/" + QString::number(i);
-      QString filename = readEntry(key);
-      if (filename.isEmpty())
-	continue;
-      QString idxfilename = readEntry(key + "-idx", "");
-      recentfiles.push_back(
-	std::pair<std::string,std::string>(filename, idxfilename));
+      if(keys.size()>1) {      // OLD format (2 keys per input file, NO subkeys!)
+        QString filename = readEntry(key);
+        if (filename.isEmpty())
+ 	  continue;
+        filenames.clear();
+        filenames.push_back(filename);
+        QString idxfilename = readEntry(key + "-idx", "");
+        recentfiles.push_back(
+        std::pair<std::list<std::string>,std::string>(filenames, idxfilename));
+      } else {                // NEW format with subkeys and multiple files!
+      beginGroup(key);
+        QString filename = readEntry("/0");
+        if (!filename.isEmpty()) {
+          // multiple input files?  
+          int j=0;
+          filenames.clear();
+          while(!filename.isEmpty()) {
+            filenames.push_back(filename);
+            filename = readEntry("/" + QString::number(++j), "");
+          }  
+          QString idxfilename = readEntry("/idx", "");
+          recentfiles.push_back(
+	    std::pair<std::list<std::string>,std::string>(filenames, idxfilename));
+        }
+      endGroup();	// key
+      }
     }
   endGroup();	// recentfiles
   beginGroup("/labels");
@@ -187,17 +211,29 @@ dvbcut_settings::save_settings() {
   writeEntry("/loadfilter", loadfilter);
   writeEntry("/export_format", export_format);
   beginGroup("/recentfiles");
+    // first remove any OLD recentfiles entries to clean the settings file (<revision 108)!!!
+    QStringList keys = entryList("/");
+    for ( QStringList::Iterator it = keys.begin(); it != keys.end(); ++it ) 
+      removeEntry("/" + *it);
+    // then remove ALL new recentfiles entries!!!
+    // (otherwise it would be a mess with erased&inserted muliple file entries of different size)
+    QStringList subkeys = subkeyList("/");
+    for ( QStringList::Iterator its = subkeys.begin(); its != subkeys.end(); ++its ) {
+      QStringList keys = entryList("/" + *its);
+      for ( QStringList::Iterator itk = keys.begin(); itk != keys.end(); ++itk ) 
+        removeEntry("/"  + *its + "/" + *itk);
+    }    
     writeEntry("/max", int(recentfiles_max));
-    for (unsigned int i = 0; i < recentfiles_max; ++i) {
+    // and NOW write the updated list from scratch!!!
+    for (unsigned int i = 0; i < recentfiles.size(); ++i) {
       QString key = "/" + QString::number(i);
-      if (i < recentfiles.size()) {
-	writeEntry(key, recentfiles[i].first);
-	writeEntry(key + "-idx", recentfiles[i].second);
-      }
-      else {
-	removeEntry(key);
-	removeEntry(key + "-idx");
-      }
+      beginGroup(key);
+        int j=0;
+        for(std::list<std::string>::iterator it=settings().recentfiles[i].first.begin();
+                                             it!=settings().recentfiles[i].first.end(); it++, j++) 
+          writeEntry("/" + QString::number(j), *it);
+        writeEntry("/idx", recentfiles[i].second);
+      endGroup();	// key
     }
   endGroup();	// recentfiles
   beginGroup("/labels");
