@@ -1,15 +1,24 @@
+2007-12-08  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* src/dvbcut.cpp:
+		Added format option to <expfile>-tag of project files.
+		Fixed a chapterlist bug.
+
+	* src/settings.cpp:
+		Empty defaults for pipe settings.
+				
 2007-12-06  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
   
-	* src/settings.cpp
-	* src/settings.h
-	* src/dvbcut.cpp
-	* src/dvbcut.h
+	* src/settings.cpp:
+	* src/settings.h:
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
 		New recent files format which allows for storing
 		multiple input files.
 
-	* src/dvbcut.cpp
-	* src/dvbcut.h
-	* src/main.cpp
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/main.cpp:
 		Input file names can come before CLI switches.
 		New -format switch.
 
@@ -44,25 +53,25 @@
  
 2007-11-26  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
-	* src/dvbcutbase.ui
-	* src/dvbcut.cpp
-	* src/dvbcut.h
-	* src/settings.cpp
-	* src/settings.h
+	* src/dvbcutbase.ui:
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/settings.cpp:
+	* src/settings.h:
 		Configurable snapshot parameters and chapter snapshots.
 
 2007-11-24  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
-	* src/tsfile.cpp
-	* src/tsfile.h
+	* src/tsfile.cpp:
+	* src/tsfile.h:
 		Import bookmarks from new Topfield TF7700HDPVR.
 
-	* src/mpgfile.cpp
-	* src/mpgfile.h
+	* src/mpgfile.cpp:
+	* src/mpgfile.h:
 		readfile() to read (small) files to memory.
 
-	* src/buffer.cpp
-	* src/buffer.h
+	* src/buffer.cpp:
+	* src/buffer.h:
 		Store filename in files structure.
 		
 2007-11-12  Michael Riepe  <too-tired@users.sourceforge.net>

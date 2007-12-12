@@ -182,9 +182,9 @@ dvbcut_settings::load_settings() {
       pipe_format.push_back(format);
       QString key = "/" + QString::number(++i);
       beginGroup(key);
-	command = readEntry("/command");
-	post = readEntry("/post");
-	label = readEntry("/label");
+	command = readEntry("/command","");
+	post = readEntry("/post","");
+	label = readEntry("/label","");
 	format = readNumEntry("/format", 0);
       endGroup();	// key
     }

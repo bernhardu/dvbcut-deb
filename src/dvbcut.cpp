@@ -369,7 +369,7 @@ void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
 
   QImage p;
   int pic, i, nr;
-  bool ok;
+  bool ok=false;
   for (std::vector<int>::iterator it = piclist.begin(); it != piclist.end(); ++it) {
 
     if(samples>1 && range>0)
@@ -734,6 +734,8 @@ void dvbcut::fileExport()
        
     if ((pos=expcmd.find("%OUTPUT%"))!=std::string::npos)
       expcmd.replace(pos,8,expfilen);  
+    if ((pos=expcmd.find("%CHAPTERS%"))!=std::string::npos)
+      expcmd.replace(pos,10,chapterstring);  
 
     pos=expcmd.find(' ');  
     std::string which="which "+expcmd.substr(0,pos)+" >/dev/null";
@@ -1635,6 +1637,12 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	      QString qs = e.attribute("path");
 	      if (!qs.isEmpty())
 		expfilename = (const char*)qs;
+	      qs = e.attribute("format");
+              bool okay=false;
+	      if (!qs.isEmpty()) {
+                int val = qs.toInt(&okay,0);
+		if(okay) exportformat = val;
+              }  
 	    }
 	  }
 	  // try old-style project file format
@@ -2105,7 +2113,7 @@ void dvbcut::update_quick_picture_lookup_table() {
   
   chapterlist.push_back(0);
     
-  int startpic, stoppic, outpics=0;
+  int startpic, stoppic, outpics=0, lastchapter=-2;
   pts_t startpts, stoppts, outpts=0;
   bool realzero=false;
   
@@ -2128,6 +2136,9 @@ void dvbcut::update_quick_picture_lookup_table() {
           startpts=eli.getpts();
           if (startpic==0)
 	    realzero=true;        
+          // did we have a chapter in the eventlist directly before?
+          if(lastchapter==startpic)
+            chapterlist.push_back(outpts);
         }
         break;
       case EventListItem::stop:
@@ -2143,6 +2154,7 @@ void dvbcut::update_quick_picture_lookup_table() {
         }
         break;
       case EventListItem::chapter:
+        lastchapter=eli.getpicture();
 	if (startpic>=0)
 	  chapterlist.push_back(eli.getpts()-startpts+outpts);
 	break;
