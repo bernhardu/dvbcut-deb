@@ -1,3 +1,12 @@
+2007-12-12  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* src/dvbcutbase.ui:
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/main.cpp:
+		Added 4:3 & 16:9 bookmark conversion to GUI & CLI.
+		Additional -cut & -automarker CLI switches.
+
 2007-12-08  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
 	* src/dvbcut.cpp:

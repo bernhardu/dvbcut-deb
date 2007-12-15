@@ -378,7 +378,6 @@
         <separator/>
         <action name="editSuggestAction"/>
         <action name="editImportAction"/>
-        <action name="editConvertAction"/>
     </item>
     <item text="View" name="viewMenu">
         <action name="viewNormalAction"/>
@@ -682,20 +681,6 @@
     </action>
     <action>
         <property name="name">
-            <cstring>editConvertAction</cstring>
-        </property>
-        <property name="enabled">
-            <bool>false</bool>
-        </property>
-        <property name="text">
-            <string>Convert bookmarks</string>
-        </property>
-        <property name="accel">
-            <string>T</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
             <cstring>fileNewAction</cstring>
         </property>
         <property name="iconSet">
@@ -953,12 +938,6 @@
         <slot>editImport()</slot>
     </connection>
     <connection>
-        <sender>editConvertAction</sender>
-        <signal>activated()</signal>
-        <receiver>dvbcutbase</receiver>
-        <slot>editConvert()</slot>
-    </connection>
-    <connection>
         <sender>eventlist</sender>
         <signal>doubleClicked(QListBoxItem*)</signal>
         <receiver>dvbcutbase</receiver>
@@ -1105,7 +1084,8 @@
     <slot>editBookmark()</slot>
     <slot>editSuggest()</slot>
     <slot>editImport()</slot>
-    <slot>editConvert()</slot>
+    <slot>editConvert(int)</slot>
+    <slot>abouttoshoweditconvert()</slot>
     <slot>doubleclickedeventlist(QListBoxItem *)</slot>
     <slot>eventlistcontextmenu(QListBoxItem *, const QPoint &amp;)</slot>
     <slot>clickedgo()</slot>

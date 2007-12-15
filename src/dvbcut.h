@@ -72,7 +72,7 @@ protected:
   quick_picture_lookup_t quick_picture_lookup;
   std::list<pts_t> chapterlist;
 
-  QPopupMenu *audiotrackpopup,*recentfilespopup;
+  QPopupMenu *audiotrackpopup,*recentfilespopup,*editconvertpopup;
   int audiotrackmenuid;
   inbuffer buf;
   mpgfile *mpg;
@@ -98,6 +98,8 @@ protected:
   int currentaudiotrack;
   bool nogui;
   int exportformat; 
+  bool start_bof; 
+  bool stop_eof; 
 
 protected:
   //   QPixmap getpixmap(int picture, bool allgop=false);
@@ -133,9 +135,9 @@ public:
             std::string idxfilename=std::string(), std::string expfilename=std::string());
   void setbusy(bool b=true);
   void batchmode(bool b=true) { nogui = b; }
-  void setexportformat(int ef=0) { exportformat = ef; }
+  void exportoptions(int format=0, bool bof=true, bool eof=true) { exportformat = format; start_bof=bof; stop_eof=eof; }
   // static dvbcut *New(std::string filename=std::string(), std::string idxfilename=std::string());
-  void addStartStopItems(std::vector<int>);
+  void addStartStopItems(std::vector<int>, int option=0);
   int getTimePerFrame() { return timeperframe>0 && timeperframe<5000 ? timeperframe : 3003; };
 
 public slots:
@@ -153,7 +155,8 @@ public slots:
   virtual void editStart();
   virtual void editSuggest();
   virtual void editImport();
-  virtual void editConvert();
+  virtual void editConvert(int);
+  virtual void abouttoshoweditconvert();
   virtual void viewDifference();
   virtual void viewUnscaled();
   virtual void viewNormal();
