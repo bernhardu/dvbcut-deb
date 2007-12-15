@@ -54,21 +54,24 @@ usage_exit(int rv=1) {
   fprintf(stderr,
     "Usage ("VERSION_STRING"):\n"
     "  %s -generateidx [-idx <idxfilename>] [<mpgfilename> ...]\n"
-    "  %s -batch [-cut AR|TS|<list>] [-exp <expfilename>] [-format <num>] <prjfilename> | <mpgfilename> ...\n\n",
+    "  %s -batch [ OPTIONS ] <prjfilename> | <mpgfilename> ...\n\n"
+    "OPTIONS: -cut 4:3|16:9|TS|TS2|<list>, -exp <expfilename>,\n"
+    "         -format <num>, -automarker <num>\n\n",
     argv0, argv0);
   fprintf(stderr,
     "If no input files are specified, `dvbcut -generateidx' reads from\n"
     "standard input.  By default, it also writes the index to standard\n"
     "output, but you can specify another destination with `-idx'.\n\n");
   fprintf(stderr,
-    "In batch mode you can use `-cut' to create automatically alternating\n"
-    "START/STOP cut markers for each found aspect ratio change (AR), for\n"
-    "the bookmarks imported from the input transport stream (TS) or for\n"
-    "a given list of frame numbers / time stamps (use ',-|;' as separators).\n" 
+    "In batch mode you can use `-cut' to keep only 4:3 resp. 16:9 frames or\n"
+    "create automatically alternating START/STOP cut markers for the bookmarks\n"
+    "imported from the input transport stream (TS, TS2) or for a given list of\n"
+    "frame numbers / time stamps (you can use any of ',-|;' as separators).\n" 
     "Without any (valid) cut markers the whole file will be converted!\n\n");
   fprintf(stderr,
     "The -exp switch specifies the name of the exported file, with -format\n"
-    "the default export format (0=MPEG program stream/DVD) can be canged.\n\n");
+    "the default export format (0=MPEG program stream/DVD) can be changed and\n"
+    "-automarker sets START/STOP markers at BOF/EOF (0=none,1=BOF,2=EOF,3=both).\n\n");
   fprintf(stderr,
     "Options may be abbreviated as long as they remain unambiguous.\n\n");
   exit(rv);
@@ -78,7 +81,7 @@ int
 main(int argc, char *argv[]) {
   argv0=argv[0];
   bool generateidx=false;
-  bool batchmode=false;
+  bool batchmode=false, start_bof=true, stop_eof=true;
   int exportformat=0;
   std::string idxfilename, expfilename;
   std::vector<std::string> cutlist;
@@ -91,7 +94,7 @@ main(int argc, char *argv[]) {
    * process arguments
    */
   for (i = 1; i < argc; ++i) {
-    if (argv[i][0] == '-') {
+    if (argv[i][0] == '-' || argv[i][0] == '+') {
       // process switches / options
       size_t n = strlen(argv[i]);
       if (n == 2 && argv[i][1] == '-') {	// POSIX argument separator
@@ -108,7 +111,11 @@ main(int argc, char *argv[]) {
         expfilename = argv[i];
       else if (strncmp(argv[i], "-format", n) == 0 && ++i < argc)
         exportformat = atoi(argv[i]);
-      else if (strncmp(argv[i], "-cut", n) == 0 && ++i < argc) {
+      else if (strncmp(argv[i], "-automarker", n) == 0 && ++i < argc) {
+        int bofeof = atoi(argv[i]);
+        start_bof = (bofeof&1)==1;
+        stop_eof  = (bofeof&2)==2;
+      } else if (strncmp(argv[i], "-cut", n) == 0 && ++i < argc) {
         char *pch = strtok(argv[i],",-|;");
         while(pch) {
           if(strlen(pch))
@@ -200,19 +207,28 @@ main(int argc, char *argv[]) {
   int rv=1;
   dvbcut *main=new dvbcut;
   main->batchmode(batchmode);
-  main->setexportformat(exportformat);
+  main->exportoptions(exportformat,start_bof,stop_eof);
 
   if (batchmode) {
     if (filenames.empty())	// must provide at least one filename
       usage_exit();
     main->open(filenames,idxfilename,expfilename);
     if(!cutlist.empty()) {
-      if(cutlist.front()=="AR") {
+      if(cutlist.front()=="AR") {  // obsolete (use 4:3 resp. 16:9 instead)! Or just in case of another AR... 
           main->editSuggest();
-          main->editConvert();             
-      } else if(cutlist.front()=="TS") {
+          main->editConvert(0);             
+      } else if(cutlist.front()=="4:3") {
+          main->editSuggest();     
+          main->editConvert(2);             
+      } else if(cutlist.front()=="16:9") {
+          main->editSuggest();     
+          main->editConvert(3);             
+      } else if(cutlist.front()=="TS" || cutlist.front()=="TS1") {  // first bookmark is a START
           main->editImport();     
-          main->editConvert();             
+          main->editConvert(0);             
+      } else if(cutlist.front()=="TS2") { // 2nd bookmark is a START
+          main->editImport();     
+          main->editConvert(1);             
       } else { 
           std::vector<int> piclist, prob_item, prob_pos;
           unsigned int pos, j;

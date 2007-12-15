@@ -119,7 +119,7 @@ void dvbcut::setbusy(bool b)
 
 dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
   :dvbcutbase(parent, name, fl),
-    audiotrackpopup(0), recentfilespopup(0), audiotrackmenuid(-1),
+    audiotrackpopup(0), recentfilespopup(0), editconvertpopup(0), audiotrackmenuid(-1),
     buf(8 << 20, 128 << 20),
     mpg(0), pictures(0),
     curpic(~0), showimage(true), fine(false),
@@ -147,6 +147,11 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
   connect( recentfilespopup, SIGNAL( activated(int) ), this, SLOT( loadrecentfile(int) ) );
   connect( recentfilespopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshowrecentfiles() ) );
 
+  editconvertpopup=new QPopupMenu(this);
+  editMenu->insertItem(QString("Convert bookmarks"),editconvertpopup,-1,7);
+  connect( editconvertpopup, SIGNAL( activated(int) ), this, SLOT( editConvert(int) ) );
+  connect( editconvertpopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshoweditconvert() ) );
+
   setviewscalefactor(settings().viewscalefactor);
 
   // install event handler
@@ -170,6 +175,8 @@ dvbcut::~dvbcut()
     delete audiotrackpopup;
   if (recentfilespopup)
     delete recentfilespopup;
+  if (editconvertpopup)
+    delete editconvertpopup;
 
   if (imgp)
     delete imgp;
@@ -870,8 +877,21 @@ void dvbcut::editImport()
     statusBar()->message(QString("*** No valid bookmarks available/found! ***"));
 }
 
-void dvbcut::editConvert()
+
+void dvbcut::abouttoshoweditconvert()
 {
+  editconvertpopup->clear();
+  editconvertpopup->insertItem(QString("START / STOP"), 0);    
+  editconvertpopup->insertItem(QString("STOP / START"), 1);    
+  editconvertpopup->insertItem(QString("4 : 3"), 2);    
+  editconvertpopup->insertItem(QString("16 : 9"), 3);    
+}
+
+void dvbcut::editConvert(int option)
+{
+  // convert Bookmarks to START/STOP markers
+  if(option<0 || option>3) return;
+  
   int found=0;
   std::vector<int> cutlist;
   for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
@@ -884,7 +904,7 @@ void dvbcut::editConvert()
       } 
     } 
   if (found) {
-    addStartStopItems(cutlist);
+    addStartStopItems(cutlist, option);
 
     if (found%2) 
       statusBar()->message(QString("*** No matching stop marker!!! ***"));
@@ -893,10 +913,16 @@ void dvbcut::editConvert()
     statusBar()->message(QString("*** No bookmarks to convert! ***"));  
 }
 
-void dvbcut::addStartStopItems(std::vector<int> cutlist)
+void dvbcut::addStartStopItems(std::vector<int> cutlist, int option)
 {
   // take list of frame numbers and set alternating START/STOP markers
-
+  bool alternate=true;
+  EventListItem::eventtype type=EventListItem::start;
+  if(option==1)
+    type=EventListItem::stop;
+  else if(option==2 || option==3)
+    alternate=false;   
+ 
   // make sure list is sorted... 
   sort(cutlist.begin(),cutlist.end());
 
@@ -907,14 +933,25 @@ void dvbcut::addStartStopItems(std::vector<int> cutlist)
       if (eli->geteventtype()==EventListItem::start || eli->geteventtype()==EventListItem::stop) 
          delete item;       
     } 
-
-  EventListItem::eventtype type=EventListItem::start;
+  
   for (std::vector<int>::iterator it = cutlist.begin(); it != cutlist.end(); ++it) {   
+    if(!alternate) {
+      // set START/STOP according aspect ratio (2=4:3, 3=16:9)
+      if (option == (*mpg)[*it].getaspectratio()) 
+        type=EventListItem::start;
+      else 
+        type=EventListItem::stop;  
+    } 
+
     addEventListItem(*it, type);
-    if (type==EventListItem::start) 
-      type=EventListItem::stop;
-    else 
-      type=EventListItem::start;  
+
+    if(alternate) {
+      // set START/STOP alternatingly
+      if(type==EventListItem::start) 
+        type=EventListItem::stop;
+      else
+        type=EventListItem::start;  
+    }
   }
   
   update_quick_picture_lookup_table();
@@ -1565,7 +1602,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   editBookmarkAction->setEnabled(false);
   editSuggestAction->setEnabled(false);
   editImportAction->setEnabled(false);
-  editConvertAction->setEnabled(false);
+  //editConvertAction->setEnabled(false);
 
 #ifdef HAVE_LIB_AO
 
@@ -1896,7 +1933,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   editBookmarkAction->setEnabled(true);
   editSuggestAction->setEnabled(true);
   editImportAction->setEnabled(true);
-  editConvertAction->setEnabled(true);
+  //editConvertAction->setEnabled(true);
   viewNormalAction->setEnabled(true);
   viewUnscaledAction->setEnabled(true);
   viewDifferenceAction->setEnabled(true);
@@ -2117,7 +2154,13 @@ void dvbcut::update_quick_picture_lookup_table() {
   pts_t startpts, stoppts, outpts=0;
   bool realzero=false;
   
-  if (settings().start_bof) {
+  if(!nogui) {
+    // overwrite CLI options
+    start_bof = settings().start_bof;
+    stop_eof = settings().stop_eof;
+  }
+  
+  if (start_bof) {
     startpic=0;
     startpts=(*mpg)[0].getpts()-firstpts; 
   }
@@ -2131,7 +2174,7 @@ void dvbcut::update_quick_picture_lookup_table() {
     const EventListItem &eli=*static_cast<const EventListItem*>(item);
     switch (eli.geteventtype()) {
       case EventListItem::start:
-	if (startpic<0 || (settings().start_bof && startpic==0 && !realzero)) {
+	if (startpic<0 || (start_bof && startpic==0 && !realzero)) {
           startpic=eli.getpicture();
           startpts=eli.getpts();
           if (startpic==0)
@@ -2164,7 +2207,7 @@ void dvbcut::update_quick_picture_lookup_table() {
     }
 
   // last item in list was a (real or virtual) START
-  if (settings().stop_eof && startpic>=0) {
+  if (stop_eof && startpic>=0) {
     // create a new export range by adding a virtual STOP marker at EOF 
     stoppic=pictures-1;
     stoppts=(*mpg)[stoppic].getpts()-firstpts;
