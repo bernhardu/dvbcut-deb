@@ -221,6 +221,10 @@ int psfile::probe(inbuffer &buf)
   if (latestsync>(8<<10))
     latestsync=8<<10;
 
+  int testupto=buf.inbytes()-16;
+  if (testupto > (2 << 20))	// scan at most 2 MB
+    testupto = 2 << 20;
+
   const uint8_t *data = (const uint8_t*) buf.data();
   int ps;
   for (ps = 0; ps < latestsync; ++ps) {
@@ -229,7 +233,6 @@ int psfile::probe(inbuffer &buf)
       continue;
     }
 
-    int testupto=buf.inbytes()-16;
     int pos=ps;
     while(pos < testupto) {
       const uint8_t *d=&data[pos];
