@@ -1,10 +1,15 @@
+2008-01-16  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/psfile.cpp:
+		Speed up PS probing.
+
 2008-01-06  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
-	* src/dvbcutbase.ui
-	* src/dvbcut.cpp
-	* src/dvbcut.h
-	* src/settings.cpp
-	* src/settings.h
+	* src/dvbcutbase.ui:
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/settings.cpp:
+	* src/settings.h:
 		Automated setting of equidistant chapter markers.
 		Fixed bug concerning positioning via output frames.
 
