@@ -376,6 +376,7 @@
         <action name="editChapterAction"/>
         <action name="editBookmarkAction"/>
         <separator/>
+        <action name="editAutoChaptersAction"/>
         <action name="editSuggestAction"/>
         <action name="editImportAction"/>
     </item>
@@ -653,6 +654,20 @@
     </action>
     <action>
         <property name="name">
+            <cstring>editAutoChaptersAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Auto chapters</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+C</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
             <cstring>editSuggestAction</cstring>
         </property>
         <property name="enabled">
@@ -926,6 +941,12 @@
         <slot>editBookmark()</slot>
     </connection>
     <connection>
+        <sender>editAutoChaptersAction</sender>
+        <signal>activated()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>editAutoChapters()</slot>
+    </connection>
+    <connection>
         <sender>editSuggestAction</sender>
         <signal>activated()</signal>
         <receiver>dvbcutbase</receiver>
@@ -1082,6 +1103,7 @@
     <slot>editStop()</slot>
     <slot>editChapter()</slot>
     <slot>editBookmark()</slot>
+    <slot>editAutoChapters()</slot>
     <slot>editSuggest()</slot>
     <slot>editImport()</slot>
     <slot>editConvert(int)</slot>

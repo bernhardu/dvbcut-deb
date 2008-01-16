@@ -79,6 +79,10 @@ public:
   std::vector<QString> pipe_post;
   std::vector<QString> pipe_label;
   std::vector<int> pipe_format;
+  int chapter_interval;
+  int chapter_tolerance;
+  double chapter_threshold;
+  int chapter_minimum;
 
 };
 
