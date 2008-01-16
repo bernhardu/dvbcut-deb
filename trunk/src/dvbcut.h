@@ -153,6 +153,7 @@ public slots:
   virtual void editChapter();
   virtual void editStop();
   virtual void editStart();
+  virtual void editAutoChapters();
   virtual void editSuggest();
   virtual void editImport();
   virtual void editConvert(int);

@@ -58,13 +58,25 @@
 #define DVBCUT_DEFAULT_PIPE_LABEL \
         "DVD-Video titleset (dvdauthor)"
 #define DVBCUT_DEFAULT_PIPE_FORMAT (0)
-/* ok,... for time consuming conversions one does not save any time processing the piped output... but just as an example. ;-) 
-#define DVBCUT_DEFAULT_PIPE_COMMAND \
-        "|ffmpeg -f mpeg2video -i - -f avi -vcodec mpeg4 -b 1200k -g 250 -bf 2 -acodec libmp3lame -ab 128k -ar 44100 %OUTPUT%"
-#define DVBCUT_DEFAULT_PIPE_POST ""
-#define DVBCUT_DEFAULT_PIPE_LABEL \
-        "MPEG-4/ASP (ffmpeg)"
-#define DVBCUT_DEFAULT_PIPE_FORMAT (1)
+/* 
+// SOME OTHER EXAMPLES for the settings file ~/.qt/dvbcut.sf.netrc 
+// (ok, for time consuming conversions one does not save any time, but it may be convenient...) 
+// 1. Conversion to mpeg4 avi-file with ffmpeg:
+//    (to recode to a smaller MPEG2 File use "--target dvd -acodec copy"?)!
+pipe/1/command=|ffmpeg -f mpeg2video -i - -f avi -vcodec mpeg4 -b 1200k -g 250 -bf 2 -acodec libmp3lame -ab 128k -ar 44100 %OUTPUT%
+pipe/1/format=1
+pipe/1/label=MPEG-4/ASP (ffmpeg)
+pipe/1/post=
+// 2. Shrinking with vamps by 20%, before piping to dvdauthor:
+pipe/2/command=| vamps -E 1.2 -S 10000000000 -a 1,2,3 | dvdauthor -t -c '%CHAPTERS%' -v mpeg2 -o %OUTPUT% -
+pipe/2/format=0
+pipe/2/label=20% shrinked DVD-Video titleset (vamps & dvdauthor)
+pipe/2/post=dvdauthor -o %OUTPUT% -T
+// 3. recoding to a (smaller?) MPEG2 file with DVD compliant resolution (ca. 3000kbps):
+pipe/3/command=|ffmpeg -f mpeg2video -i - --target dvd -qscale 3.0 -bf 2 -acodec copy %OUTPUT%"
+pipe/3/format=1
+pipe/3/label=recoded DVD compliant video (ffmpeg)
+pipe/3/post=
 */
 
 dvbcut_settings::dvbcut_settings() {
@@ -189,6 +201,18 @@ dvbcut_settings::load_settings() {
       endGroup();	// key
     }
   endGroup();	// pipe
+  beginGroup("/chapters");
+    // length (>0) or number (<0) of chapter(s)
+    chapter_interval = readNumEntry("/interval", 600*25);
+    // detection of scene changes is rather time comsuming... 
+    //chapter_tolerance = readNumEntry("/tolerance", 10*25);
+    //... better switch it off per default!
+    chapter_tolerance = readNumEntry("/tolerance", 0);
+    // average color distance needed for a scene change
+    chapter_threshold = readDoubleEntry("/threshold", 50.);
+    // minimal length of a chapter
+    chapter_minimum = readNumEntry("/minimum", 200*25);
+  endGroup();	// auto chapters
 }
 
 void
@@ -266,6 +290,12 @@ dvbcut_settings::save_settings() {
       endGroup();	// key
     }
   endGroup();	// pipe
+  beginGroup("/chapters");
+    writeEntry("/interval", chapter_interval);
+    writeEntry("/tolerance", chapter_tolerance);
+    writeEntry("/threshold", chapter_threshold);
+    writeEntry("/minimum", chapter_minimum);
+  endGroup();	// auto chapters
 }
 
 // private settings variable

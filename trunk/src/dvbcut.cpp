@@ -148,7 +148,7 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
   connect( recentfilespopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshowrecentfiles() ) );
 
   editconvertpopup=new QPopupMenu(this);
-  editMenu->insertItem(QString("Convert bookmarks"),editconvertpopup,-1,7);
+  editMenu->insertItem(QString("Convert bookmarks"),editconvertpopup,-1,8);
   connect( editconvertpopup, SIGNAL( activated(int) ), this, SLOT( editConvert(int) ) );
   connect( editconvertpopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshoweditconvert() ) );
 
@@ -854,6 +854,82 @@ void dvbcut::editStart()
   update_quick_picture_lookup_table();
 }
 
+void dvbcut::editAutoChapters()
+{
+  int inpic, chapters = 0;
+  quick_picture_lookup_t::iterator it;
+  QImage p1, p2;
+
+  // the first chapter at 0sec is ALWAYS set by default from update_quick_picture_lookup_table()
+  int chapter_start; 
+  if(settings().chapter_interval>0) {
+    chapter_start = settings().chapter_interval;  // fixed length of intervals
+  } else {
+    chapter_start = quick_picture_lookup.back().outpicture/(1-settings().chapter_interval);  // given number of chapters
+    chapter_start = chapter_start > settings().chapter_minimum ? chapter_start : settings().chapter_minimum;
+  }  
+  // don't make a new chapter if it would be shorter than the specified minimal length
+  int chapter_max = quick_picture_lookup.back().outpicture - settings().chapter_minimum;
+
+  for(int outpic = chapter_start; outpic < chapter_max; outpic+=chapter_start) 
+    if (!quick_picture_lookup.empty()) {
+      // find the entry in the quick_picture_lookup table that corresponds to given output picture
+      it = std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),outpic,quick_picture_lookup_s::cmp_outpicture());
+      inpic = outpic - it->outpicture + it->stoppicture;   
+
+      if(inpic+settings().chapter_tolerance>it->stoppicture) {
+        if(it == quick_picture_lookup.end()) break;
+        // take begin of next START/STOP range as chapter picture if to near at end of current range
+        it++;
+        inpic=it->startpicture;
+      } else if(settings().chapter_tolerance>0) {  
+        // look for the next scene change inside specified frame tolerance (VERY SLOW!!!)
+        if (!imgp) 
+          imgp = new imageprovider(*mpg, new dvbcutbusy(this), false, viewscalefactor, settings().chapter_tolerance);
+        p2 = imgp->getimage(inpic,fine);  
+        for(int pic=inpic+1; pic<inpic+settings().chapter_tolerance && pic<pictures; pic++) {
+          // get next picture
+          p1 = p2;
+          p2 = imgp->getimage(pic,fine);
+          if (p2.size()!=p1.size())
+            p2=p2.scale(p1.size());
+
+          // calculate color distance between two consecutive frames
+          double dist=0.;
+          if (p2.depth()==32 && p1.depth()==32)
+            for (int y=0;y<p1.height();++y) {
+              QRgb *col1=(QRgb*)p1.scanLine(y);
+              QRgb *col2=(QRgb*)p2.scanLine(y);
+
+              for (int x=p1.width();x>0;--x) {
+                dist+=sqrt(pow(qRed(*col1)-qRed(*col2),2)+pow(qGreen(*col1)-qGreen(*col2),2)+pow(qBlue(*col1)-qBlue(*col2),2));
+                // that's a bit faster...   
+                //dist+=(abs(qRed(*col1)-qRed(*col2))+abs(qGreen(*col1)-qGreen(*col2))+abs(qBlue(*col1)-qBlue(*col2)));
+                ++col1;
+                ++col2;
+              }
+            }
+          dist/=(p1.height()*p1.width());
+ 
+          // 50. seems to be a good measure for the color distance at scene changes (about sqrt(3)*50. if sum of abs values)! 
+          //fprintf(stderr,"%d, DIST=%f\n",pic,dist); 
+          if(dist>settings().chapter_threshold) { 
+            inpic=pic;
+            statusBar()->message(QString().sprintf("%d. Scene change @ %d, DIST=%f\n",chapters+1,inpic,dist));   
+            break;
+          }  
+        }
+      }
+      
+      addEventListItem(inpic, EventListItem::chapter);
+      chapters++;
+    }  
+
+  if (chapters)
+    update_quick_picture_lookup_table();
+
+}
+
 void dvbcut::editSuggest()
 {
   int pic = 0, found=0;
@@ -1366,7 +1442,6 @@ void dvbcut::clickedgo2()
     // find the entry in the quick_picture_lookup table that corresponds to given output picture
     quick_picture_lookup_t::iterator it=
       std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),outpic,quick_picture_lookup_s::cmp_outpicture());
-    --it;
     inpic=outpic-it->outpicture+it->stoppicture;   
     fine=true;
     linslider->setValue(inpic);
@@ -1600,6 +1675,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   editStopAction->setEnabled(false);
   editChapterAction->setEnabled(false);
   editBookmarkAction->setEnabled(false);
+  editAutoChaptersAction->setEnabled(false);
   editSuggestAction->setEnabled(false);
   editImportAction->setEnabled(false);
   //editConvertAction->setEnabled(false);
@@ -1931,6 +2007,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   editStopAction->setEnabled(true);
   editChapterAction->setEnabled(true);
   editBookmarkAction->setEnabled(true);
+  editAutoChaptersAction->setEnabled(true);
   editSuggestAction->setEnabled(true);
   editImportAction->setEnabled(true);
   //editConvertAction->setEnabled(true);
