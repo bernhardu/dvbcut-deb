@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <climits>
 #include <memory>
+#include <algorithm>
 
 #include <qlabel.h>
 #include <qpixmap.h>
