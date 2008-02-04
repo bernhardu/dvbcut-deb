@@ -9,7 +9,7 @@ opts=Options()
 
 opt=opts.Add(PathOption('PREFIX', 'Directory to install under', '/usr/local'))
 opt=opts.Add(PathOption('BINDIR', 'Directory to install under', os.path.join('$PREFIX','bin')))
-opt=opts.Add(PathOption('MANPATH', 'Directory to install under', os.path.join('$PREFIX','man')))
+opt=opts.Add(PathOption('MANPATH', 'Directory to install under', os.path.join('$PREFIX','share/man')))
 
 ### DEBUG MODE
 

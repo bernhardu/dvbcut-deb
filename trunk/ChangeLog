@@ -1,3 +1,12 @@
+2008-02-04  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* SConstruct:
+		Install manpages to $PREFIX/share/man.
+
+	* src/dvbcut.cpp:
+	* src/tsfile.cpp:
+		#include <algorithm>.
+
 2008-01-16  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/psfile.cpp:

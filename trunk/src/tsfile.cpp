@@ -23,6 +23,7 @@
 #include "streamhandle.h"
 #include <list>
 #include <utility>
+#include <algorithm>
 
 tsfile::tsfile(inbuffer &b, int initial_offset) : mpgfile(b, initial_offset)
 {
