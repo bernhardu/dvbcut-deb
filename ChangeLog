@@ -1,5 +1,13 @@
 2008-02-15  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/main.cpp:
+		Add "-voracious" option for people who have several
+		gigabytes of cache and want dvbcut to use all of it.
+
+2008-02-15  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* src/settings.cpp:
 		Added "versioned" config file and format adaption.
 
