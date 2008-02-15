@@ -37,6 +37,8 @@ class dvbcut: public dvbcutbase
   Q_OBJECT
 
 public:
+  static bool cache_friendly;
+
   struct quick_picture_lookup_s
   {
     int startpicture;

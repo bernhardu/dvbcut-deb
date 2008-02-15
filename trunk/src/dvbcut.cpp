@@ -71,6 +71,8 @@
 
 #define VERSION_STRING	"dvbcut " VERSION "/" REVISION
 
+bool dvbcut::cache_friendly = true;
+
 // **************************************************************************
 // ***  busy cursor helpers
 
@@ -702,7 +704,7 @@ void dvbcut::fileExport()
   }
 
   // starting export, switch source to sequential mode
-  buf.setsequential(true);
+  buf.setsequential(cache_friendly);
 
   int startpic, stoppic, savedpic=0;
   pts_t startpts=(*mpg)[0].getpts(), stoppts, savedtime=0;
@@ -1816,7 +1818,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   std::list<std::string>::const_iterator it = filenames.begin();
   while (it != filenames.end() && buf.open(*it, &errormessage))
     ++it;
-  buf.setsequential(true);
+  buf.setsequential(cache_friendly);
   if (it == filenames.end()) {
     mpg = mpgfile::open(buf, &errormessage);
   }

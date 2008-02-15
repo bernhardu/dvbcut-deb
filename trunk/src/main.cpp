@@ -105,6 +105,8 @@ main(int argc, char *argv[]) {
         batchmode = true;
       else if (strncmp(argv[i], "-generateidx", n) == 0)
         generateidx = true;
+      else if (strncmp(argv[i], "-voracious", n) == 0)
+	dvbcut::cache_friendly = false;
       else if (strncmp(argv[i], "-idx", n) == 0 && ++i < argc)
         idxfilename = argv[i];
       else if (strncmp(argv[i], "-exp", n) == 0 && ++i < argc)
@@ -155,13 +157,13 @@ main(int argc, char *argv[]) {
         idxfilename = mpgfilename + ".idx"; 
       for(std::list<std::string>::iterator it = filenames.begin(); 
                                     okay && it != filenames.end(); it++)	
-	okay = buf.open(*it, &errormessage);
+      okay = buf.open(*it, &errormessage);
     }
     if (!okay) {
       fprintf(stderr, "%s: %s\n", argv0, errormessage.c_str());
       return 1;
     }
-    buf.setsequential(true);
+    buf.setsequential(dvbcut::cache_friendly);
 
     mpgfile *mpg = mpgfile::open(buf, &errormessage);
     if (mpg == 0) {
