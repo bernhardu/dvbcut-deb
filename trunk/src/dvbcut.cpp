@@ -1608,22 +1608,33 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
       this,
       "Open file...",
       "Choose one or more MPEG files to open");
-    if (fn.empty())
+    if (fn.empty()) {
+      fprintf(stderr,"open(): QFileDialog::getOpenFileNames() returned EMPTY filelist!!!\n");    
+      fprintf(stderr,"        If you didn't saw a FileDialog, please check your 'lastdir' settings variable...");    
       return;
+    }  
     for (QStringList::Iterator it = fn.begin(); it != fn.end(); ++it)
       filenames.push_back((const char*)*it);
 
-    // remember directory
-    QString dir = fn.front();
-    int n = dir.findRev('/');
-    if (n > 0)
-      dir = dir.left(n);
-    else if (n == 0)
-      dir = "/";
-    settings().lastdir = dir;
-  }
+    // remember last directory if requested
+    if (settings().lastdir_update) {
+      QString dir = fn.front();
+      int n = dir.findRev('/');
+      if (n > 0)
+        dir = dir.left(n);
+      else if (n == 0)
+        dir = "/";
+#ifdef __WIN32__
+      // there has to be a / after the device name in case of a top level directory (i.e. 'C:/' and NOT 'C:')
+      if (dir.findRev(':') == int(dir.length())-1)
+        dir = dir+"/"; 
+#endif /* __WIN32__ */      
+      settings().lastdir = dir;
+    }
+  } 
 
-  if (filenames.empty())
+  // hmmmm,... do we really need this? With fn.empty() we never reach this line...
+  if (filenames.empty()) 
     return;
 
   make_canonical(filenames);

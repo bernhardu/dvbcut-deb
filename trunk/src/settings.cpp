@@ -33,9 +33,9 @@
 #define DVBCUT_QSETTINGS_PATH "/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT "/"
 
 #define DVBCUT_DEFAULT_LOADFILTER \
-	"Recognized files (*.dvbcut *.mpg *.rec* *.ts *.tts* *.vdr);;" \
+	"Recognized files (*.dvbcut *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;" \
 	"dvbcut project files (*.dvbcut);;" \
-	"MPEG files (*.mpg *.rec* *.ts *.tts* *.vdr);;" \
+	"MPEG files (*.mpg *.rec* *.ts *.tts* *.trp *.vdr);;" \
 	"All files (*)"
 #define DVBCUT_DEFAULT_IDXFILTER \
 	"dvbcut index files (*.idx);;All files (*)"
@@ -94,31 +94,88 @@ dvbcut_settings::~dvbcut_settings() {
 
 void
 dvbcut_settings::load_settings() {
+  int version = readNumEntry("/version", 0);
+  if (version >= 1) {
+	// config format version 1
+	beginGroup("/wheel");
+	  wheel_increments[WHEEL_INCR_NORMAL] = readNumEntry("/incr_normal", 25*60);
+	  wheel_increments[WHEEL_INCR_SHIFT] = readNumEntry("/incr_shift", 25);
+	  wheel_increments[WHEEL_INCR_CTRL] = readNumEntry("/incr_ctrl", 1);
+	  wheel_increments[WHEEL_INCR_ALT] = readNumEntry("/incr_alt", 15*25*60);
+	  wheel_threshold = readNumEntry("/threshold", 24);
+	  // Note: delta is a multiple of 120 (see Qt documentation)
+	  wheel_delta = readNumEntry("/delta", 120);
+	  if (wheel_delta == 0)
+		wheel_delta = 1;	// avoid devide by zero
+	endGroup();	// wheel
+	beginGroup("/slider");
+	  jog_maximum = readNumEntry("/jog_maximum", 180000);
+	  jog_threshold = readNumEntry("/jog_threshold", 50);
+	  // to increase the "zero frames"-region of the jog-slider
+	  jog_offset = readDoubleEntry("/jog_offset", 0.4);
+	  // sub-intervals of jog_maximum
+	  jog_interval = readNumEntry("/jog_interval", 1);
+	  if (jog_interval < 0)
+		jog_interval = 0;
+	  lin_interval = readNumEntry("/lin_interval", 3600);
+	  if (lin_interval < 0)
+		lin_interval = 0;
+	endGroup();	// slider
+	beginGroup("/lastdir");
+	  lastdir = readEntry("/name", ".");
+	  lastdir_update = readBoolEntry("/update", true);
+	endGroup(); // lastdir
+	beginGroup("/filter");
+	  idxfilter = readEntry("/idxfilter", DVBCUT_DEFAULT_IDXFILTER);
+	  prjfilter = readEntry("/prjfilter", DVBCUT_DEFAULT_PRJFILTER);
+	  loadfilter = readEntry("/loadfilter", DVBCUT_DEFAULT_LOADFILTER);
+	endGroup();	// filter
+  }
+  else {
+	// old (unnumbered) config format
+	wheel_increments[WHEEL_INCR_NORMAL] = readNumEntry("/wheel_incr_normal", 25*60);
+	wheel_increments[WHEEL_INCR_SHIFT] = readNumEntry("/wheel_incr_shift", 25);
+	wheel_increments[WHEEL_INCR_CTRL] = readNumEntry("/wheel_incr_ctrl", 1);
+	wheel_increments[WHEEL_INCR_ALT] = readNumEntry("/wheel_incr_alt", 15*25*60);
+	wheel_threshold = readNumEntry("/wheel_threshold", 24);
+	// Note: delta is a multiple of 120 (see Qt documentation)
+	wheel_delta = readNumEntry("/wheel_delta", 120);
+	if (wheel_delta == 0)
+	  wheel_delta = 1;	// avoid devide by zero
+	jog_maximum = readNumEntry("/jog_maximum", 180000);
+	jog_threshold = readNumEntry("/jog_threshold", 50);
+	// to increase the "zero frames"-region of the jog-slider
+	jog_offset = readDoubleEntry("/jog_offset", 0.4);
+	// sub-intervals of jog_maximum
+	jog_interval = readNumEntry("/jog_interval", 1);
+	if (jog_interval < 0)
+	  jog_interval = 0;
+	lin_interval = readNumEntry("/lin_interval", 3600);
+	if (lin_interval < 0)
+	  lin_interval = 0;
+	lastdir = readEntry("/lastdir", ".");
+	lastdir_update = true;
+	idxfilter = readEntry("/idxfilter", DVBCUT_DEFAULT_IDXFILTER);
+	prjfilter = readEntry("/prjfilter", DVBCUT_DEFAULT_PRJFILTER);
+	loadfilter = readEntry("/loadfilter", DVBCUT_DEFAULT_LOADFILTER);
+	// remove old-style entries
+	removeEntry("/wheel_incr_normal");
+	removeEntry("/wheel_incr_shift");
+	removeEntry("/wheel_incr_ctrl");
+	removeEntry("/wheel_incr_alt");
+	removeEntry("/wheel_threshold");
+	removeEntry("/wheel_delta");
+	removeEntry("/jog_maximum");
+	removeEntry("/jog_threshold");
+	removeEntry("/jog_offset");
+	removeEntry("/jog_interval");
+	removeEntry("/lin_interval");
+	removeEntry("/lastdir");
+	removeEntry("/idxfilter");
+	removeEntry("/prjfilter");
+	removeEntry("/loadfilter");
+  }
   viewscalefactor = readNumEntry("/viewscalefactor", 1);
-  wheel_increments[WHEEL_INCR_NORMAL] = readNumEntry("/wheel_incr_normal", 25*60);
-  wheel_increments[WHEEL_INCR_SHIFT] = readNumEntry("/wheel_incr_shift", 25);
-  wheel_increments[WHEEL_INCR_CTRL] = readNumEntry("/wheel_incr_ctrl", 1);
-  wheel_increments[WHEEL_INCR_ALT] = readNumEntry("/wheel_incr_alt", 15*25*60);
-  wheel_threshold = readNumEntry("/wheel_threshold", 24);
-  // Note: delta is a multiple of 120 (see Qt documentation)
-  wheel_delta = readNumEntry("/wheel_delta", 120);
-  if (wheel_delta == 0)
-    wheel_delta = 1;	// avoid devide by zero
-  jog_maximum = readNumEntry("/jog_maximum", 180000);
-  jog_threshold = readNumEntry("/jog_threshold", 50);
-  // to increase the "zero frames"-region of the jog-slider
-  jog_offset = readDoubleEntry("/jog_offset", 0.4);
-  // sub-intervals of jog_maximum
-  jog_interval = readNumEntry("/jog_interval", 1);
-  if (jog_interval < 0)
-    jog_interval = 0;
-  lin_interval = readNumEntry("/lin_interval", 3600);
-  if (lin_interval < 0)
-    lin_interval = 0;
-  lastdir = readEntry("/lastdir", ".");
-  idxfilter = readEntry("/idxfilter", DVBCUT_DEFAULT_IDXFILTER);
-  prjfilter = readEntry("/prjfilter", DVBCUT_DEFAULT_PRJFILTER);
-  loadfilter = readEntry("/loadfilter", DVBCUT_DEFAULT_LOADFILTER);
   export_format = readNumEntry("/export_format", 0);
   beginGroup("/recentfiles");
     recentfiles_max = readNumEntry("/max", 5);
@@ -127,33 +184,36 @@ dvbcut_settings::load_settings() {
     QStringList keys = entryList("/");
     for (unsigned int i = 0; i < recentfiles_max; ++i) {
       QString key = "/" + QString::number(i);
-      if(keys.size()>1) {      // OLD format (2 keys per input file, NO subkeys!)
+      if (version < 1 && keys.size()>1) {
+		// OLD format (2 keys per input file, NO subkeys!)
         QString filename = readEntry(key);
         if (filename.isEmpty())
- 	  continue;
+		  continue;
         filenames.clear();
         filenames.push_back(filename);
         QString idxfilename = readEntry(key + "-idx", "");
         recentfiles.push_back(
         std::pair<std::list<std::string>,std::string>(filenames, idxfilename));
-      } else {                // NEW format with subkeys and multiple files!
-      beginGroup(key);
-        QString filename = readEntry("/0");
-        if (!filename.isEmpty()) {
-          // multiple input files?  
-          int j=0;
-          filenames.clear();
-          while(!filename.isEmpty()) {
-            filenames.push_back(filename);
-            filename = readEntry("/" + QString::number(++j), "");
-          }  
-          QString idxfilename = readEntry("/idx", "");
-          recentfiles.push_back(
-	    std::pair<std::list<std::string>,std::string>(filenames, idxfilename));
-        }
-      endGroup();	// key
       }
-    }
+	  else {
+	  	// NEW format with subkeys and multiple files!
+		beginGroup(key);
+		  QString filename = readEntry("/0");
+		  if (!filename.isEmpty()) {
+			// multiple input files?  
+			int j=0;
+			filenames.clear();
+			while(!filename.isEmpty()) {
+			  filenames.push_back(filename);
+			  filename = readEntry("/" + QString::number(++j), "");
+			}  
+			QString idxfilename = readEntry("/idx", "");
+			recentfiles.push_back(
+			  std::pair<std::list<std::string>,std::string>(filenames, idxfilename));
+		  }
+		endGroup();	// key
+	  }
+	}
   endGroup();	// recentfiles
   beginGroup("/labels");
     start_label = readEntry("/start", DVBCUT_DEFAULT_START_LABEL);
@@ -217,22 +277,32 @@ dvbcut_settings::load_settings() {
 
 void
 dvbcut_settings::save_settings() {
+  writeEntry("/version", 1);	// latest config version
+  beginGroup("/wheel");
+	  writeEntry("/incr_normal", wheel_increments[WHEEL_INCR_NORMAL]);
+	  writeEntry("/incr_shift", wheel_increments[WHEEL_INCR_SHIFT]);
+	  writeEntry("/incr_ctrl", wheel_increments[WHEEL_INCR_CTRL]);
+	  writeEntry("/incr_alt", wheel_increments[WHEEL_INCR_ALT]);
+	  writeEntry("/threshold", wheel_threshold);
+	  writeEntry("/delta", wheel_delta);
+  endGroup();	// wheel
+  beginGroup("/slider");
+	  writeEntry("/jog_maximum", jog_maximum);
+	  writeEntry("/jog_threshold", jog_threshold);
+	  writeEntry("/jog_offset", jog_offset);
+	  writeEntry("/jog_interval", jog_interval);
+	  writeEntry("/lin_interval", lin_interval);
+  endGroup();	// slider
+  beginGroup("/lastdir");
+    writeEntry("/name", lastdir);
+    writeEntry("/update", lastdir_update);
+  endGroup();	// lastdir
+  beginGroup("/filter");
+	  writeEntry("/idxfilter", idxfilter);
+	  writeEntry("/prjfilter", prjfilter);
+	  writeEntry("/loadfilter", loadfilter);
+  endGroup();	// filter
   writeEntry("/viewscalefactor", viewscalefactor);
-  writeEntry("/wheel_incr_normal", wheel_increments[WHEEL_INCR_NORMAL]);
-  writeEntry("/wheel_incr_shift", wheel_increments[WHEEL_INCR_SHIFT]);
-  writeEntry("/wheel_incr_ctrl", wheel_increments[WHEEL_INCR_CTRL]);
-  writeEntry("/wheel_incr_alt", wheel_increments[WHEEL_INCR_ALT]);
-  writeEntry("/wheel_threshold", wheel_threshold);
-  writeEntry("/wheel_delta", wheel_delta);
-  writeEntry("/jog_maximum", jog_maximum);
-  writeEntry("/jog_threshold", jog_threshold);
-  writeEntry("/jog_offset", jog_offset);
-  writeEntry("/jog_interval", jog_interval);
-  writeEntry("/lin_interval", lin_interval);
-  writeEntry("/lastdir", lastdir);
-  writeEntry("/idxfilter", idxfilter);
-  writeEntry("/prjfilter", prjfilter);
-  writeEntry("/loadfilter", loadfilter);
   writeEntry("/export_format", export_format);
   beginGroup("/recentfiles");
     // first remove any OLD recentfiles entries to clean the settings file (<revision 108)!!!

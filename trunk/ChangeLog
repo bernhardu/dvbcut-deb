@@ -1,3 +1,18 @@
+2008-02-15  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/settings.cpp:
+		Added "versioned" config file and format adaption.
+
+2008-02-10  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* src/dvbcut.cpp:
+	* src/settings.cpp:
+	* src/settings.h:
+		Fixed bug with 'lastdir' & toplevel directories 
+		under Windows and implemented possibility to use 
+		a fixed 'lastdir'.
+		Added *.trp to recognized files.
+
 2008-02-04  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* SConstruct:
