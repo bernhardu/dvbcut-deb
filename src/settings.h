@@ -45,6 +45,7 @@ public:
   bool loaded;
 
   QString lastdir;
+  bool lastdir_update;
   QString idxfilter;
   QString prjfilter;
   QString loadfilter;
