@@ -1,3 +1,8 @@
+2008-02-17  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* src/dvbcut.cpp:
+		Always add a trailing slash to directory names.
+
 2008-02-15  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:

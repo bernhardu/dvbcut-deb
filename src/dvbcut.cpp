@@ -1611,8 +1611,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
       "Open file...",
       "Choose one or more MPEG files to open");
     if (fn.empty()) {
-      fprintf(stderr,"open(): QFileDialog::getOpenFileNames() returned EMPTY filelist!!!\n");    
-      fprintf(stderr,"        If you didn't saw a FileDialog, please check your 'lastdir' settings variable...");    
+//      fprintf(stderr,"open(): QFileDialog::getOpenFileNames() returned EMPTY filelist!!!\n");    
+//      fprintf(stderr,"        If you didn't saw a FileDialog, please check your 'lastdir' settings variable...");    
       return;
     }  
     for (QStringList::Iterator it = fn.begin(); it != fn.end(); ++it)
@@ -1624,13 +1624,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
       int n = dir.findRev('/');
       if (n > 0)
         dir = dir.left(n);
-      else if (n == 0)
-        dir = "/";
-#ifdef __WIN32__
-      // there has to be a / after the device name in case of a top level directory (i.e. 'C:/' and NOT 'C:')
-      if (dir.findRev(':') == int(dir.length())-1)
-        dir = dir+"/"; 
-#endif /* __WIN32__ */      
+      // adding a slash is NEEDED for top level directories (win or linux), and doesn't matter otherwise!
+      dir = dir + "/"; 
       settings().lastdir = dir;
     }
   } 
