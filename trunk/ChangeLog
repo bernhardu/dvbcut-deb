@@ -1,5 +1,10 @@
 2008-03-12  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/dvbcut.cpp:
+		Add hack for filenames with colons in them.
+
+2008-03-12  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* SConstruct:
 		Always define __STDC_CONSTANT_MACROS and __STDC_LIMIT_MACROS.
 
