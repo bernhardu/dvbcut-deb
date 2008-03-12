@@ -188,7 +188,7 @@ int psfile::streamreader(streamhandle &sh)
 	payloadbegin += 4;
       else if (sid&0x300)
         ++payloadbegin;
-      else if (sid&0xf0==0xe0) {
+      else if ((sid&0xf0)==0xe0) {
         if ( *(uint32_t*)(data+payloadbegin)==mbo32(0x00000001) )
           ++payloadbegin;
       }

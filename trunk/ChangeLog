@@ -1,3 +1,16 @@
+2008-03-12  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* SConstruct:
+		Always define __STDC_CONSTANT_MACROS and __STDC_LIMIT_MACROS.
+
+	* src/buffer.cpp:
+		Remove obsolete definition of __STDC_LIMIT_MACROS.
+
+	* src/mpgfile.cpp:
+	* src/psfile.cpp:
+	* src/tsfile.cpp:
+		Avoid stupid compiler warnings.
+
 2008-02-17  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
 	* src/dvbcut.cpp:

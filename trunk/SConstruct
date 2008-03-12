@@ -50,6 +50,7 @@ else:
 env.Replace(CXXFILESUFFIX=".cpp")
 
 env.Append(CPPDEFINES=[("_FILE_OFFSET_BITS", "64"), "_LARGEFILE_SOURCE"])
+env.Append(CPPDEFINES=["__STDC_CONSTANT_MACROS", "__STDC_LIMIT_MACROS"])
 
 for v in ("CXX","LINK"):
   if (v in os.environ):
@@ -124,8 +125,6 @@ if (ffmpegpath!='/usr'):
   env.Append(CPPPATH=os.path.join(str(ffmpegpath),'include'))
   env.Append(LIBPATH=os.path.join(str(ffmpegpath),'lib'))
 env.Append(LIBS=['avformat','avcodec','avutil'])
-if (localffmpeg==False):
-  env.Append(CPPDEFINES=["__STDC_CONSTANT_MACROS", "__STDC_LIMIT_MACROS"])
 
 ### LIBSWSCALE
 

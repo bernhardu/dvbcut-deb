@@ -18,8 +18,6 @@
 
 /* $Id$ */
 
-#define __STDC_LIMIT_MACROS	// for INT64_MAX
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
