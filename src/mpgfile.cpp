@@ -798,9 +798,9 @@ void mpgfile::fixtimecode(uint8_t *buf, int len, pts_t pts)
   int hh=mm/60; mm %= 60;
   int pp=pts%90000;
   pp=(pp*framerate)/90000;
-  buf[4] = (hh<<2) & 0x7c | (mm>>4) & 0x03;
-  buf[5] = (mm<<4) & 0xf0 | (ss>>3) & 0x07 | 0x08;
-  buf[6] = (ss<<5) & 0xe0 | (pp>>1) & 0x1f;
+  buf[4] = ((hh<<2) & 0x7c) | ((mm>>4) & 0x03);
+  buf[5] = ((mm<<4) & 0xf0) | ((ss>>3) & 0x07) | 0x08;
+  buf[6] = ((ss<<5) & 0xe0) | ((pp>>1) & 0x1f);
   buf[7] |= (pp<<7) & 0x80;
 }
   

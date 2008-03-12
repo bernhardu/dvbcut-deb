@@ -24,6 +24,7 @@
 #include <list>
 #include <utility>
 #include <algorithm>
+#include <cstring>
 
 tsfile::tsfile(inbuffer &b, int initial_offset) : mpgfile(b, initial_offset)
 {
