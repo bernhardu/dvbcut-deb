@@ -1825,24 +1825,37 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
     return;
   }
 
-  if (nogui && idxfilename.empty())
-    idxfilename = filename + ".idx";
-
   if (idxfilename.empty()) {
-    QString s=QFileDialog::getSaveFileName(
-        filename+".idx",
-    settings().idxfilter,
-    this,
-    "Choose index file...",
-    "Choose the name of the index file" );
-    if (s)
-      idxfilename=(const char*)s;
-    else {
-      delete mpg;
-      mpg=0;
-      fileOpenAction->setEnabled(true);
-      return;
-    }
+    idxfilename = filename + ".idx";
+    if (!nogui) {
+	  /*
+	   * BEWARE! UGLY HACK BELOW!
+	   *
+	   * In order to circumvent the QFileDialog's stupid URL parsing,
+	   * we need to first change to the directory and then pass the
+	   * filename as a relative file: URL. Otherwise, filenames that
+	   * contain ":" will not be handled correctly. --mr
+	   */
+	  QUrl u;
+	  u.setProtocol(QString("file"));
+	  u.setPath(QString(idxfilename));
+	  if (chdir((const char*)u.dirPath()) == -1) chdir("/");
+	  QString relname = QString("file:") + u.fileName();
+	  QString s=QFileDialog::getSaveFileName(
+		  relname,
+		  settings().idxfilter,
+		  this,
+		  "Choose index file...",
+		  "Choose the name of the index file" );
+	  if (!s) {
+		delete mpg;
+		mpg=0;
+		fileOpenAction->setEnabled(true);
+		return;
+	  }
+	  idxfilename=(const char*)s;
+	  // it's now a relative name that will be canonicalized again soon
+	}
   }
 
   make_canonical(idxfilename);
