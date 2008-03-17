@@ -607,6 +607,7 @@ tsfile::check_si_tables() {
 	    break;
 	  case 0x01:	// MPEG-1 video
 	  case 0x02:	// MPEG-2 video
+	  case 0x80:	// legacy MPEG video
 	    if (vpid == -1)
 	      vpid = pid;
 	    break;
