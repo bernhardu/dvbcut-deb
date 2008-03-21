@@ -1,3 +1,9 @@
+2008-03-21  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/Makefile.w32:
+	* src/dvbcut.cpp:
+		Windows compile fixes.
+		
 2008-03-17  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/tsfile.cpp:

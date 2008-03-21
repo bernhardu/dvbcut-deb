@@ -71,6 +71,7 @@ CXX = g++
 CXXFLAGS = -O2 -Wall -g
 CPPFLAGS = -I../ffmpeg/include -I../import -I/usr/local/include \
 	-I. -DQT3_SUPPORT -DHAVE_LIB_MAD -DHAVE_LIB_A52 -DHAVE_LIB_AO \
+	-D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS \
 	-I$(QTDIR)/include/Qt -I$(QTDIR)/include/QtCore \
 	-I$(QTDIR)/include/QtGui -I$(QTDIR)/include/Qt3Support \
 	-I$(QTDIR)/include
