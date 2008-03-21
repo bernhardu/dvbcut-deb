@@ -18,6 +18,8 @@
 
 /* $Id$ */
 
+#include <unistd.h>
+
 #include <cstring>
 #include <cerrno>
 #include <cmath>
