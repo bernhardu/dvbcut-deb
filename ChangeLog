@@ -1,3 +1,8 @@
+2008-03-23  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/psfile.cpp:
+		Mark audio streams in first pass, renumber in second.
+
 2008-03-21  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.w32:
