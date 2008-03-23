@@ -18,6 +18,8 @@
 
 /* $Id$ */
 
+#include <cassert>
+
 #include "psfile.h"
 #include "streamhandle.h"
 #include "stream.h"
