@@ -22,6 +22,31 @@
 #include "streamhandle.h"
 #include "stream.h"
 
+static inline streamtype::type
+stream_type(int sid) {
+  if (sid >= 0xc0 && sid <= 0xdf)
+    return streamtype::mpegaudio;
+  if (sid >= 0x180 && sid <= 0x187)
+    return streamtype::ac3audio;
+  /* not supported yet:
+  if (sid >= 0x188 && sid <= 0x18f)
+    return streamtype::dtsaudio;
+  if (sid >= 0x120 && sid <= 0x13f)
+    return streamtype::vobsub;
+  */
+  return streamtype::unknown;
+}
+
+static inline bool
+is_audio_stream(streamtype::type t) {
+  return t == streamtype::mpegaudio
+      || t == streamtype::ac3audio
+      /* not yet
+      || t == streamtype::dtsaudio
+      */
+      ;
+}
+
 psfile::psfile(inbuffer &b, int initial_offset)
     : mpgfile(b, initial_offset)
 {
@@ -33,6 +58,7 @@ psfile::psfile(inbuffer &b, int initial_offset)
   const uint8_t* data=(const uint8_t*) buf.data();
 
   bool streamfound[0x300]={};
+  int count = 0;
   int sid;
 
   while (inbytes>=9) {
@@ -83,33 +109,29 @@ psfile::psfile(inbuffer &b, int initial_offset)
 
     if (!streamfound[sid]) {	// first occurrence of this stream
       streamfound[sid] = true;
-      streamtype::type t = streamtype::unknown;
-      if (sid >= 0xc0 && sid <= 0xdf)
-	t = streamtype::mpegaudio;
-      else if (sid >= 0x180 && sid <= 0x187)
-	t = streamtype::ac3audio;
-      /* not supported yet:
-      else if (sid >= 0x188 && sid <= 0x18f)
-	t = streamtype::dtsaudio;
-      else if (sid >= 0x120 && sid <= 0x13f)
-	t = streamtype::vobsub;
-      if (t == streamtype::vobsub) {
-	// TODO
-      }
-      else
-      */
-      if (t != streamtype::unknown
-       && audiostreams < MAXAUDIOSTREAMS) {
-	streamnumber[sid] = audiostream(audiostreams);
-	stream *S = &s[audiostream(audiostreams++)];
-	S->id = sid;
-	S->type = t;
+      streamtype::type t = stream_type(sid);
+      if (is_audio_stream(t) && count < MAXAUDIOSTREAMS) {
+	// note: streams will be renumbered later
+	streamnumber[sid] = audiostream(0);
+	++count;
       }
     }
     inbytes-=len;
     data+=len;
     continue;
   }
+
+  // renumber audio streams
+  for (sid = 0; sid < 0x300; ++sid) {
+    if (streamnumber[sid] == audiostream(0)) {
+      fprintf(stderr, "Found audio stream %d (sid 0x%03x)\n", audiostreams, sid);
+      streamnumber[sid] = audiostream(audiostreams);
+      stream *S = &s[audiostream(audiostreams++)];
+      S->id = sid;
+      S->type = stream_type(sid);
+    }
+  }
+  assert(audiostreams == count);
 
   initcodeccontexts(vid);
 }
