@@ -32,7 +32,7 @@
 
 #include <qapplication.h>
 extern "C" {
-#include <ffmpeg/avformat.h>
+#include <avformat.h>
 }
 #include <qimage.h>
 #include <qsettings.h>

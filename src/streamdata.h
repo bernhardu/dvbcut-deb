@@ -24,7 +24,7 @@
 #include <string>
 #include <list>
 extern "C" {
-#include <ffmpeg/avformat.h>
+#include <avformat.h>
 }
 
 #include "port.h"

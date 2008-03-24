@@ -24,7 +24,7 @@
 #include <string>
 
 extern "C" {
-#include <ffmpeg/avcodec.h>
+#include <avcodec.h>
 }
 
 class stream

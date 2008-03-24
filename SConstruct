@@ -32,7 +32,7 @@ opts.Add('QT_LIB',"Qt library name (qt, qt-mt)","qt-mt")
 ### FFMPEG
 
 opts.Add('FFMPEG',"""Prefix path to the FFMPEG libraries.
-        If set to '/usr', include files have to be in '/usr/include/ffmpeg'
+        If set to '/usr', include files have to be in '/usr/include'
         and static libraries in '/usr/lib'. If unset, FFMPEG will be
 	compiled locally.""",None)
 
@@ -119,10 +119,17 @@ if (env.GetOption('clean') or not ((env.has_key("FFMPEG")) and (env["FFMPEG"]!=N
   ffmpegpath=Dir("ffmpeg").abspath
 else:
   localffmpeg=False
-  ffmpegpath=env["FFMPEG"].rstrip("/")
+  ffmpegpath=env["FFMPEG"].rstrip(os.sep)
+
+if (localffmpeg or os.path.isdir(os.path.join(str(ffmpegpath),'include','ffmpeg'))):
+  env.Append(CPPPATH=os.path.join(str(ffmpegpath),'include','ffmpeg'))
+else:
+  env.Append(CPPPATH=os.path.join(str(ffmpegpath),'include','libavcodec'))
+  env.Append(CPPPATH=os.path.join(str(ffmpegpath),'include','libavformat'))
+  env.Append(CPPPATH=os.path.join(str(ffmpegpath),'include','libswscale'))
+  env.Append(CPPPATH=os.path.join(str(ffmpegpath),'include'))
 
 if (ffmpegpath!='/usr'): 
-  env.Append(CPPPATH=os.path.join(str(ffmpegpath),'include'))
   env.Append(LIBPATH=os.path.join(str(ffmpegpath),'lib'))
 env.Append(LIBS=['avformat','avcodec','avutil'])
 
@@ -133,7 +140,7 @@ if (not env.GetOption('clean') and not localffmpeg):
     conf.env.Append(CPPDEFINES="HAVE_LIB_SWSCALE")
     conf.env.ParseConfig('pkg-config --cflags --libs libswscale')
     print "Checking for C library swscale... yes"
-  elif (conf.CheckLibWithHeader('swscale', 'ffmpeg/swscale.h', 'C')):
+  elif (conf.CheckLibWithHeader('swscale', 'swscale.h', 'C')):
     conf.env.Append(CPPDEFINES="HAVE_LIB_SWSCALE")
   
 ### FINISH
