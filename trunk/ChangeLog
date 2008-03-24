@@ -1,3 +1,14 @@
+2008-03-24  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* SConstruct:
+	* src/avframe.h:
+	* src/lavfmuxer.cpp:
+	* src/lavfmuxer.h:
+	* src/main.cpp:
+	* src/stream.h:
+	* src/streamdata.h:
+		Yet another ffmpeg interface change.
+
 2008-03-23  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/psfile.cpp:
