@@ -1,3 +1,8 @@
+2008-03-31  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/Makefile.w32:
+		Fix Windows build (patch by Ralph Glasstetter).
+
 2008-03-24  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* SConstruct:
