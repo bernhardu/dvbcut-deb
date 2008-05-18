@@ -233,7 +233,8 @@ main(int argc, char *argv[]) {
           main->editConvert(1);             
       } else { 
           std::vector<int> piclist, prob_item, prob_pos;
-          unsigned int pos, j;
+          unsigned int j;
+          size_t pos;
           for (j=0; j<cutlist.size(); j++)
             if((pos=cutlist[j].find_first_not_of("0123456789:./"))==std::string::npos) {                 
               if(cutlist[j].find_first_of(":./")!=std::string::npos) 

@@ -1,3 +1,8 @@
+2008-05-18  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/main.cpp:
+		Use size_t instead of unsigned int.
+
 2008-03-31  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.w32:
