@@ -1,3 +1,17 @@
+2008-06-14  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* configure.in:
+		Improve ffmpeg/libswscale handling.
+ 
+2008-06-14  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* configure.in:
+	* install-sh:
+	* makefile.in:
+	* mkinstalldirs:
+	* src/Makefile.in:
+		New files.
+
 2008-05-18  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/main.cpp:
