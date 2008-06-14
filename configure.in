@@ -63,9 +63,11 @@ LDFLAGS="-L$ffmpeg_lib $LDFLAGS"
 
 dnl Checks for libraries.
 dnl AC_CHECK_LIB(m, sqrt, [LIBS="$LIBS -lm"])
-AC_CHECK_LIB(swscale, main,
-  [AC_DEFINE(HAVE_LIB_SWSCALE, 1, [Define this if you have libswscale.])
-  LIBS="$LIBS -lswscale"])
+if test x$ffmpeg_internal != xffmpeg_internal; then
+  AC_CHECK_LIB(swscale, main,
+    [AC_DEFINE(HAVE_LIB_SWSCALE, 1, [Define this if you have libswscale.])
+    LIBS="$LIBS -lswscale"])
+fi
 AC_CHECK_LIB(ao, ao_initialize,
   [AC_DEFINE(HAVE_LIB_AO, 1, [Define this if you have libao.])
   LIBS="$LIBS -lao"])
@@ -82,9 +84,7 @@ AC_CHECK_HEADERS(ao/ao.h mad.h stdint.h a52dec/a52.h)
 
 CPPFLAGS="$CPPFLAGS -I$ffmpeg_include"
 
-AC_CHECK_HEADERS(ffmpeg/avcodec.h libavcodec/avcodec.h libavformat/avformat.h libswscale/swscale.h)
-
-if test yes = "$ac_cv_have_libavcodec_avcodec_h"; then
+if test -f $ffmpeg_include/libavcodec/avcodec.h; then
   # newer ffmpeg versions
   CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/libavcodec"
   CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/libavformat"
@@ -120,9 +120,9 @@ AC_CHECK_LIB(qt-mt, main,
     [LIBS="$LIBS -lqt"],
     [AC_MSG_ERROR([Qt library not found])])])
 
-AC_DEFINE(__STDC_LIMIT_MACROS)
-AC_DEFINE(__STDC_CONSTANT_MACROS)
-AC_DEFINE(_FILE_OFFSET_BITS, 64)
+AC_DEFINE(__STDC_LIMIT_MACROS, 1, [Required for C++])
+AC_DEFINE(__STDC_CONSTANT_MACROS, 1, [Required for C++])
+AC_DEFINE(_FILE_OFFSET_BITS, 64, [We are always using large files])
 dnl AC_DEFINE(_LARGEFILE_SOURCE)
 
 AC_OUTPUT([makefile src/Makefile])
