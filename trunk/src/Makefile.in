@@ -1,0 +1,150 @@
+# Makefile - Makefile template for Linux/Unix
+# Copyright (c) 2007 - 2008 Michael Riepe
+#  
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#  
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#  
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+# @(#) $Id$
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+topdir = ..
+subdir = src
+
+QTDIR = @QTDIR@
+
+PATH := $(QTDIR)/bin:$(PATH)
+
+%.h: %.ui
+	uic -o $@ $<
+
+uic_%.cpp: %.h
+	uic -impl $< -o $@ $*.ui
+
+moc_%.cpp: %.h
+	moc -o $@ $<
+
+MOC = \
+	moc_dvbcut.cpp \
+	moc_dvbcutbase.cpp \
+	moc_exportdialog.cpp \
+	moc_exportdialogbase.cpp \
+	moc_mplayererrorbase.cpp \
+	moc_progressstatusbar.cpp \
+	moc_progresswindow.cpp \
+	moc_progresswindowbase.cpp
+
+UIC = \
+	uic_dvbcutbase.cpp \
+	uic_exportdialogbase.cpp \
+	uic_mplayererrorbase.cpp \
+	uic_progresswindowbase.cpp
+
+SRCS = \
+	avframe.cpp differenceimageprovider.cpp buffer.cpp \
+	dvbcut.cpp eventlistitem.cpp exception.cpp exportdialog.cpp \
+	imageprovider.cpp index.cpp lavfmuxer.cpp logoutput.cpp \
+	main.cpp mpegmuxer.cpp mpgfile.cpp playaudio.cpp \
+	progressstatusbar.cpp progresswindow.cpp psfile.cpp \
+	pts.cpp streamdata.cpp tsfile.cpp settings.cpp $(MOC) $(UIC)
+
+OBJS = $(SRCS:.cpp=.o)
+
+CXX = g++
+CXXFLAGS = -O2 -Wall -g $(DEFS) $(CPPFLAGS)
+CPPFLAGS = @CPPFLAGS@ -I.
+DEFS = @DEFS@
+LDFLAGS = @LDFLAGS@
+FFMPEG_LIBS = -lavformat -lavcodec -lavutil
+LIBS = $(FFMPEG_LIBS) @LIBS@
+
+all: @ffmpeg_internal@ $(topdir)/bin/dvbcut
+
+$(topdir)/bin/dvbcut: $(SRCS) $(OBJS)
+	$(CXX) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
+
+ffmpeg_internal: $(topdir)/ffmpeg/lib/libavcodec.a
+
+OPT.ffmpeg = \
+	--prefix=$(shell cd .. && pwd)/ffmpeg \
+	--enable-gpl \
+	--disable-decoders \
+	--enable-memalign-hack \
+	--disable-encoders \
+	--disable-ffplay \
+	--disable-ffserver \
+	--disable-vhook \
+	--disable-zlib \
+	--disable-network \
+	--disable-dv1394 \
+	--disable-bktr \
+	--disable-v4l \
+	--disable-audio-beos \
+	--disable-audio-oss \
+	--enable-codec=mpeg2encoder \
+	--enable-codec=mp2_encoder \
+	--enable-codec=ac3_decoder \
+	--enable-codec=ac3_encoder \
+	--enable-a52 \
+	--disable-mmx \
+	--disable-debug
+
+$(topdir)/ffmpeg/lib/libavcodec.a: $(topdir)/ffmpeg.src
+	if cd $(topdir)/ffmpeg.src; then \
+	  ./configure $(OPT.ffmpeg) || exit 1; \
+	  $(MAKE) installlib || exit 1; \
+	fi
+
+clean:
+	-rm -f *.o
+	-cd $(topdir)/ffmpeg.src && $(MAKE) clean
+
+distclean: clean
+	# remove moc/uic generated files and ffmpeg as well
+	-rm -f $(MOC) $(UIC)
+	-rm -rf $(topdir)/ffmpeg
+	-rm -f .depend stamp-depend
+
+maintainer-clean: distclean
+
+dep: stamp-depend
+stamp-depend: $(SRCS)
+	-@rm -f .depend $@
+	-$(CXX) -MM $(DEFS) $(CPPFLAGS) $(SRCS) > .depend
+	echo timestamp > $@
+
+-include .depend
+
+# static dependencies:
+
+moc_dvbcut.cpp: dvbcut.h
+moc_dvbcutbase.cpp: dvbcutbase.h
+moc_exportdialog.cpp: exportdialog.h
+moc_exportdialogbase.cpp: exportdialogbase.h
+moc_mplayererrorbase.cpp: mplayererrorbase.h
+moc_progressstatusbar.cpp: progressstatusbar.h
+moc_progresswindow.cpp: progresswindow.h
+moc_progresswindowbase.cpp: progresswindowbase.h
+uic_dvbcutbase.cpp: dvbcutbase.h
+uic_exportdialogbase.cpp: exportdialogbase.h
+uic_mplayererrorbase.cpp: mplayererrorbase.h
+uic_progresswindowbase.cpp: progresswindowbase.h
+dvbcutbase.h: dvbcutbase.ui
+exportdialogbase.h: exportdialogbase.ui
+mplayererrorbase.h: mplayererrorbase.ui
+progresswindowbase.h: progresswindowbase.ui
+
+dvbcut.o: version.h
+version.h: $(SRCS) $(HDRS)
+	../setversion.sh $^

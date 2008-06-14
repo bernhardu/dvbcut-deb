@@ -1,0 +1,130 @@
+# configure.in - Configure template for dvbcut.
+# Process this file with autoconf to produce a configure script.
+# Copyright (C) 2007 - 2008 Michael Riepe
+
+# @(#) $Id$
+
+AC_INIT(src/dvbcut.cpp)
+
+AC_PREREQ(2.13)
+
+dnl Checks for programs.
+AC_PROG_MAKE_SET
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_INSTALL
+
+dnl check for library dir
+mr_libdirname=lib
+set -- `LC_ALL=C $CC -print-search-dirs | sed -n -e 's,^libraries: ,,p' | sed -e 's,^=,,' | sed -e 's,:, ,'g`
+for ac_dir; do
+  case `cd $ac_dir 2>/dev/null && pwd` in
+    */lib32 | */lib32/) mr_libdirname=lib32; break;;
+    */lib64 | */lib64/) mr_libdirname=lib64; break;;
+  esac
+done
+
+ffmpeg_prefix=`pwd`/ffmpeg
+ffmpeg_lib=$ffmpeg_prefix/lib	# internally, use lib regardless of architecture
+ffmpeg_internal=ffmpeg_internal
+AC_ARG_WITH(ffmpeg,
+  [  --with-ffmpeg=DIR       use installed ffmpeg in DIR],
+  [case $withval in
+    no)
+      ;;
+    ''|yes)
+      AC_MSG_ERROR([You MUST specify a directory for ffmpeg.])
+      ;;
+    *)
+      ffmpeg_prefix=$withval
+      ffmpeg_lib=$ffmpeg_prefix/$mr_libdirname
+      ffmpeg_internal=
+      ;;
+  esac])
+AC_SUBST(ffmpeg_prefix)
+AC_SUBST(ffmpeg_internal)
+
+ffmpeg_include=$ffmpeg_prefix/include
+
+AC_ARG_WITH(ffmpeg-include,
+  [  --with-ffmpeg-include=DIR   set ffmpeg include directory],
+  [case $withval in
+    ''|yes|no) AC_MSG_ERROR([You MUST specify a directory for ffmpeg-include.]);;
+    *) ffmpeg_include=$withval;;
+  esac])
+AC_ARG_WITH(ffmpeg-lib,
+  [  --with-ffmpeg-lib=DIR   set ffmpeg library directory],
+  [case $withval in
+    ''|yes|no) AC_MSG_ERROR([You MUST specify a directory for ffmpeg-lib.]);;
+    *) ffmpeg_lib=$withval;;
+  esac])
+
+LDFLAGS="-L$ffmpeg_lib $LDFLAGS"
+
+dnl Checks for libraries.
+dnl AC_CHECK_LIB(m, sqrt, [LIBS="$LIBS -lm"])
+AC_CHECK_LIB(swscale, main,
+  [AC_DEFINE(HAVE_LIB_SWSCALE, 1, [Define this if you have libswscale.])
+  LIBS="$LIBS -lswscale"])
+AC_CHECK_LIB(ao, ao_initialize,
+  [AC_DEFINE(HAVE_LIB_AO, 1, [Define this if you have libao.])
+  LIBS="$LIBS -lao"])
+AC_CHECK_LIB(mad, mad_decoder_init,
+  [AC_DEFINE(HAVE_LIB_MAD, 1, [Define this if you have libmad.])
+  LIBS="$LIBS -lmad"])
+AC_CHECK_LIB(a52, a52_init,
+  [AC_DEFINE(HAVE_LIB_A52, 1, [Define this if you have liba52.])
+  LIBS="$LIBS -la52"])
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(ao/ao.h mad.h stdint.h a52dec/a52.h)
+
+CPPFLAGS="$CPPFLAGS -I$ffmpeg_include"
+
+AC_CHECK_HEADERS(ffmpeg/avcodec.h libavcodec/avcodec.h libavformat/avformat.h libswscale/swscale.h)
+
+if test yes = "$ac_cv_have_libavcodec_avcodec_h"; then
+  # newer ffmpeg versions
+  CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/libavcodec"
+  CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/libavformat"
+  CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/libswscale"
+else
+  # older ffmpeg versions
+  CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/ffmpeg"
+fi
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_OFF_T
+AC_TYPE_SIZE_T
+
+dnl Checks for library functions.
+AC_FUNC_MMAP
+
+dnl external stuff
+AC_ARG_WITH(qt3, [  --with-qt3=DIR          path to qt3],
+  [case $withval in
+    no) QTDIR=no;;
+    yes) ;;
+    *) QTDIR=$withval;;
+  esac])
+AC_SUBST(QTDIR)
+
+CPPFLAGS="$CPPFLAGS -I$QTDIR/include"
+LDFLAGS="$LDFLAGS -L$QTDIR/$mr_libdirname"
+
+AC_CHECK_LIB(qt-mt, main,
+  [LIBS="$LIBS -lqt-mt"],
+  [AC_CHECK_LIB(qt, main,
+    [LIBS="$LIBS -lqt"],
+    [AC_MSG_ERROR([Qt library not found])])])
+
+AC_DEFINE(__STDC_LIMIT_MACROS)
+AC_DEFINE(__STDC_CONSTANT_MACROS)
+AC_DEFINE(_FILE_OFFSET_BITS, 64)
+dnl AC_DEFINE(_LARGEFILE_SOURCE)
+
+AC_OUTPUT([makefile src/Makefile])
+
+# vi: set ts=8 sw=2 :
