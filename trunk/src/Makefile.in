@@ -22,6 +22,27 @@ top_srcdir = @top_srcdir@
 topdir = ..
 subdir = src
 
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+datadir = @datadir@
+mandir = @mandir@
+man1dir = $(mandir)/man1
+
+installdirs = $(bindir)
+
+CXX = @CXX@
+CXXFLAGS = @CXXFLAGS@ -Wall $(DEFS) $(CPPFLAGS)
+CPPFLAGS = @CPPFLAGS@ -I.
+DEFS = @DEFS@
+LDFLAGS = @LDFLAGS@
+FFMPEG_LIBS = -lavformat -lavcodec -lavutil
+LIBS = $(FFMPEG_LIBS) @LIBS@
+
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+
 QTDIR = @QTDIR@
 
 PATH := $(QTDIR)/bin:$(PATH)
@@ -61,15 +82,17 @@ SRCS = \
 
 OBJS = $(SRCS:.cpp=.o)
 
-CXX = g++
-CXXFLAGS = -O2 -Wall -g $(DEFS) $(CPPFLAGS)
-CPPFLAGS = @CPPFLAGS@ -I.
-DEFS = @DEFS@
-LDFLAGS = @LDFLAGS@
-FFMPEG_LIBS = -lavformat -lavcodec -lavutil
-LIBS = $(FFMPEG_LIBS) @LIBS@
-
 all: @ffmpeg_internal@ $(topdir)/bin/dvbcut
+
+check:
+
+install: all installdirs
+	$(INSTALL_PROGRAM) $(topdir)/bin/dvbcut $(bindir)
+
+installdirs: $(installdirs)
+
+$(installdirs):
+	$(SHELL) $(top_srcdir)/mkinstalldirs $@
 
 $(topdir)/bin/dvbcut: $(SRCS) $(OBJS)
 	$(CXX) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)

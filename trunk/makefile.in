@@ -20,13 +20,30 @@
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+datadir = @datadir@
+mandir = @mandir@
+man1dir = $(mandir)/man1
+
+installdirs = $(mandir) $(man1dir)
+
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+
 all check install mostlyclean clean distclean maintainer-clean::
 	$(MAKE) -C src $@
 	$(MAKE) $@-local
 
 all-local:
 check-local:
-install-local:
+install-local: $(installdirs) dvbcut.1
+	$(INSTALL_DATA) dvbcut.1 $(man1dir)/dvbcut.1
+
+$(installdirs):
+	$(SHELL) $(top_srcdir)/mkinstalldirs $@
 
 mostlyclean-local:
 clean-local: mostlyclean-local
