@@ -8,11 +8,24 @@ AC_INIT(src/dvbcut.cpp)
 
 AC_PREREQ(2.13)
 
+AC_CANONICAL_SYSTEM
+
 dnl Checks for programs.
 AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
+AC_CHECK_TOOL(STRIP, strip, :)
+
+AC_CYGWIN
+AC_MINGW32
+AC_EXEEXT
+AC_OBJEXT
+
+if test "$MINGW32" = yes; then
+  CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+  LDFLAGS="$LDFLAGS -L/usr/local/lib"
+fi
 
 dnl check for library dir
 mr_libdirname=lib
@@ -62,21 +75,45 @@ AC_ARG_WITH(ffmpeg-lib,
 LDFLAGS="-L$ffmpeg_lib $LDFLAGS"
 
 dnl Checks for libraries.
-dnl AC_CHECK_LIB(m, sqrt, [LIBS="$LIBS -lm"])
+
+FFMPEG_LIBS='-lavformat -lavcodec -lavutil'
+AC_SUBST(FFMPEG_LIBS)
+
 if test x$ffmpeg_internal != xffmpeg_internal; then
   AC_CHECK_LIB(swscale, main,
     [AC_DEFINE(HAVE_LIB_SWSCALE, 1, [Define this if you have libswscale.])
-    LIBS="$LIBS -lswscale"])
+    FFMPEG_LIBS="$FFMPEG_LIBS -lswscale"])
 fi
-AC_CHECK_LIB(ao, ao_initialize,
-  [AC_DEFINE(HAVE_LIB_AO, 1, [Define this if you have libao.])
-  LIBS="$LIBS -lao"])
+
 AC_CHECK_LIB(mad, mad_decoder_init,
   [AC_DEFINE(HAVE_LIB_MAD, 1, [Define this if you have libmad.])
-  LIBS="$LIBS -lmad"])
+  LIBS="$LIBS -lmad"],
+  [AC_MSG_ERROR([Did not find required mad library])])
 AC_CHECK_LIB(a52, a52_init,
   [AC_DEFINE(HAVE_LIB_A52, 1, [Define this if you have liba52.])
-  LIBS="$LIBS -la52"])
+  LIBS="$LIBS -la52"],
+  [AC_MSG_ERROR([Did not find required a52 library])])
+
+mr_other_libs=
+if test "$MINGW32" = yes; then
+  mr_other_libs=-lwinmm
+fi
+
+AC_CHECK_LIB(ao, ao_initialize,
+  [AC_DEFINE(HAVE_LIB_AO, 1, [Define this if you have libao.])
+  LIBS="$LIBS -lao $mr_other_libs"],
+  [AC_MSG_WARN([Did not find libao - dvbcut will not play audio])],
+  [$mr_other_libs])
+
+STDLIB=
+AC_SUBST(STDLIB)
+
+if test "$MINGW32" = yes; then
+  CPPFLAGS="-I\$(top_srcdir)/import $CPPFLAGS"
+  STDLIB='$(top_srcdir)/import/stdlib.cpp'
+fi
+
+dnl AC_CHECK_LIB(m, sqrt, [LIBS="$LIBS -lm"])
 
 dnl Checks for header files.
 AC_HEADER_STDC

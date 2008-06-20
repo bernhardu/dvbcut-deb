@@ -47,6 +47,7 @@ $(installdirs):
 
 mostlyclean-local:
 clean-local: mostlyclean-local
+	rm -rf ffmpeg
 	rm -f config.log
 distclean-local: clean-local
 	rm -f makefile config.cache config.status

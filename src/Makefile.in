@@ -36,12 +36,17 @@ CXXFLAGS = @CXXFLAGS@ -Wall $(DEFS) $(CPPFLAGS)
 CPPFLAGS = @CPPFLAGS@ -I.
 DEFS = @DEFS@
 LDFLAGS = @LDFLAGS@
-FFMPEG_LIBS = -lavformat -lavcodec -lavutil
+FFMPEG_LIBS = @FFMPEG_LIBS@
 LIBS = $(FFMPEG_LIBS) @LIBS@
 
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
+STRIP = @STRIP@
+
+EXEEXT = @EXEEXT@
+OBJEXT = @OBJEXT@
+STDLIB = @STDLIB@
 
 QTDIR = @QTDIR@
 
@@ -78,23 +83,28 @@ SRCS = \
 	imageprovider.cpp index.cpp lavfmuxer.cpp logoutput.cpp \
 	main.cpp mpegmuxer.cpp mpgfile.cpp playaudio.cpp \
 	progressstatusbar.cpp progresswindow.cpp psfile.cpp \
-	pts.cpp streamdata.cpp tsfile.cpp settings.cpp $(MOC) $(UIC)
+	pts.cpp streamdata.cpp tsfile.cpp settings.cpp $(MOC) $(UIC) \
+	$(STDLIB)
 
-OBJS = $(SRCS:.cpp=.o)
+OBJS = $(SRCS:.cpp=.$(OBJEXT))
 
-all: @ffmpeg_internal@ $(topdir)/bin/dvbcut
+all: @ffmpeg_internal@ $(topdir)/bin/dvbcut$(EXEEXT)
 
 check:
 
 install: all installdirs
-	$(INSTALL_PROGRAM) $(topdir)/bin/dvbcut $(bindir)
+	$(INSTALL_PROGRAM) $(topdir)/bin/dvbcut$(EXEEXT) $(bindir)
 
 installdirs: $(installdirs)
 
 $(installdirs):
 	$(SHELL) $(top_srcdir)/mkinstalldirs $@
 
-$(topdir)/bin/dvbcut: $(SRCS) $(OBJS)
+$(topdir)/bin/dvbcut$(EXEEXT): dvbcut$(EXEEXT)
+	$(INSTALL_PROGRAM) dvbcut$(EXEEXT) $(topdir)/bin/dvbcut$(EXEEXT)
+	$(STRIP) $(topdir)/bin/dvbcut$(EXEEXT)
+
+dvbcut$(EXEEXT): $(SRCS) $(OBJS)
 	$(CXX) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
 
 ffmpeg_internal: $(topdir)/ffmpeg/lib/libavcodec.a
@@ -130,8 +140,8 @@ $(topdir)/ffmpeg/lib/libavcodec.a: $(topdir)/ffmpeg.src
 	fi
 
 clean:
-	-rm -f *.o
 	-cd $(topdir)/ffmpeg.src && $(MAKE) clean
+	-rm -f *.$(OBJEXT)
 
 distclean: clean
 	# remove moc/uic generated files and ffmpeg as well
@@ -168,6 +178,6 @@ exportdialogbase.h: exportdialogbase.ui
 mplayererrorbase.h: mplayererrorbase.ui
 progresswindowbase.h: progresswindowbase.ui
 
-dvbcut.o: version.h
+dvbcut.$(OBJEXT): version.h
 version.h: $(SRCS) $(HDRS)
 	../setversion.sh $^
