@@ -1,3 +1,9 @@
+2008-10-10  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/mpegmuxer.h:
+	* src/mpegmuxer.cpp:
+		Return false if writing fails.
+
 2008-06-14  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* configure.in:
