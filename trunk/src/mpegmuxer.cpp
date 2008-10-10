@@ -297,7 +297,7 @@ bool mpegmuxer::flush(bool flushall)
         pack p(packsize,0,muxrate,0);
         scr+=13500000;
         p.setscr(scr);
-        ::write(fd,p.getdata(),p.getsize());
+        if (!p.write(fd)) return false;
         }
 
       scr=minscr;
@@ -362,7 +362,7 @@ bool mpegmuxer::flush(bool flushall)
               ptsstring(scr2pts(p->getmaxscr())).c_str(),
               ptsstring(p->getdts()).c_str(),
               s->getbuffree() );
-    ::write(fd,p->getdata(),p->getsize());
+    if (!p->write(fd)) return false;
     if (p->getaupayloadlen()>0) {
       s->fill(p->getaupayloadlen());
       }
@@ -737,3 +737,25 @@ void mpegmuxer::pack::setscr(scr_t scr)
   d[4]=((scrb32<<3)&0xf8)|0x04|((scrx>>7)&0x03);
   d[5]=scrx<<1|0x01;
   }
+
+bool
+mpegmuxer::pack::write(int fd) {
+  uint8_t *d = (uint8_t*)data;
+  size_t len = size;
+  ssize_t n = 0;
+
+  while (len > 0 && (n = ::write(fd, d, len)) > 0) {
+    len -= n;
+    d += n;
+  }
+  if (len == 0) {
+    return true;
+  }
+  if (n == 0) {
+    fprintf(stderr, "zero-length write - disk full?\n");
+  }
+  else {
+    perror("write");
+  }
+  return false;
+}

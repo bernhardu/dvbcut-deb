@@ -196,6 +196,8 @@ public:
       {
       return maxscr<p.maxscr;
       }
+
+    bool write(int fd);
     };
 
   class stream
