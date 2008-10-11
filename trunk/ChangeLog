@@ -1,3 +1,12 @@
+2008-10-10  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* dvbcutbase.ui 
+	* dvbcut.cpp
+	* index.cpp 
+	* index.h
+	* mpgfile.h
+		Show picture related infos (slightly changed index format!)
+ 
 2008-10-10  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/mpegmuxer.h:

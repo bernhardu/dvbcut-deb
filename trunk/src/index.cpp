@@ -27,6 +27,9 @@
 #include <cstring>
 #include <list>
 #include <utility>
+#include <set>
+#include <vector>
+#include <string>
 
 #include "port.h"
 #include "index.h"
@@ -58,8 +61,12 @@ static inline ssize_t writer(int fd, const void *buf, size_t count)
 
 index::~index()
   {
-  if (p)
-    free(p);
+    if (p) {
+      free(p);
+      // delete read resolutions
+      WIDTH.clear();		
+      HEIGHT.clear();		
+    }
   }
 
 int index::generate(const char *savefilename, std::string *errorstring, logoutput *log)
@@ -68,7 +75,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   bool usestdout=false;
   int pictureswritten=0;
   dvbcut_off_t filesize=0;
-
+  
   if (savefilename && savefilename[0]) {
     if (savefilename[0]=='-' && savefilename[1]==0) // use stdout
       {
@@ -106,11 +113,16 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   bool foundseqheader=false;
   bool waitforfirstsequenceheader=true;
   int aspectratio=0,framerate=0;
-  filepos_t seqheaderpos=0;
+  double maxbitrate=0., bitrate;
+  long int bits=0;
+  pts_t maxbitratepts=0, dt;
+  std::pair<int,int> res;
+  int nres = 0;
+  filepos_t seqheaderpos=0, lastseqheaderpos=0;
   int seqheaderpic=0;
   pts_t referencepts=0; // pts of picture #0 in current sequence
   int maxseqnr=-1; // maximum sequence number in current sequence
-  pts_t lastpts=1ll<<31;
+  pts_t lastpts=1ll<<31, lastseqheaderpts=0, firstseqheaderpts=0;
   int last_non_b_pic = -1;
   int last_non_b_seqnr = -1;
   int last_seqnr = -1;
@@ -174,6 +186,21 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
         foundseqheader=true;
         sd->discard(skip);
         data=(const uint8_t*) sd->getdata();
+
+        // store found resolutions in lookup table 
+        res.first=(data[4]<<4)|((data[5]>>4)&0xf);      // width
+        res.second=((data[5]&0xf)<<8)|data[6];          // height
+        if (resolutions.find(res)==resolutions.end() && nres<7) {
+          nres++; 
+	  resolutions.insert(res);   // a set helps checking already read resolutions
+	  WIDTH.push_back(res.first);		
+	  HEIGHT.push_back(res.second);		
+	  //fprintf(stderr, "RESOLUTION[%d]: %d x %d\n", nres, res.first, res.second);
+	}
+        
+        // that's always the same preset value and thus not very usefull (in 400 bps)!!!
+	//bitrate = ((data[8]<<10)|(data[9]<<2)|((data[10]>>6)&0x3))*400;      
+        //if (bitrate>maxbitrate) maxbitrate=bitrate;
 
         aspectratio=(data[7]>>4)&0xf;
         framerate=data[7]&0xf;
@@ -245,7 +272,27 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
           p=(picture*)realloc((void*)p,size*sizeof(picture));
           }
 
-        p[pictures]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,aspectratio,seqnr,frametype,foundseqheader);
+        p[pictures]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,aspectratio,seqnr,frametype,foundseqheader,nres);
+
+        // try to determine bitrate per GOP manually since the read one is not very usefull 
+        if (foundseqheader) {
+          if (firstseqheaderpts && lastseqheaderpos<seqheaderpos && lastseqheaderpts<pts) {
+            dt = (pts-lastseqheaderpts)/90;
+            bits = (seqheaderpos-lastseqheaderpos)*8;
+            // avergage (input) bitrate per GOP
+            bitrate=1000*double(bits)/double(dt);
+            if (maxbitrate<bitrate) {
+              maxbitrate=bitrate;
+              maxbitratepts=lastseqheaderpts; 
+            }  
+	    //fprintf(stderr, "%s: BITRATE = %d kbps over next %d ms\n",
+           //                 ptsstring(lastseqheaderpts-firstseqheaderpts).c_str(), int(bitrate/1024.), int(dt));          
+          } else {
+            firstseqheaderpts=pts;
+          }
+          lastseqheaderpos=seqheaderpos;
+          lastseqheaderpts=pts;
+        } 
 
         if (frametype == IDX_PICTYPE_I) {
 	  if (lastiframe >= 0) {
@@ -313,6 +360,16 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
     sd->discard(skip);
     }
 
+  // create 7 fake pictures containing read resolutions (pos: width, pts: height)
+  for (int i=0; i<nres; i++) {
+      p[pictures]=picture(filepos_t(WIDTH[i]),pts_t(HEIGHT[i]),0,0,0,0,false,i+1);
+      ++pictures;
+  }  
+  for (int i=nres; i<7; i++) {
+      p[pictures]=picture(filepos_t(0),pts_t(0),0,0,0,0,false,i+1);
+      ++pictures;
+  }  
+
   if (err1cnt > 0)
     fprintf(stderr, "last video PTS error repeated %d times\n", err1cnt);
   if (errcnt > 0)
@@ -344,6 +401,9 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 
   if (!usestdout && fd>=0)
     ::close(fd);
+
+  pictures-=7;  // subtract fake pictures
+  fprintf(stderr, "Max. input bitrate of %d kbps detected at %s!\n", int(maxbitrate/1024), ptsstring(maxbitratepts-firstseqheaderpts).c_str());
 
   return check();
   }
@@ -454,6 +514,23 @@ int index::load(const char *filename, std::string *errorstring)
     }
   p=(picture*)realloc((void*)data,pictures*sizeof(picture));
 
+  // 7 fake pictures at end contain resolution lookup table 
+  // (if new type of index file, after svn-revision 131)
+  if (p[0].getresolution()>0) {
+    pictures-=7;
+    int w, h, nres=0;
+    for (int i=pictures; nres<7; i++) {
+      w=int(p[i].getpos());
+      h=int(p[i].getpts());    
+      if (w==0 || h==0)
+        break;
+      nres++;  
+      WIDTH.push_back(w);         
+      HEIGHT.push_back(h);                
+      //fprintf(stderr, "RESOLUTION[%d]: %d x %d\n", nres, w, h);
+    }  
+  }
+
   int seqnr[1<<10]={0};
   int seqpics=0;
   for(int i=0;;++i) {
@@ -502,7 +579,7 @@ int index::load(const char *filename, std::string *errorstring)
       return -3;
       }
     }
-
+  
   return check();
   }
 

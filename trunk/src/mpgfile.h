@@ -203,6 +203,14 @@ public:
     {
     return idx.save(filename,errorstring);
     }
+  int getwidth(int res)
+    {
+	return idx.getwidth(res); 
+    }	
+  int getheight(int res)
+    {
+	return idx.getheight(res); 
+    }	
 
   void decodegop(int start, int stop, std::list<avframe*> &framelist);
   void initaudiocodeccontext(int aud);

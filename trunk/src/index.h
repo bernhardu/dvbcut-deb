@@ -23,6 +23,8 @@
 
 #include <stdint.h>
 #include <byteswap.h>
+#include <set>
+#include <vector>
 #include "types.h"
 #include "pts.h"
 #include "defines.h"
@@ -45,7 +47,8 @@ public:
     {
     filepos_t position;
     uint64_t pts; // additional information in the 24 most significant bits:
-    // ...QTTSSSSSSSSSSAAAAFFFF
+    // RRRQTTSSSSSSSSSSAAAAFFFF
+    // R: resolution number (according to lookup table with WIDTHxHEIGHT at end of index)
     // Q: sequence header flag
     // T: picture type
     // S: picture sequence number
@@ -53,10 +56,11 @@ public:
     // F: frame rate (mpeg code)
 
     picture(filepos_t pos, pts_t _pts, int framerate, int aspectratio,
-            int sequencenumber, int picturetype, bool seqheader=false) :
+            int sequencenumber, int picturetype, bool seqheader=false, int resolution=0) :
         position( pos ),
         pts((_pts&0xffffffffffll) | ((uint64_t)( (framerate&0xf)|((aspectratio&0xf)<<4)|
-                                       ((sequencenumber&0x3ff)<<8)|((picturetype&0x3)<<18)|(seqheader?0x100000:0) )<<40))
+                                    ((sequencenumber&0x3ff)<<8)|((picturetype&0x3)<<18)|
+                                    (seqheader?0x100000:0)|((resolution&0x7)<<21) )<<40))
       { }
     picture() : position(0), pts(0)
       {}
@@ -94,6 +98,10 @@ public:
       {
       return pts&0x1000000000000000ll;
       }
+    int getresolution() const
+      {
+      return int(pts>>61)&0x7;
+      }
     bool isbframe() const
       {
       return getpicturetype()==IDX_PICTYPE_B;
@@ -123,6 +131,11 @@ protected:
   int realpictures;
 
   int check();
+   
+  // lookup-tables with found resolutions (stored at end of index file and coded in 3
+  // most significant bits of picture structure, 0 for old type index files)
+  std::vector<int> WIDTH, HEIGHT;  
+  std::set<std::pair<int,int> > resolutions;
 
 public:
   index(mpgfile &m) : mpg(m),p(0),pictures(0)
@@ -134,6 +147,15 @@ public:
   int save(int fd, std::string *errorstring = 0, bool closeme = false);
   int save(const char *filename, std::string *errorstring=0);
   int load(const char *filename, std::string *errorstring=0);
+  
+  int getwidth(int res) const
+  {
+      return res>0 && res<=int(WIDTH.size()) ? WIDTH[res-1] : -1;
+  }
+  int getheight(int res) const
+  {
+      return res>0 && res<=int(HEIGHT.size()) ? HEIGHT[res-1] : -1;
+  }
 
   int indexnr(int pic) const
     {

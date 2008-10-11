@@ -1663,6 +1663,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   imagedisplay->setPixmap(QPixmap());
   pictimelabel->clear();
   pictimelabel2->clear();
+  picinfolabel->clear();
+  picinfolabel2->clear();
   linslider->setValue(0);
   jogslider->setValue(0);
 
@@ -1705,6 +1707,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   imagedisplay->setEnabled(false);
   pictimelabel->setEnabled(false);
   pictimelabel2->setEnabled(false);
+  picinfolabel->setEnabled(false);
+  picinfolabel2->setEnabled(false);
   goinput->setEnabled(false);
   gobutton->setEnabled(false);
   goinput2->setEnabled(false);
@@ -2051,6 +2055,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   imagedisplay->setEnabled(true);
   pictimelabel->setEnabled(true);
   pictimelabel2->setEnabled(true);
+  picinfolabel->setEnabled(true);
+  picinfolabel2->setEnabled(true);
   goinput->setEnabled(true);
   gobutton->setEnabled(true);
   goinput2->setEnabled(true);
@@ -2203,7 +2209,9 @@ void dvbcut::update_time_display()
   {
   const index::picture &idx=(*mpg)[curpic];
   const pts_t pts=idx.getpts()-firstpts;
-  
+  const char *AR[]={"forbidden","1:1","4:3","16:9","2.21:1","reserved"};
+  const char *FR[]={"forbidden","23.976","24","25","29.97","30","50","59.94","60","reserved"};  
+ 
   int outpic=0;
   pts_t outpts=0;
   QChar mark = ' ';
@@ -2240,6 +2248,21 @@ void dvbcut::update_time_display()
   pictimelabel2->setText(outtime);
   goinput->setText(QString::number(curpic));
   goinput2->setText(QString::number(outpic));
+  
+  int res=idx.getresolution();	// are found video resolutions stored in index?
+  if (res) {	
+    // new index with resolution bits set and lookup table at the end			  
+    picinfolabel->setText(QString::number(mpg->getwidth(res)) + "x" 
+                        + QString::number(mpg->getheight(res)));
+  } else {
+    // in case of an old index file type (or if we don't want to change the index format/encoding?)
+    // ==> get info directly from each image (which could be somewhat slower?!?)
+    QImage p = imageprovider(*mpg, new dvbcutbusy(this), true).getimage(curpic,false);   
+    picinfolabel->setText(QString::number(p.width()) + "x" 
+                        + QString::number(p.height()));
+  }
+  picinfolabel2->setText(QString(FR[idx.getframerate()]) + "fps, "
+                      + QString(AR[idx.getaspectratio()]));
 
   }
 
