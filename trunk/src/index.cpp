@@ -272,7 +272,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
           p=(picture*)realloc((void*)p,size*sizeof(picture));
           }
 
-        p[pictures]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,aspectratio,seqnr,frametype,foundseqheader,nres);
+        p[pictures]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,aspectratio,seqnr,frametype,foundseqheader,0/*nres*/);
 
         // try to determine bitrate per GOP manually since the read one is not very usefull 
         if (foundseqheader) {
@@ -360,16 +360,6 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
     sd->discard(skip);
     }
 
-  // create 7 fake pictures containing read resolutions (pos: width, pts: height)
-  for (int i=0; i<nres; i++) {
-      p[pictures]=picture(filepos_t(WIDTH[i]),pts_t(HEIGHT[i]),0,0,0,0,false,i+1);
-      ++pictures;
-  }  
-  for (int i=nres; i<7; i++) {
-      p[pictures]=picture(filepos_t(0),pts_t(0),0,0,0,0,false,i+1);
-      ++pictures;
-  }  
-
   if (err1cnt > 0)
     fprintf(stderr, "last video PTS error repeated %d times\n", err1cnt);
   if (errcnt > 0)
@@ -383,9 +373,26 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   if (pictures==0) {
     free(p);
     p=0;
-    } else if (size!=pictures) {
-    p=(picture*)realloc((void*)p,pictures*sizeof(picture));
+  } else {
+#if 0
+    if (size < pictures + 7) {
+      size = pictures + 7;
+      p=(picture*)realloc((void*)p,size*sizeof(picture));
     }
+    // create 7 fake pictures containing read resolutions (pos: width, pts: height)
+    for (int i=0; i<nres; i++) {
+      p[pictures]=picture(filepos_t(WIDTH[i]),pts_t(HEIGHT[i]),0,0,0,0,false,i+1);
+      ++pictures;
+    }  
+    for (int i=nres; i<7; i++) {
+      p[pictures]=picture(filepos_t(0),pts_t(0),0,0,0,0,false,i+1);
+      ++pictures;
+    }  
+#endif
+    if (size != pictures) {
+      p=(picture*)realloc((void*)p,pictures*sizeof(picture));
+    }
+  }
 
   if (fd>=0 && pictureswritten<pictures) {
     int len=(pictures-pictureswritten)*sizeof(picture);
@@ -402,7 +409,10 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   if (!usestdout && fd>=0)
     ::close(fd);
 
-  pictures-=7;  // subtract fake pictures
+#if 0
+  if (pictures != 0)
+    pictures-=7;  // subtract fake pictures
+#endif
   fprintf(stderr, "Max. input bitrate of %d kbps detected at %s!\n", int(maxbitrate/1024), ptsstring(maxbitratepts-firstseqheaderpts).c_str());
 
   return check();
@@ -538,13 +548,15 @@ int index::load(const char *filename, std::string *errorstring)
       for(int j=0;j<seqpics;++j) {
         if (seqnr[j]!=1) // this sequence-number did not appear exactly once
           {
+          if (errorstring)
+            *errorstring+=std::string("Invalid index file (")+filename+")\n";
+          fprintf(stderr,"Invalid index file: sequence number %u appears %u times\n",
+			  j, seqnr[j]);
+          fprintf(stderr, "Picture %u/%u, %u seqpics\n", i, pictures, seqpics);
           free(p);
           p=0;
           pictures=0;
           realpictures=0;
-          if (errorstring)
-            *errorstring+=std::string("Invalid index file (")+filename+")\n";
-          fprintf(stderr,"Invalid index file: sequence number did not appear exactly once\n");
           return -2;
           }
         seqnr[j]=0;
