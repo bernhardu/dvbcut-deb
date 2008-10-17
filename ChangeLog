@@ -1,10 +1,15 @@
+2008-10-17  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/index.cpp:
+		Disable generation of new index format for now.
+
 2008-10-10  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
-	* dvbcutbase.ui 
-	* dvbcut.cpp
-	* index.cpp 
-	* index.h
-	* mpgfile.h
+	* src/dvbcutbase.ui:
+	* src/dvbcut.cpp:
+	* src/index.cpp:
+	* src/index.h:
+	* src/mpgfile.h:
 		Show picture related infos (slightly changed index format!)
  
 2008-10-10  Michael Riepe  <too-tired@users.sourceforge.net>
