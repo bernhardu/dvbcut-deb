@@ -1,3 +1,8 @@
+2008-10-19  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/buffer.cpp:
+		Fix Ubuntu compilation error.
+
 2008-10-17  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/index.cpp:

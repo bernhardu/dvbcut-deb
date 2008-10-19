@@ -499,7 +499,8 @@ outbuffer::~outbuffer()
 int outbuffer::open(const char* filename)
   {
   close=true;
-  return fd=::open(filename,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
+  return fd=::open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY,
+		   S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH);
   }
 
 int outbuffer::putdata(const void *data, unsigned int len, bool autoresize)
