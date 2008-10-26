@@ -42,6 +42,8 @@
 #define O_BINARY    0
 #endif /* O_BINARY */
 
+#define WRITE_FAKE_PICTURES	// #undef to disable writing fake pictures
+
 static inline ssize_t writer(int fd, const void *buf, size_t count)
   {
   int written=0;
@@ -116,7 +118,6 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   double maxbitrate=0., bitrate;
   long int bits=0;
   pts_t maxbitratepts=0, dt;
-  std::pair<int,int> res;
   int nres = 0;
   filepos_t seqheaderpos=0, lastseqheaderpos=0;
   int seqheaderpic=0;
@@ -188,6 +189,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
         data=(const uint8_t*) sd->getdata();
 
         // store found resolutions in lookup table 
+	std::pair<int,int> res;
         res.first=(data[4]<<4)|((data[5]>>4)&0xf);      // width
         res.second=((data[5]&0xf)<<8)|data[6];          // height
         if (resolutions.find(res)==resolutions.end() && nres<7) {
@@ -197,7 +199,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
 	  HEIGHT.push_back(res.second);		
 	  //fprintf(stderr, "RESOLUTION[%d]: %d x %d\n", nres, res.first, res.second);
 	}
-        
+
         // that's always the same preset value and thus not very usefull (in 400 bps)!!!
 	//bitrate = ((data[8]<<10)|(data[9]<<2)|((data[10]>>6)&0x3))*400;      
         //if (bitrate>maxbitrate) maxbitrate=bitrate;
@@ -272,7 +274,13 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
           p=(picture*)realloc((void*)p,size*sizeof(picture));
           }
 
-        p[pictures]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,aspectratio,seqnr,frametype,foundseqheader,0/*nres*/);
+#ifdef WRITE_FAKE_PICTURES
+        p[pictures]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,
+			    aspectratio,seqnr,frametype,foundseqheader,nres);
+#else
+        p[pictures]=picture(foundseqheader?seqheaderpos:picpos,pts,framerate,
+			    aspectratio,seqnr,frametype,foundseqheader,0);
+#endif
 
         // try to determine bitrate per GOP manually since the read one is not very usefull 
         if (foundseqheader) {
@@ -374,18 +382,16 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
     free(p);
     p=0;
   } else {
-#if 0
+#ifdef WRITE_FAKE_PICTURES
     if (size < pictures + 7) {
       size = pictures + 7;
       p=(picture*)realloc((void*)p,size*sizeof(picture));
     }
-    // create 7 fake pictures containing read resolutions (pos: width, pts: height)
-    for (int i=0; i<nres; i++) {
-      p[pictures]=picture(filepos_t(WIDTH[i]),pts_t(HEIGHT[i]),0,0,0,0,false,i+1);
-      ++pictures;
-    }  
-    for (int i=nres; i<7; i++) {
-      p[pictures]=picture(filepos_t(0),pts_t(0),0,0,0,0,false,i+1);
+    // create fake pictures containing read resolutions (pos: width, pts: height)
+    for (int i=0; i<7; i++) {
+      int w = i < nres ? WIDTH[i] : 0;
+      int h = i < nres ? HEIGHT[i] : 0;
+      p[pictures]=picture(filepos_t(w),pts_t(h),0,0,0,0,false,i+1);
       ++pictures;
     }  
 #endif
@@ -409,18 +415,22 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
   if (!usestdout && fd>=0)
     ::close(fd);
 
-#if 0
+#ifdef WRITE_FAKE_PICTURES
   if (pictures != 0)
     pictures-=7;  // subtract fake pictures
 #endif
-  fprintf(stderr, "Max. input bitrate of %d kbps detected at %s!\n", int(maxbitrate/1024), ptsstring(maxbitratepts-firstseqheaderpts).c_str());
+  fprintf(stderr, "Max. input bitrate of %d kbps detected at %s\n", int(maxbitrate/1024), ptsstring(maxbitratepts-firstseqheaderpts).c_str());
 
   return check();
   }
 
 int
 index::save(int fd, std::string *errorstring, bool closeme) {
+#ifdef WRITE_FAKE_PICTURES
+  int len = (pictures + 7) * sizeof(picture);
+#else
   int len = pictures * sizeof(picture);
+#endif
   int res = 0;
   int save = 0;
 
