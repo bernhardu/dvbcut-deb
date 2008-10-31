@@ -41,8 +41,13 @@ avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
                  (u_int8_t*)tobefreed,
                  ctx->pix_fmt,ctx->width,ctx->height);
 
+#if LIBAVCODEC_VERSION_INT >= (51 << 16)
+  av_picture_copy((AVPicture *)f, (const AVPicture *) src,
+                  ctx->pix_fmt, ctx->width, ctx->height);
+#else
   img_copy((AVPicture *)f, (const AVPicture *) src,
            ctx->pix_fmt, ctx->width, ctx->height);
+#endif
 
   f->pict_type              = src->pict_type;
   f->quality                = src->quality;
