@@ -59,6 +59,9 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   mpg.setvideoencodingparameters();
   s->codec=mpg.getavcc(VIDEOSTREAM);
   s->codec->rc_buffer_size = 224*1024*8;
+#if LIBAVFORMAT_VERSION_INT >= ((52<<16)+(21<<8)+0)
+  s->sample_aspect_ratio = s->codec->sample_aspect_ratio;
+#endif
 
   for (int i=0;i<mpg.getaudiostreams();++i)
     if (audiostreammask & (1u<<i)) {
@@ -86,11 +89,16 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 	if (sd->getitemlistsize() > 1) {
 	  if (!avcodec_open(s->codec,
 			    avcodec_find_decoder(s->codec->codec_id))) {
-	    int16_t samples[6*1536]; // must be enough for 6 AC-3 channels --mr
+	    int16_t samples[AVCODEC_MAX_AUDIO_FRAME_SIZE/sizeof(int16_t)];
 	    int frame_size=sizeof(samples);
 	    //fprintf(stderr, "** decode audio size=%d\n", sd->inbytes());
-	    avcodec_decode_audio(s->codec,samples,&frame_size,
-				 (uint8_t*) sd->getdata(),sd->inbytes());
+#if LIBAVCODEC_VERSION_INT >= ((52<<16)+(0<<8)+0)
+	    avcodec_decode_audio2
+#else
+	    avcodec_decode_audio
+#endif
+	      (s->codec,samples,&frame_size,
+	       (uint8_t*) sd->getdata(),sd->inbytes());
 	    avcodec_close(s->codec);
 	  }
 	  break;

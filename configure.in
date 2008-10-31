@@ -88,7 +88,7 @@ fi
 AC_CHECK_LIB(mad, mad_decoder_init,
   [AC_DEFINE(HAVE_LIB_MAD, 1, [Define this if you have libmad.])
   LIBS="$LIBS -lmad"],
-  [AC_MSG_ERROR([Did not find required mad library])])
+  [AC_MSG_WARN([Did not find mad library])])
 AC_CHECK_LIB(a52, a52_init,
   [AC_DEFINE(HAVE_LIB_A52, 1, [Define this if you have liba52.])
   LIBS="$LIBS -la52"],
@@ -148,7 +148,7 @@ AC_ARG_WITH(qt3, [  --with-qt3=DIR          path to qt3],
   esac])
 AC_SUBST(QTDIR)
 
-CPPFLAGS="$CPPFLAGS -I$QTDIR/include"
+CPPFLAGS="$CPPFLAGS -I$QTDIR/include/qt3 -I$QTDIR/include"
 LDFLAGS="$LDFLAGS -L$QTDIR/$mr_libdirname"
 
 AC_CHECK_LIB(qt-mt, main,

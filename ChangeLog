@@ -1,3 +1,14 @@
+2008-10-31  Wolfram Gloger  <video06@malloc.de>  (mr)
+
+	* src/lavfmuxer.cpp:
+		Use avcodec_decode_audio2 with newer ffmpeg.
+
+	* src/avframe.cpp:
+		Replace img_copy with av_picture_copy for newer ffmpeg.
+
+	* configure.in:
+		Add -I.../include/qt3 to CPPFLAGS.
+
 2008-10-26  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/index.cpp:
