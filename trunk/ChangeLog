@@ -1,3 +1,11 @@
+2009-01-07  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* configure.in:
+		Add --with-qt3-include and --with-qt3-lib options.
+	* makefile.in:
+	* src/Makefile.in:
+		Use $(DESTDIR).
+ 
 2009-01-07  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
 	* INSTALL:
