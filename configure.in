@@ -1,6 +1,6 @@
 # configure.in - Configure template for dvbcut.
 # Process this file with autoconf to produce a configure script.
-# Copyright (C) 2007 - 2008 Michael Riepe
+# Copyright (C) 2007 - 2009 Michael Riepe
 
 # @(#) $Id$
 
@@ -140,16 +140,28 @@ dnl Checks for library functions.
 AC_FUNC_MMAP
 
 dnl external stuff
-AC_ARG_WITH(qt3, [  --with-qt3=DIR          path to qt3],
+AC_ARG_WITH(qt3, [  --with-qt3=DIR          path to qt3 (default: QTDIR)],
   [case $withval in
-    no) QTDIR=no;;
+    no) AC_MSG_ERROR([dvbcut requires Qt3]);;
     yes) ;;
     *) QTDIR=$withval;;
   esac])
 AC_SUBST(QTDIR)
+QTINC=$QTDIR/include
+QTLIB=$QTDIR/$mr_libdirname
+AC_ARG_WITH(qt3-include, [  --with-qt3-include=DIR  path to qt3 include files],
+  [case $withval in
+    yes|no) ;;
+    *) QTINC=$withval;;
+  esac])
+AC_ARG_WITH(qt3-lib, [  --with-qt3-lib=DIR      path to qt3 libraries],
+  [case $withval in
+    yes|no) ;;
+    *) QTLIB=$withval;;
+  esac])
 
-CPPFLAGS="$CPPFLAGS -I$QTDIR/include/qt3 -I$QTDIR/include"
-LDFLAGS="$LDFLAGS -L$QTDIR/$mr_libdirname"
+CPPFLAGS="$CPPFLAGS -I$QTINC"
+LDFLAGS="$LDFLAGS -L$QTLIB"
 
 AC_CHECK_LIB(qt-mt, main,
   [LIBS="$LIBS -lqt-mt"],

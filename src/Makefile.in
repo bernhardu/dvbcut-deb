@@ -1,5 +1,5 @@
 # Makefile - Makefile template for Linux/Unix
-# Copyright (c) 2007 - 2008 Michael Riepe
+# Copyright (c) 2007 - 2009 Michael Riepe
 #  
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ datadir = @datadir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
 
-installdirs = $(bindir)
+installdirs = $(DESTDIR)$(bindir)
 
 CXX = @CXX@
 CXXFLAGS = @CXXFLAGS@ -Wall $(DEFS) $(CPPFLAGS)
@@ -93,7 +93,7 @@ all: @ffmpeg_internal@ $(topdir)/bin/dvbcut$(EXEEXT)
 check:
 
 install: all installdirs
-	$(INSTALL_PROGRAM) $(topdir)/bin/dvbcut$(EXEEXT) $(bindir)
+	$(INSTALL_PROGRAM) dvbcut$(EXEEXT) $(DESTDIR)$(bindir)
 
 installdirs: $(installdirs)
 
