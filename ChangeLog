@@ -1,3 +1,8 @@
+2009-01-07  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* INSTALL:
+		Updated dependencies and build instructions.
+
 2008-10-31  Wolfram Gloger  <video06@malloc.de>  (mr)
 
 	* src/lavfmuxer.cpp:
