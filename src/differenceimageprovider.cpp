@@ -26,7 +26,7 @@
 #include "busyindicator.h"
 
 differenceimageprovider::differenceimageprovider(mpgfile &mpg, int basepicture, busyindicator *bi, 
-                                                 bool unscaled, int factor, int cachesize)
+                                                 bool unscaled, double factor, int cachesize)
     : imageprovider(mpg,bi,unscaled,factor,cachesize), basepic(basepicture)
   {
   RTTI=unscaled?IMAGEPROVIDER_DIFFERENCE_UNSCALED:IMAGEPROVIDER_DIFFERENCE;
@@ -83,9 +83,9 @@ void differenceimageprovider::decodepicture(int picture, bool decodeallgop)
         }
 
 
-    if ((RTTI!=IMAGEPROVIDER_DIFFERENCE_UNSCALED && displaywidth!=im.width())||(viewscalefactor!=1))
-      im=im.scale(((RTTI!=IMAGEPROVIDER_DIFFERENCE_UNSCALED)?displaywidth:im.width())/viewscalefactor,
-	im.height()/viewscalefactor);
+    if ((RTTI!=IMAGEPROVIDER_DIFFERENCE_UNSCALED && displaywidth!=im.width())||(viewscalefactor!=1.0))
+      im=im.scale(int(((RTTI!=IMAGEPROVIDER_DIFFERENCE_UNSCALED)?displaywidth:im.width())/viewscalefactor+0.5),
+	int(im.height()/viewscalefactor+0.5));
     framecache.push_front(framecacheitem(startpic++,im));
     }
   }

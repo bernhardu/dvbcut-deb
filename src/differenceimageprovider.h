@@ -36,7 +36,7 @@ protected:
 
 public:
   differenceimageprovider(mpgfile &mpg, int basepicture, busyindicator *bi=0, 
-                          bool unscaled=false, int factor=1, int cachesize=50);
+                          bool unscaled=false, double factor=1.0, int cachesize=50);
 
   ~differenceimageprovider();
 

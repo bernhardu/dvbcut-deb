@@ -40,7 +40,7 @@ protected:
   int RTTI;
   mpgfile &m;
   int maxcachedframes;
-  int viewscalefactor;
+  double viewscalefactor;
   typedef std::pair<int,QImage> framecacheitem;
   std::list<framecacheitem> framecache;
   busyindicator *busyind;
@@ -49,7 +49,7 @@ protected:
   virtual void decodepicture(int picture, bool decodeallgop=false);
   
 public:
-  imageprovider(mpgfile &mpg, busyindicator *bi=0, bool unscaled=false, int factor=1, int cachesize=50);
+  imageprovider(mpgfile &mpg, busyindicator *bi=0, bool unscaled=false, double factor=1.0, int cachesize=50);
   virtual ~imageprovider();
   int rtti() const
     {
@@ -60,9 +60,9 @@ public:
     {
     framecache.clear();
     }
-  void setviewscalefactor(int factor)
+  void setviewscalefactor(double factor)
   {
-  if (factor<1) factor=1;
+  if (factor<=0.0) factor=1.0;
   if (factor==viewscalefactor) return;
   clearcache();
   viewscalefactor=factor;

@@ -1,7 +1,28 @@
+2009-01-08  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+        * src/settings.cpp:
+                Fixed bug with output pipe directory/file names
+                containing spaces (added quotes).
+
+        * src/dvbcutbase.ui:
+        * src/dvbcut.cpp:
+        * src/dvbcut.h:
+        * src/avframe.cpp:
+        * src/avframe.h:
+        * src/imageprovider.cpp:
+        * src/imageprovider.h:
+        * src/differenceimageprovider.cpp:
+        * src/differenceimageprovider.h:
+        * src/settings.cpp:
+        * src/settings.h:
+                viewscalefactor can now be any positive float,  
+                and implemented "Custem size" viewing scale.
+
 2009-01-07  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* configure.in:
 		Add --with-qt3-include and --with-qt3-lib options.
+
 	* makefile.in:
 	* src/Makefile.in:
 		Use $(DESTDIR).

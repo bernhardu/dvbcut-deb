@@ -23,7 +23,7 @@
 #include "avframe.h"
 #include "busyindicator.h"
 
-imageprovider::imageprovider(mpgfile &mpg, busyindicator *bi, bool unscaled, int factor, int cachesize) :
+imageprovider::imageprovider(mpgfile &mpg, busyindicator *bi, bool unscaled, double factor, int cachesize) :
     RTTI(IMAGEPROVIDER_STANDARD), m(mpg), maxcachedframes(cachesize), viewscalefactor(factor),
     busyind(bi)
   {

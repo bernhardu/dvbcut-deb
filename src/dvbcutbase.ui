@@ -474,6 +474,7 @@
         <action name="viewFullSizeAction"/>
         <action name="viewHalfSizeAction"/>
         <action name="viewQuarterSizeAction"/>
+        <action name="viewCustomSizeAction"/>
     </item>
     <item text="&amp;Play" name="playMenu">
         <action name="playPlayAction"/>
@@ -883,6 +884,20 @@
     </action>
     <action>
         <property name="name">
+            <cstring>viewCustomSizeAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Custom size</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+3</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
             <cstring>viewHalfSizeAction</cstring>
         </property>
         <property name="toggleAction">
@@ -1165,6 +1180,12 @@
         <slot>viewQuarterSize()</slot>
     </connection>
     <connection>
+        <sender>viewCustomSizeAction</sender>
+        <signal>activated()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>viewCustomSize()</slot>
+    </connection>
+    <connection>
         <sender>snapshotSaveAction</sender>
         <signal>activated()</signal>
         <receiver>dvbcutbase</receiver>
@@ -1217,6 +1238,7 @@
     <slot>abouttoshowrecentfiles()</slot>
     <slot>viewFullSize()</slot>
     <slot>viewHalfSize()</slot>
+    <slot>viewCustomSize()</slot>
     <slot>viewQuarterSize()</slot>
     <slot>snapshotSave()</slot>
     <slot>chapterSnapshotsSave()</slot>

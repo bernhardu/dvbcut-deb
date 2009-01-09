@@ -130,7 +130,7 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
     curpic(~0), showimage(true), fine(false),
     jogsliding(false), jogmiddlepic(0),
     mplayer_process(0), imgp(0), busy(0),
-    viewscalefactor(1),
+    viewscalefactor(1.0),
     nogui(false)
 {
 #ifndef HAVE_LIB_AO
@@ -1082,17 +1082,22 @@ void dvbcut::viewNormal()
 
 void dvbcut::viewFullSize()
 {
-  setviewscalefactor(1);
+  setviewscalefactor(1.0);
 }
 
 void dvbcut::viewHalfSize()
 {
-  setviewscalefactor(2);
+  setviewscalefactor(2.0);
 }
 
 void dvbcut::viewQuarterSize()
 {
-  setviewscalefactor(4);
+  setviewscalefactor(4.0);
+}
+
+void dvbcut::viewCustomSize()
+{
+  setviewscalefactor(settings().viewscalefactor_custom);
 }
 
 void dvbcut::playPlay()
@@ -2096,13 +2101,14 @@ void dvbcut::addtorecentfiles(const std::list<std::string> &filenames, const std
     settings().recentfiles.pop_back();
 }
 
-void dvbcut::setviewscalefactor(int factor)
+void dvbcut::setviewscalefactor(double factor)
 {
-  if (factor!=1 && factor!=2 && factor!=4)
-    factor=1;
-  viewFullSizeAction->setOn(factor==1);
-  viewHalfSizeAction->setOn(factor==2);
-  viewQuarterSizeAction->setOn(factor==4);
+  if (factor<=0.0)
+    factor=1.0;
+  viewFullSizeAction->setOn(factor==1.0);
+  viewHalfSizeAction->setOn(factor==2.0);
+  viewQuarterSizeAction->setOn(factor==4.0);
+  viewCustomSizeAction->setOn(factor==settings().viewscalefactor_custom);
 
   settings().viewscalefactor = factor;
 
