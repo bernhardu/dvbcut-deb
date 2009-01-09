@@ -73,7 +73,7 @@ public:
     {
     return pix_fmt;
     }
-  QImage getqimage(bool scaled=true, int viewscalefactor=1);
+  QImage getqimage(bool scaled=true, double viewscalefactor=1.0);
   };
 
 #endif

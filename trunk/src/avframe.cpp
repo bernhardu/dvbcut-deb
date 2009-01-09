@@ -82,7 +82,7 @@ avframe::~avframe()
 #endif
   }
 
-QImage avframe::getqimage(bool scaled, int viewscalefactor)
+QImage avframe::getqimage(bool scaled, double viewscalefactor)
   {
 #ifdef HAVE_LIB_SWSCALE
   if (w<=0 || h<=0 || img_convert_ctx==NULL)
@@ -114,11 +114,11 @@ QImage avframe::getqimage(bool scaled, int viewscalefactor)
   im = im.swapRGB();
 #endif
 
-  if ((scaled && w!=dw)||(viewscalefactor!=1)) {
+  if ((scaled && w!=dw)||(viewscalefactor!=1.0)) {
 #ifdef SMOOTHSCALE
-    im = im.smoothScale((scaled?dw:w)/viewscalefactor, h/viewscalefactor);
+    im = im.smoothScale(int((scaled?dw:w)/viewscalefactor+0.5), int(h/viewscalefactor+0.5));
 #else
-    im = im.scale((scaled?dw:w)/viewscalefactor, h/viewscalefactor);
+    im = im.scale(int((scaled?dw:w)/viewscalefactor+0.5), int(h/viewscalefactor+0.5));
 #endif
     }
 

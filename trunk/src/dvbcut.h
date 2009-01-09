@@ -96,7 +96,7 @@ protected:
   pts_t mplayer_curpts;
   imageprovider *imgp;
   int busy;
-  int viewscalefactor;
+  double viewscalefactor;
   int currentaudiotrack;
   bool nogui;
   int exportformat; 
@@ -107,7 +107,7 @@ protected:
   //   QPixmap getpixmap(int picture, bool allgop=false);
   void exportvideo(const char *fmt);
   void addtorecentfiles(const std::list<std::string> &filenames, const std::string &idxfilename=std::string());
-  void setviewscalefactor(int factor);
+  void setviewscalefactor(double factor);
 
   // special event handling (mouse wheel)
   bool eventFilter(QObject *watched, QEvent *e);
@@ -166,6 +166,7 @@ public slots:
   virtual void viewFullSize();
   virtual void viewHalfSize();
   virtual void viewQuarterSize();
+  virtual void viewCustomSize();
   virtual void playAudio2();
   virtual void playAudio1();
   virtual void playStop();
