@@ -2122,20 +2122,41 @@ void dvbcut::setviewscalefactor(double factor)
 }
 
 bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
-  if (e->type() == QEvent::Wheel) {
+  bool myEvent = true;
+  int delta = 0;
+  int incr = WHEEL_INCR_NORMAL;
+
+  if (e->type() == QEvent::Wheel && watched != jogslider) {
     QWheelEvent *we = (QWheelEvent*)e;
-    if (watched == linslider) {
-      // process event myself
-      int delta = we->delta();
-      int incr = 0;
+    // Note: delta is a multiple of 120 (see Qt documentation)
+    delta = we->delta();
       if (we->state() & AltButton)
-        incr = settings().wheel_increments[WHEEL_INCR_ALT];
+      incr = WHEEL_INCR_ALT;
       else if (we->state() & ControlButton)
-        incr = settings().wheel_increments[WHEEL_INCR_CTRL];
+      incr = WHEEL_INCR_CTRL;
       else if (we->state() & ShiftButton)
-        incr = settings().wheel_increments[WHEEL_INCR_SHIFT];
+      incr = WHEEL_INCR_SHIFT;
+  }
+  else if (e->type() == QEvent::KeyPress) {
+    QKeyEvent *ke = (QKeyEvent*)e;
+    delta = ke->count() * settings().wheel_delta;
+    if (ke->key() == Key_Right)
+      delta = -delta;
+    else if (ke->key() != Key_Left)
+      myEvent = false;
+    if (ke->state() & AltButton)
+      incr = WHEEL_INCR_ALT;
+    else if (ke->state() & ControlButton)
+      incr = WHEEL_INCR_CTRL;
+    else if (ke->state() & ShiftButton)
+      incr = WHEEL_INCR_SHIFT;
+  }
       else
-        incr = settings().wheel_increments[WHEEL_INCR_NORMAL];
+    myEvent = false;
+
+  if (myEvent) {
+    // process scroll event myself
+    incr = settings().wheel_increments[incr];
       if (incr != 0) {
         bool save = fine;
 	// use fine positioning if incr is small
@@ -2151,7 +2172,7 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
       }
       return true;
     }
-  }
+
   // propagate to base class
   return dvbcutbase::eventFilter(watched, e);
 }
