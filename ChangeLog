@@ -1,3 +1,9 @@
+2009-01-10  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
+
+	* src/dvbcut.cpp:
+		Handle left/right key events.
+		Make mouse wheel work in video window.
+
 2009-01-08  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
         * src/settings.cpp:
