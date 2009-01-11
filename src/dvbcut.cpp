@@ -1080,6 +1080,16 @@ void dvbcut::viewNormal()
   }
 }
 
+void dvbcut::zoomIn()
+{
+  setviewscalefactor(viewscalefactor / 1.2);
+}
+
+void dvbcut::zoomOut()
+{
+  setviewscalefactor(viewscalefactor * 1.2);
+}
+
 void dvbcut::viewFullSize()
 {
   setviewscalefactor(1.0);

@@ -1,3 +1,10 @@
+2009-01-11  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/dvbcutbase.ui:
+		Add Zoom in/out function.
+
 2009-01-10  Ralph Glasstetter  <ralph.glasstetter@web.de>  (mr)
 
 	* src/dvbcut.cpp:

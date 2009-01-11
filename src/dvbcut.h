@@ -163,6 +163,8 @@ public slots:
   virtual void viewDifference();
   virtual void viewUnscaled();
   virtual void viewNormal();
+  virtual void zoomIn();
+  virtual void zoomOut();
   virtual void viewFullSize();
   virtual void viewHalfSize();
   virtual void viewQuarterSize();
