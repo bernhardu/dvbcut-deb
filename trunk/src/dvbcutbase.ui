@@ -471,6 +471,9 @@
         <action name="viewUnscaledAction"/>
         <action name="viewDifferenceAction"/>
         <separator/>
+        <action name="zoomInAction"/>
+        <action name="zoomOutAction"/>
+        <separator/>
         <action name="viewFullSizeAction"/>
         <action name="viewHalfSizeAction"/>
         <action name="viewQuarterSizeAction"/>
@@ -898,6 +901,28 @@
     </action>
     <action>
         <property name="name">
+            <cstring>zoomInAction</cstring>
+        </property>
+        <property name="text">
+            <string>Zoom in</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl++</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>zoomOutAction</cstring>
+        </property>
+        <property name="text">
+            <string>Zoom out</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+-</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
             <cstring>viewHalfSizeAction</cstring>
         </property>
         <property name="toggleAction">
@@ -1162,6 +1187,18 @@
         <slot>fileExport()</slot>
     </connection>
     <connection>
+        <sender>zoomInAction</sender>
+        <signal>activated()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>zoomIn()</slot>
+    </connection>
+    <connection>
+        <sender>zoomOutAction</sender>
+        <signal>activated()</signal>
+        <receiver>dvbcutbase</receiver>
+        <slot>zoomOut()</slot>
+    </connection>
+    <connection>
         <sender>viewHalfSizeAction</sender>
         <signal>activated()</signal>
         <receiver>dvbcutbase</receiver>
@@ -1236,6 +1273,8 @@
     <slot>audiotrackchosen(int)</slot>
     <slot>loadrecentfile(int)</slot>
     <slot>abouttoshowrecentfiles()</slot>
+    <slot>zoomIn()</slot>
+    <slot>zoomOut()</slot>
     <slot>viewFullSize()</slot>
     <slot>viewHalfSize()</slot>
     <slot>viewCustomSize()</slot>
