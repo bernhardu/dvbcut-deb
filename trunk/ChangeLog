@@ -1,5 +1,16 @@
 2009-01-12  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* DISTFILES:
+		New file.
+
+	* makefile.in:
+		Add distfiles, dist and check-dist targets.
+
+	* src/Makefile.in:
+		Add distfiles target.
+
+2009-01-12  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* INSTALL:
 	* makefile.in:
 		Add and document `dep' target.

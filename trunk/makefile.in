@@ -33,7 +33,7 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 
-all check dep install mostlyclean clean distclean maintainer-clean::
+all check dep distfiles install mostlyclean clean distclean maintainer-clean::
 	$(MAKE) -C src $@
 	$(MAKE) $@-local
 
@@ -54,4 +54,36 @@ distclean-local: clean-local
 	rm -f makefile config.cache config.status
 maintainer-clean-local: distclean-local
 	rm -f configure
+
+distfiles-local: configure
+configure: configure.in
+	autoconf
+
+VERSION := $(shell cat VERSION)
+DISTFILES := $(shell cat DISTFILES)
+
+distdir = dvbcut-$(VERSION)
+dist: ./stamp-dist
+./stamp-dist: distfiles $(DISTFILES)
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	files="$(DISTFILES)"; for file in $$files; do \
+		d=`dirname $$file`; \
+		test -d $(distdir)/$$d || mkdir -p $(distdir)/$$d || exit 1; \
+		ln $$file $(distdir)/$$file || exit 1; \
+	done
+	cd $(distdir) && \
+		find . -type f ! -name MANIFEST -exec wc -c {} \; | \
+		sort +1 >MANIFEST
+	-@rm -f $(distdir).tar.gz.bak dvbcut.tar.gz
+	-@mv -f $(distdir).tar.gz $(distdir).tar.gz.bak
+	tar cvohfz $(distdir).tar.gz --numeric-owner --owner=0 --group=0 $(distdir)
+	ln -s $(distdir).tar.gz dvbcut.tar.gz
+	rm -f stamp-dist && echo timestamp > stamp-dist
+
+check-dist:
+	cd $(distdir) && CONFIG_SITE=no.config.site ./configure
+	$(MAKE) -C $(distdir)
+	$(MAKE) -C $(distdir) check
+	$(MAKE) -C $(distdir) dist
 
