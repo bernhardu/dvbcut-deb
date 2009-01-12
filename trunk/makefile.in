@@ -33,12 +33,13 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 
-all check install mostlyclean clean distclean maintainer-clean::
+all check dep install mostlyclean clean distclean maintainer-clean::
 	$(MAKE) -C src $@
 	$(MAKE) $@-local
 
 all-local:
 check-local:
+dep-local:
 install-local: $(installdirs) dvbcut.1
 	$(INSTALL_DATA) dvbcut.1 $(DESTDIR)$(man1dir)/dvbcut.1
 

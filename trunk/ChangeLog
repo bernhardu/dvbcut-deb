@@ -1,5 +1,11 @@
 2009-01-12  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* INSTALL:
+	* makefile.in:
+		Add and document `dep' target.
+
+2009-01-12  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* src/stream.h:
 		Fix "impossible bitrate constraints" error
 		from external ffmpeg.
