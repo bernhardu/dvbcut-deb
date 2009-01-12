@@ -88,7 +88,7 @@ SRCS = \
 
 OBJS = $(SRCS:.cpp=.$(OBJEXT))
 
-all: @ffmpeg_internal@ $(topdir)/bin/dvbcut$(EXEEXT)
+all: @ffmpeg_internal@ $(topdir)/bin $(topdir)/bin/dvbcut$(EXEEXT)
 
 check:
 
@@ -99,6 +99,9 @@ installdirs: $(installdirs)
 
 $(installdirs):
 	$(SHELL) $(top_srcdir)/mkinstalldirs $@
+
+$(topdir)/bin:
+	mkdir $@
 
 $(topdir)/bin/dvbcut$(EXEEXT): dvbcut$(EXEEXT)
 	$(INSTALL_PROGRAM) dvbcut$(EXEEXT) $(topdir)/bin/dvbcut$(EXEEXT)
@@ -181,3 +184,22 @@ progresswindowbase.h: progresswindowbase.ui
 dvbcut.$(OBJEXT): version.h
 version.h: $(SRCS) $(HDRS)
 	../setversion.sh $^
+
+distfiles: \
+	dvbcutbase.h \
+	exportdialogbase.h \
+	moc_dvbcut.cpp \
+	moc_dvbcutbase.cpp \
+	moc_exportdialog.cpp \
+	moc_exportdialogbase.cpp \
+	moc_mplayererrorbase.cpp \
+	moc_progressstatusbar.cpp \
+	moc_progresswindow.cpp \
+	moc_progresswindowbase.cpp \
+	mplayererrorbase.h \
+	progresswindowbase.h \
+	uic_dvbcutbase.cpp \
+	uic_exportdialogbase.cpp \
+	uic_mplayererrorbase.cpp \
+	uic_progresswindowbase.cpp \
+	version.h
