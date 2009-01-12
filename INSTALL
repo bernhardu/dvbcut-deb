@@ -18,7 +18,10 @@ How to compile DVBCUT:
 
 * Unpack the dvbcut source archive and enter the dvbcut directory.
 * Type `make' (for the scons build procedure), or
-  `autoconf && ./configure && make' (the preferred way). If everything
-  works well, you will find the DVBCUT executable in the bin
-  subdirectory.
-
+  `./configure && make' (the preferred way). If everything works well,
+  you will find the DVBCUT executable in the bin subdirectory. To
+  install it, run `make install' (as root).
+* Note to SVN users:
+  You need to run `autoconf' in order to generate the `configure'
+  script. If you're going to modify the sources, it may also be a
+  good idea to run `make dep' after configuring dvbcut.
