@@ -58,6 +58,7 @@ protected:
   void setvideoencodingparameters(bool interlaced=true)
     {
     avcc->bit_rate=9500000;
+    avcc->rc_min_rate=9500000;
     avcc->rc_max_rate=9500000;
     avcc->rc_buffer_size=224*1024*8;
     avcc->rc_buffer_aggressivity=1.0;

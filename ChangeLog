@@ -1,3 +1,9 @@
+2009-01-12  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/stream.h:
+		Fix "impossible bitrate constraints" error
+		from external ffmpeg.
+
 2009-01-11  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:
