@@ -1,58 +1,14 @@
-dvbcut (0.5.4-0.1) unstable; urgency=low
+dvbcut (0.5.4+r146-0ubuntu1~ppa) intrepid; urgency=low
 
-  * Added a patch to fix build with g++ 4.3
+  * First ubuntu version (SVN - revision 146)
 
- -- Christian Marillat <marillat@debian.org>  Mon, 21 Apr 2008 00:42:37 +0200
+ -- Fabrice Coutadeur <coutadeurf@gmail.com>  Tue, 13 Jan 2009 22:13:06 +0100
 
-dvbcut (0.5.4-0.0) unstable; urgency=low
+dvbcut (0.5.4) unstable; urgency=low
 
-  * New upstream release.
+  * New upstream version.
 
- -- Christian Marillat <marillat@debian.org>  Sat, 14 Apr 2007 09:11:48 +0200
-
-dvbcut (0.5.3-0.6) unstable; urgency=high
-
-  * Build statically against ffmpeg.
-
- -- Christian Marillat <marillat@debian.org>  Mon, 19 Mar 2007 11:07:41 +0100
-
-dvbcut (0.5.3-0.5) unstable; urgency=low
-
-  * Add patch from svn to fix build on alpha.
-
- -- Christian Marillat <marillat@debian.org>  Mon, 29 Jan 2007 14:47:24 +0100
-
-dvbcut (0.5.3-0.4) unstable; urgency=low
-
-  * Build against the latest ffmpeg libraries.
-  * Add libavformatcvs51-dev in Build-Depends.
-  * Added patch from Ingo Saitz to fix compilation.
-
- -- Christian Marillat <marillat@debian.org>  Sun, 28 Jan 2007 09:47:31 +0100
-
-dvbcut (0.5.3-0.3) unstable; urgency=low
-
-  * Need to build-depends on libavutilcvs49-dev.
-
- -- Christian Marillat <marillat@debian.org>  Sun, 15 Oct 2006 08:23:04 +0200
-
-dvbcut (0.5.3-0.2) unstable; urgency=low
-
-  * Link dynamically against libavcodec.
-
- -- Christian Marillat <marillat@debian.org>  Sun,  7 May 2006 22:06:59 +0200
-
-dvbcut (0.5.3-0.1) unstable; urgency=low
-
-  * Rename the original tarball to upload a diff.
-
- -- Christian Marillat <marillat@debian.org>  Thu,  5 Jan 2006 11:23:43 +0100
-
-dvbcut (0.5.3-0.0) unstable; urgency=low
-
-  * Upload for my repository.
-
- -- Christian Marillat <marillat@debian.org>  Fri, 30 Dec 2005 14:45:32 +0100
+ -- Sven Over <svenover@svenover.de>  Fri, 13 Apr 2007 19:43:07 +0100
 
 dvbcut (0.5.3) unstable; urgency=low
 
