@@ -3,12 +3,19 @@ Section: graphics
 Priority: optional
 Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
 XSBC-Original-Maintainer: Sven Over <svenover@svenover.de>
-Build-Depends: debhelper (>= 4.0.0), libqt3-mt-dev (>= 3.3.4-3), qt3-dev-tools (>= 3.3.4-3), libao-dev (> 0.8.6), libmad0-dev (>= 0.15.1b-2.1), liba52-0.7.4-dev (>= 0.7.4-11), scons (>= 0.96.93-2)
+Build-Depends: debhelper (>= 4.0.0),
+	       libqt3-mt-dev (>= 3.3.4-3),
+	       qt3-dev-tools (>= 3.3.4-3),
+	       libao-dev (> 0.8.6),
+	       libmad0-dev (>= 0.15.1b-2.1),
+	       liba52-0.7.4-dev (>= 0.7.4-11),
+	       scons (>= 0.96.93-2)
 Standards-Version: 3.8.0
 
 Package: dvbcut
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends},
+	 ${misc:Depends}
 Recommends: mplayer
 Description: Qt application for cutting parts out of DVB streams
  DVBCUT is a Qt application that allows you to select certain parts of an
