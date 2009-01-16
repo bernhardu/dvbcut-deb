@@ -3,7 +3,7 @@
 build: build-stamp
 build-stamp:
 	dh_testdir
-	$(MAKE)
+	$(MAKE) FFMPEG=/usr
 	touch build-stamp
 
 clean:
