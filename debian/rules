@@ -16,7 +16,7 @@ build-stamp:
 clean:
 	dh_testdir
 	dh_testroot
-	[ ! -f Makefile ] || $(MAKE) distclean
+	[ ! -f Makefile ] || $(MAKE) distclean FFMPEG=/usr
 	dh_clean build-stamp
 
 install: build
@@ -26,6 +26,7 @@ install: build
 	dh_installdirs
 
 	$(MAKE) install PREFIX=/usr \
+		FFMPEG=/usr \
 		MANPATH=/usr/share/man \
 		DESTDIR=$(CURDIR)/debian/dvbcut
 
