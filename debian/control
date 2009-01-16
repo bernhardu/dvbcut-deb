@@ -7,12 +7,12 @@ Build-Depends: debhelper (>= 4.0.0),
 	       libavcodec-dev,
 	       libavformat-dev,
 	       libpostproc-dev,
-	       libqt3-mt-dev (>= 3.3.4-3),
-	       qt3-dev-tools (>= 3.3.4-3),
-	       libao-dev (> 0.8.6),
-	       libmad0-dev (>= 0.15.1b-2.1),
-	       liba52-0.7.4-dev (>= 0.7.4-11),
-	       scons (>= 0.96.93-2)
+	       libqt3-mt-dev,
+	       qt3-dev-tools,
+	       libao-dev,
+	       libmad0-dev,
+	       liba52-0.7.4-dev,
+	       scons
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/dvbcut.git
 Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/dvbcut.git;a=summary
 Standards-Version: 3.8.0
