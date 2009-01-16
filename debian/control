@@ -13,6 +13,8 @@ Build-Depends: debhelper (>= 4.0.0),
 	       libmad0-dev (>= 0.15.1b-2.1),
 	       liba52-0.7.4-dev (>= 0.7.4-11),
 	       scons (>= 0.96.93-2)
+Vcs-Git: git://git.debian.org/git/pkg-multimedia/dvbcut.git
+Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/dvbcut.git;a=summary
 Standards-Version: 3.8.0
 
 Package: dvbcut
