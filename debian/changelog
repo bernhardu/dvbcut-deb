@@ -1,3 +1,9 @@
+dvbcut (0.5.4+r146-1) UNRELEASED; urgency=low
+
+  * Package dvbcut for debian. Closes: #457272
+
+ -- Reinhard Tartler <siretart@tauware.de>  Fri, 16 Jan 2009 11:47:44 +0100
+
 dvbcut (0.5.4+r146-0ubuntu1~ppa) intrepid; urgency=low
 
   * First ubuntu version (SVN - revision 146)
