@@ -1,8 +1,8 @@
 Source: dvbcut
 Section: graphics
 Priority: optional
-Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
-XSBC-Original-Maintainer: Sven Over <svenover@svenover.de>
+Maintainer: Debian multimedia packages maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
+Uploaders: Reinhard Tartler <siretart@tauware.de>
 Build-Depends: debhelper (>= 4.0.0),
 	       libqt3-mt-dev (>= 3.3.4-3),
 	       qt3-dev-tools (>= 3.3.4-3),
