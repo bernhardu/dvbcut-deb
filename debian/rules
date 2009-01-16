@@ -1,5 +1,12 @@
 #!/usr/bin/make -f
 
+DEB_SOURCE := $(shell dpkg-parsechangelog | sed -n 's/^Source: //p')
+DEB_VERSION := $(shell dpkg-parsechangelog | sed -n 's/^Version: //p')
+UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed -r ' s/\+[^+]+$$//')
+SVN_VERSION := $(shell echo $(DEB_VERSION) | sed -r 's/^[0-9.:-]+\+r//; s/-[^-]+$$//' )
+SVN_URL := http://dvbcut.svn.sourceforge.net/svnroot/dvbcut/trunk
+ORIG_TAR_GZ := ../$(DEB_SOURCE)_$(UPSTREAM_VERSION)+svn$(SVN_VERSION).orig.tar.gz
+
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -22,6 +29,14 @@ install: build
 		MANPATH=/usr/share/man \
 		DESTDIR=$(CURDIR)/debian/dvbcut
 
+get-orig-source:
+	TMPDIR=`mktemp -d` && \
+	trap 'rm -rf $${TMPDIR}' EXIT && \
+	svn export -r$(SVN_VERSION) $(SVN_URL) $${TMPDIR}/dvbcut && \
+	rm -rf $${TMPDIR}/dvbcut/ffmpeg.src && \
+	rm -rf $${TMPDIR}/dvbcut/ffmpeg-patches && \
+	rm -rf $${TMPDIR}/dvbcut/debian && \
+	tar czvf $(ORIG_TAR_GZ) -C $${TMPDIR} dvbcut
 
 binary-indep: build install
 
@@ -43,4 +58,4 @@ binary-arch: build install
 	dh_builddeb
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: build clean binary-indep binary-arch binary install get-orig-source
