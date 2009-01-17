@@ -11,7 +11,7 @@
 # previous calls and is scanned additionally in case of incremental calls 
 # with just a few changed (or no) files as arguments.
 
-#$Id$
+#@(#) $Id$
 
 # location of this script (specify the input/output filenames below rel. to this!)
 DIR=`dirname "$0"`
