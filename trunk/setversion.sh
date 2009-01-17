@@ -38,9 +38,11 @@ fi
 # maybe we want to know when the project was built?
 BUILT=`TZ=UTC date '+%Y-%m-%d %H:%M:%SZ'`
 
-# extract&analyse the $Id$-keyword lines from the given source files
+# extract&analyse the Id keyword lines from the given source files
 getids() {
 	sed -ne 's,^[^ ]\+ \+\$Id: \(.*\) \$.*,\1,p' "$@" < /dev/null
+	[ -f "$HEADER_FILE" ] && \
+	  sed -ne 's,^#define LASTID \(.*\)$,\1,p' "$HEADER_FILE"
 }
 set -- $(getids "$@" | sort -k 2n,2 -k 3,4 -k 1,1 | tail -1)
 NAME=$1
@@ -56,7 +58,7 @@ cat <<EOF >$HEADER_FILE
  * Last changed source file (read on input) was:
  */
 
-/* \$Id$NAME $REVISION $DATE $TIME $AUTHOR \$ */
+#define LASTID $NAME $REVISION $DATE $TIME $AUTHOR
 
 #ifndef _VERSION_H
 #define _VERSION_H
