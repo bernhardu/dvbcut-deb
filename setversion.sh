@@ -1,5 +1,5 @@
 #! /bin/sh 
-# Copyright (c) 2007 Ralph Glasstetter, Michael Riepe
+# Copyright (c) 2007 - 2009 Ralph Glasstetter, Michael Riepe
 # This program is free software; see COPYING for details.
 #
 # Create a header file containing a version string, max. revision number and
@@ -11,7 +11,7 @@
 # previous calls and is scanned additionally in case of incremental calls 
 # with just a few changed (or no) files as arguments.
 
-# $Id$
+#$Id$
 
 # location of this script (specify the input/output filenames below rel. to this!)
 DIR=`dirname "$0"`
@@ -56,7 +56,7 @@ cat <<EOF >$HEADER_FILE
  * Last changed source file (read on input) was:
  */
 
-/* \$Id: $NAME $REVISION $DATE $TIME $AUTHOR \$ */
+/* \$Id$NAME $REVISION $DATE $TIME $AUTHOR \$ */
 
 #ifndef _VERSION_H
 #define _VERSION_H

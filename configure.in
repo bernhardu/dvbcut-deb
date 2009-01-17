@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 # Copyright (C) 2007 - 2009 Michael Riepe
 
-# @(#) $Id$
+#@(#) $Id$
 
 AC_INIT(src/dvbcut.cpp)
 
