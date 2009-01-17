@@ -32,9 +32,6 @@ then VERSION="$VERSION-svn"
 else VERSION="$VERSION-release"
 fi
 
-# scan the header file if it exists
-[ -f "$HEADER_FILE" ] && set -- "$@" "$HEADER_FILE"
-
 # maybe we want to know when the project was built?
 BUILT=`TZ=UTC date '+%Y-%m-%d %H:%M:%SZ'`
 
