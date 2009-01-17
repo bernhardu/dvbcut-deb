@@ -247,6 +247,7 @@ src/differenceimageprovider.cpp
 src/differenceimageprovider.h
 src/dvbcut.cpp
 src/dvbcut.h
+src/dvbcutbase.h
 src/dvbcutbase.ui
 src/eventlistitem.cpp
 src/eventlistitem.h
@@ -254,6 +255,7 @@ src/exception.cpp
 src/exception.h
 src/exportdialog.cpp
 src/exportdialog.h
+src/exportdialogbase.h
 src/exportdialogbase.ui
 src/gettext.cpp
 src/gettext.h
@@ -266,10 +268,19 @@ src/lavfmuxer.h
 src/logoutput.cpp
 src/logoutput.h
 src/main.cpp
+src/moc_dvbcut.cpp
+src/moc_dvbcutbase.cpp
+src/moc_exportdialog.cpp
+src/moc_exportdialogbase.cpp
+src/moc_mplayererrorbase.cpp
+src/moc_progressstatusbar.cpp
+src/moc_progresswindow.cpp
+src/moc_progresswindowbase.cpp
 src/mpegmuxer.cpp
 src/mpegmuxer.h
 src/mpgfile.cpp
 src/mpgfile.h
+src/mplayererrorbase.h
 src/mplayererrorbase.ui
 src/muxer.h
 src/playaudio.cpp
@@ -279,6 +290,7 @@ src/progressstatusbar.cpp
 src/progressstatusbar.h
 src/progresswindow.cpp
 src/progresswindow.h
+src/progresswindowbase.h
 src/progresswindowbase.ui
 src/psfile.cpp
 src/psfile.h
@@ -293,3 +305,7 @@ src/streamhandle.h
 src/tsfile.cpp
 src/tsfile.h
 src/types.h
+src/uic_dvbcutbase.cpp
+src/uic_exportdialogbase.cpp
+src/uic_mplayererrorbase.cpp
+src/uic_progresswindowbase.cpp
