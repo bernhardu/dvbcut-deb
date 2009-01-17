@@ -182,8 +182,8 @@ mplayererrorbase.h: mplayererrorbase.ui
 progresswindowbase.h: progresswindowbase.ui
 
 dvbcut.$(OBJEXT): version.h
-version.h: $(SRCS) $(HDRS)
-	../setversion.sh $^
+version.h:
+	cd $(topdir) && $(MAKE) $(subdir)/version.h
 
 distfiles: \
 	dvbcutbase.h \
