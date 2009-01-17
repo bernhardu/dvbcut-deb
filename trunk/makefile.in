@@ -60,17 +60,17 @@ configure: configure.in
 	autoconf
 
 VERSION := $(shell cat VERSION)
-DISTFILES := $(shell cat DISTFILES) src/version.h
+DISTFILES := $(shell cat DISTFILES)
 
 src/version.h: $(DISTFILES)
 	$(SHELL) ./setversion.sh $(DISTFILES)
 
 distdir = dvbcut-$(VERSION)
 dist: ./stamp-dist
-./stamp-dist: distfiles $(DISTFILES)
+./stamp-dist: distfiles $(DISTFILES) src/version.h
 	rm -rf $(distdir)
 	mkdir $(distdir)
-	files="$(DISTFILES)"; for file in $$files; do \
+	files="$(DISTFILES) src/version.h"; for file in $$files; do \
 		d=`dirname $$file`; \
 		test -d $(distdir)/$$d || mkdir -p $(distdir)/$$d || exit 1; \
 		ln $$file $(distdir)/$$file || exit 1; \
