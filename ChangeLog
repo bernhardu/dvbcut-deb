@@ -17,6 +17,9 @@
 	* src/SConscript:
 		Remove.
 
+	* DISTFILES:
+		Remove SConstruct, SConscript.ffmpeg and src/SConscript.
+
 	* configure.in:
 		Pass configure args to Makefiles.
 
