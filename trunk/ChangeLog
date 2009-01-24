@@ -1,3 +1,29 @@
+2009-01-24  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* VERSION:
+		Bump up to 0.6.0.
+
+	* README:
+		Edit for release.
+
+	* INSTALL:
+		Remove references to scons.
+
+	* Makefile:
+		Tell people to run configure instead of scons.
+
+	* SConstruct:
+	* SConscript.ffmpeg:
+	* src/SConscript:
+		Remove.
+
+	* configure.in:
+		Pass configure args to Makefiles.
+
+	* makefile.in:
+		Generate new version.h for tarball.
+		Pass configure args to "make check-dist".
+ 
 2009-01-17  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.in:

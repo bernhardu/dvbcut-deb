@@ -1,27 +1,23 @@
-export DESTDIR
+# Makefile - top-level Makefile stub
+# Copyright (c) 2009 Michael Riepe
+#  
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#  
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#  
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-build:
-	scons $(if $(FFMPEG),FFMPEG=$(FFMPEG)) \
-		$(if $(DEBUG),DEBUG=$(DEBUG))
+default:
+	@echo >&2 '*** Attention, please! ***'
+	@echo >&2 'The old scons-based build procedure does not work anymore.'
+	@echo >&2 'Please run "./configure && make && make install" instead.'
+	@echo >&2 '*** We apologize for any inconvenience. ***'
 
-clean:
-	scons --clean
-	
-install:
-	scons $(if $(FFMPEG),FFMPEG=$(FFMPEG)) \
-		$(if $(PREFIX),PREFIX=$(PREFIX)) \
-		$(if $(BINDIR),BINDIR=$(BINDIR)) \
-		$(if $(MANPATH),MANPATH=$(MANPATH)) \
-		$(if $(DEBUG),DEBUG=$(DEBUG)) \
-		install
-
-distclean: clean
-	@rm -Rfv *~ */*~ .sconsign* */.sconsign* .sconf_temp config.log ffmpeg tags
-ifeq ($(wildcard ffmpeg.src/),ffmpeg.src/)
-	@touch ffmpeg.src/config.mak
-	@make -C ffmpeg.src/libavformat distclean
-	@make -C ffmpeg.src/libavutil distclean
-	@make -C ffmpeg.src/ distclean
-	@rm -Rfv ffmpeg.src/config.log ffmpeg.src/*.pc ffmpeg.src/*/*.a \
-		latex html xml dvbcut.tag
-endif

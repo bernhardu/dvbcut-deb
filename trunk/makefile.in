@@ -67,14 +67,15 @@ src/version.h: $(DISTFILES)
 
 distdir = dvbcut-$(VERSION)
 dist: ./stamp-dist
-./stamp-dist: distfiles $(DISTFILES) src/version.h
+./stamp-dist: distfiles $(DISTFILES)
 	rm -rf $(distdir)
 	mkdir $(distdir)
-	files="$(DISTFILES) src/version.h"; for file in $$files; do \
+	files="$(DISTFILES)"; for file in $$files; do \
 		d=`dirname $$file`; \
 		test -d $(distdir)/$$d || mkdir -p $(distdir)/$$d || exit 1; \
 		ln $$file $(distdir)/$$file || exit 1; \
 	done
+	cd $(distdir) && $(SHELL) ./setversion.sh $(DISTFILES)
 	cd $(distdir) && \
 		find . -type f ! -name MANIFEST -exec wc -c {} \; | \
 		sort +1 >MANIFEST
@@ -84,8 +85,10 @@ dist: ./stamp-dist
 	ln -s $(distdir).tar.gz dvbcut.tar.gz
 	rm -f stamp-dist && echo timestamp > stamp-dist
 
+CONFIGURE_ARGS = @CONFIGURE_ARGS@
+
 check-dist:
-	cd $(distdir) && CONFIG_SITE=no.config.site ./configure
+	cd $(distdir) && CONFIG_SITE=/no/config.site ./configure $(CONFIGURE_ARGS)
 	$(MAKE) -C $(distdir)
 	$(MAKE) -C $(distdir) check
 	$(MAKE) -C $(distdir) dist
