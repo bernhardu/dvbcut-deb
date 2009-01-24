@@ -9,8 +9,6 @@ README
 README.MingGW
 README.ffmpeg
 README.icons
-SConscript.ffmpeg
-SConstruct
 VERSION
 config.guess
 config.sub
@@ -236,7 +234,6 @@ mkinstalldirs
 setversion.sh
 src/Makefile.in
 src/Makefile.w32
-src/SConscript
 src/avframe.cpp
 src/avframe.h
 src/buffer.cpp
