@@ -1,3 +1,8 @@
+2009-01-28  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* configure.in:
+		Also link with -lm when looking for liba52.
+
 2009-01-24  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* VERSION:
