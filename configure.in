@@ -95,7 +95,8 @@ AC_CHECK_LIB(mad, mad_decoder_init,
 AC_CHECK_LIB(a52, a52_init,
   [AC_DEFINE(HAVE_LIB_A52, 1, [Define this if you have liba52.])
   LIBS="$LIBS -la52"],
-  [AC_MSG_ERROR([Did not find required a52 library])])
+  [AC_MSG_ERROR([Did not find required a52 library])],
+  [-lm])
 
 mr_other_libs=
 if test "$MINGW32" = yes; then
