@@ -1,3 +1,8 @@
+2009-02-11  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/Makefile.in:
+		Generate all sources before calling setversion.sh.
+ 
 2009-01-28  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* configure.in:
