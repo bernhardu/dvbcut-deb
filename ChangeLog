@@ -1,3 +1,12 @@
+2009-06-09  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* contrib:
+		New directory
+	* contrib/AR_to_169:
+	* contrib/AR_to_43:
+		New scripts to force an aspect ratio of 16:9 or
+		4:3. Contributed by Dominik Kopp.
+
 2009-02-11  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/Makefile.in:
