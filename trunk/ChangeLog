@@ -6,6 +6,8 @@
 	* contrib/AR_to_43:
 		New scripts to force an aspect ratio of 16:9 or
 		4:3. Contributed by Dominik Kopp.
+	* DISTFILES:
+		Add new files to distribution list.
 
 2009-02-11  Michael Riepe  <too-tired@users.sourceforge.net>
 

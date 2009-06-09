@@ -14,6 +14,8 @@ config.guess
 config.sub
 configure
 configure.in
+contrib/AR_to_169
+contrib/AR_to_43
 debian/README.Debian
 debian/changelog
 debian/compat
