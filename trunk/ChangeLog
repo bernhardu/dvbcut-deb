@@ -1,3 +1,9 @@
+2009-06-19  Dominik Kopp  <my@kabelfunk.de>  (mr)
+
+	* contrib/AR_to_169:
+	* contrib/AR_to_43:
+		Add missing quotes.
+
 2009-06-09  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* contrib:

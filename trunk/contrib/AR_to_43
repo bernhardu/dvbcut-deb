@@ -15,7 +15,7 @@ path=`dirname "$X"`
 
 mkdir "$path/good43"
 
-sed -r 's/(\x00\x00\x01\xB3...)\x33/\1\x23/g' $X > "$path/good43/$file"
+sed -r 's/(\x00\x00\x01\xB3...)\x33/\1\x23/g' "$X" > "$path/good43/$file"
 # example of a MPEG2 movie:
 # 00 00 01 B3 2D 02 40 33
 # for more information about the structure 
