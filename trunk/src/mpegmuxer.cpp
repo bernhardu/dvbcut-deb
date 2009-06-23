@@ -20,6 +20,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 #include <strings.h>
 #include <unistd.h>
 #include <fcntl.h>
