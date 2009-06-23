@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <cstdlib>
-// #include <cstdio>
+#include <cstdio>
 #include <stdint.h>
 #include <cassert>
 

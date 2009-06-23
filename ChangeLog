@@ -1,3 +1,9 @@
+2009-06-23  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/buffer.cpp:
+	* src/mpegmuxer.cpp:
+		Fix gcc 4.4 build.
+
 2009-06-19  Dominik Kopp  <my@kabelfunk.de>  (mr)
 
 	* contrib/AR_to_169:
