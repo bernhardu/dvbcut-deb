@@ -1,3 +1,8 @@
+2009-06-26  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* import/stdlib.h:
+		Use #include_next <stdlib.h> instead of a fixed path.
+		
 2009-06-23  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/buffer.cpp:

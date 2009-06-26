@@ -1,6 +1,6 @@
 #ifndef MYSTDLIB
 #define MYSTDLIB
-#include "c:/MingW/include/stdlib.h"
+#include_next <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
