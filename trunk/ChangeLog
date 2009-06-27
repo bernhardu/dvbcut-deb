@@ -1,3 +1,8 @@
+2009-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* makefile.in:
+		Allow parallel (make -j<n>) install.
+
 2009-06-26  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* import/stdlib.h:
