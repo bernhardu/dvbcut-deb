@@ -1,5 +1,10 @@
 2009-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/stream.h:
+		Make non-interlaced video the default.
+
+2009-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* makefile.in:
 		Allow parallel (make -j<n>) install.
 
