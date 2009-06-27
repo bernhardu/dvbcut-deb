@@ -456,7 +456,7 @@
         <separator/>
         <action name="fileCloseAction"/>
     </item>
-    <item text="Edit" name="editMenu">
+    <item text="&amp;Edit" name="editMenu">
         <action name="editStartAction"/>
         <action name="editStopAction"/>
         <action name="editChapterAction"/>
@@ -466,7 +466,7 @@
         <action name="editSuggestAction"/>
         <action name="editImportAction"/>
     </item>
-    <item text="View" name="viewMenu">
+    <item text="&amp;View" name="viewMenu">
         <action name="viewNormalAction"/>
         <action name="viewUnscaledAction"/>
         <action name="viewDifferenceAction"/>
@@ -485,6 +485,10 @@
         <separator/>
         <action name="playAudio1Action"/>
         <action name="playAudio2Action"/>
+    </item>
+    <item text="&amp;Help" name="Help">
+	<action name="helpAboutAction"/>
+	<action name="helpContentAction"/>
     </item>
 </menubar>
 <toolbars>
@@ -966,6 +970,40 @@
             <string>Ctrl+G</string>
         </property>
     </action>
+    <action>
+	<property name="name">
+	    <cstring>helpAboutAction</cstring>
+	</property>
+	<property name="text">
+	    <string>&amp;About</string>
+	</property>
+	<property name="menuText">
+	    <string>&amp;About</string>
+	</property>
+	<property name="toolTip">
+	    <string>About </string>
+	</property>
+	<property name="statusTip">
+	    <string>About </string>
+	</property>
+    </action>
+    <action>
+	<property name="name">
+	    <cstring>helpContentAction</cstring>
+	</property>
+	<property name="text">
+	    <string>&amp;Contents</string>
+	</property>
+	<property name="menuText">
+	    <string>&amp;Contents</string>
+	</property>
+	<property name="toolTip">
+	    <string>Contents</string>
+	</property>
+	<property name="accel">
+	    <string>F1</string>
+	</property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -1234,6 +1272,18 @@
         <receiver>dvbcutbase</receiver>
         <slot>chapterSnapshotsSave()</slot>
     </connection>
+    <connection>
+	<sender>helpAboutAction</sender>
+	<signal>activated()</signal>
+	<receiver>dvbcutbase</receiver>
+	<slot>helpAboutAction_activated()</slot>
+    </connection>
+    <connection>
+	<sender>helpContentAction</sender>
+	<signal>activated()</signal>
+	<receiver>dvbcutbase</receiver>
+	<slot>helpContentAction_activated()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">gettext.h</include>
@@ -1281,6 +1331,8 @@
     <slot>viewQuarterSize()</slot>
     <slot>snapshotSave()</slot>
     <slot>chapterSnapshotsSave()</slot>
+    <slot>helpAboutAction_activated()</slot>
+    <slot>helpContentAction_activated()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

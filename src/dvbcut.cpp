@@ -2381,3 +2381,90 @@ void dvbcut::update_quick_picture_lookup_table() {
   update_time_display();
 }
 
+void dvbcut::helpAboutAction_activated()
+{
+  QMessageBox::about(this, tr("dvbcut"), 
+    tr("<head></head><body><span style=\"font-family: Helvetica,Arial,sans-serif;\">"
+      "<p>dvbcut Version %1</p>"
+      "eMail: <a href=\"mailto:dvbcut-user@lists.sourceforge.net?subject=Comment%20about%20dvbcut\">"
+      "dvbcut-user@lists.sourceforge.net</a></p>"
+      "<p>This program is free software; you can redistribute it and/or "
+      "modify it under the terms of the GNU General Public License as "
+      "published by the Free Software Foundation; either version 2 of "
+      "the License, or (at your option) any later version. This "
+      "program is distributed in the hope that it will be useful, "
+      "but WITHOUT ANY WARRANTY; without even the implied warranty of "
+      "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU "
+      "General Public License for more details.</p>"
+      "<p>You should have received a copy of the GNU General Public License along "
+      "with this program; if not, see "
+      "<a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.</p>"
+      "</span></body></html>").arg(VERSION_STRING));
+}
+
+#include <qhbox.h>
+#include <qvbox.h>
+#include <qdialog.h>
+#include <qtextbrowser.h>
+#include <qpushbutton.h>
+
+class helpDialog : public QDialog {
+public:
+  helpDialog(QWidget *parent, const char *name, QString file)
+  : QDialog(parent, name)
+  {
+    vbox = new QVBox(this);
+    vbox->resize(640, 480);
+    viewer = new QTextBrowser(vbox);
+    hbox = new QHBox(vbox);
+    prev = new QPushButton(tr("Prev"), hbox);
+    next = new QPushButton(tr("Next"), hbox);
+    home = new QPushButton(tr("Home"), hbox);
+    close = new QPushButton(tr("Close"), hbox);
+    close->setDefault(true);
+    connect(prev, SIGNAL(clicked()), viewer, SLOT(backward()));
+    connect(viewer, SIGNAL(backwardAvailable(bool)), prev, SLOT(setEnabled(bool)));
+    connect(next, SIGNAL(clicked()), viewer, SLOT(forward()));
+    connect(viewer, SIGNAL(forwardAvailable(bool)), next, SLOT(setEnabled(bool)));
+    connect(home, SIGNAL(clicked()), viewer, SLOT(home()));
+    connect(close, SIGNAL(clicked()), this, SLOT(accept()));
+    viewer->setSource(file);
+    setCaption(tr("dvbcut help"));
+    show();
+  }
+  virtual ~helpDialog() {
+    delete prev;
+    delete next;
+    delete home;
+    delete close;
+    delete hbox;
+    delete viewer;
+    delete vbox;
+  }
+private:
+  QVBox *vbox;
+  QHBox *hbox;
+  QTextBrowser *viewer;
+  QPushButton *prev, *next, *home, *close;
+};
+
+void dvbcut::helpContentAction_activated()
+{
+  QFileInfo appDir(qApp->applicationDirPath());
+  // first search in the directory containing dvbcut
+  QString helpFile = appDir.absFilePath() + "/dvbcut_en.html";
+#ifndef __WIN32__
+  // Unix/Linux: search in the associated share subdirectory
+  if (!QFile::exists(helpFile)) {
+    helpFile = appDir.dirPath(true) + "/share/help/dvbcut_en.html";
+  }
+#endif
+  if (QFile::exists(helpFile)) {
+    helpDialog dlg(this, "helpDialog", helpFile);
+    dlg.exec();
+  }
+  else {
+    QMessageBox::information(this, tr("dvbcut"),
+      tr("Help file %1 not available").arg(helpFile));
+  }
+}

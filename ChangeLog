@@ -1,5 +1,18 @@
 2009-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/dvbcut.cpp:
+	* src/dvbcut.h:
+	* src/dvbcutbase.ui:
+		Add help dialog and about box.
+	* src/dvbcut_en.html:
+		Initial (rudimentary) help file.
+	* DISTFILES:
+		Add dvbcut_en.html.
+	* src/Makefile.in:
+		Install dvbcut_en.html.
+
+2009-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* src/stream.h:
 		Make non-interlaced video the default.
 

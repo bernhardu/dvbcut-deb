@@ -130,6 +130,10 @@ protected:
   void snapshotSave(std::vector<int> piclist, int range=0, int samples=1);
   int chooseBestPicture(int startpic, int range, int smaples);
 
+protected slots:
+  virtual void helpAboutAction_activated();
+  virtual void helpContentAction_activated();
+	
 public:
   ~dvbcut();
   dvbcut(QWidget *parent = 0, const char *name = 0, WFlags fl = WType_TopLevel|WDestructiveClose );
