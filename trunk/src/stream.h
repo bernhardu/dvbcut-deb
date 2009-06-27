@@ -55,7 +55,7 @@ protected:
     avcc=avcodec_alloc_context();
     avcodec_get_context_defaults(avcc);
     }
-  void setvideoencodingparameters(bool interlaced=true)
+  void setvideoencodingparameters(bool interlaced=false)
     {
     avcc->bit_rate=9500000;
     avcc->rc_min_rate=9500000;
