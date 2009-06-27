@@ -27,7 +27,7 @@ datadir = @datadir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
 
-installdirs = $(DESTDIR)$(mandir) $(DESTDIR)$(man1dir)
+installdirs = $(DESTDIR)$(man1dir)
 
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
