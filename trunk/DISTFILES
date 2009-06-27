@@ -246,6 +246,7 @@ src/differenceimageprovider.cpp
 src/differenceimageprovider.h
 src/dvbcut.cpp
 src/dvbcut.h
+src/dvbcut_en.html
 src/dvbcutbase.h
 src/dvbcutbase.ui
 src/eventlistitem.cpp
