@@ -1,3 +1,10 @@
+2009-06-28  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* makefile.in:
+		Fix stamp-dist dependencies.
+		Fix non-POSIX sort command.
+		Add bindist target.
+
 2009-06-27  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:
