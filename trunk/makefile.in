@@ -66,8 +66,8 @@ src/version.h: $(DISTFILES)
 	$(SHELL) ./setversion.sh $(DISTFILES)
 
 distdir = dvbcut-$(VERSION)
-dist: ./stamp-dist
-./stamp-dist: distfiles $(DISTFILES)
+dist: distfiles ./stamp-dist
+./stamp-dist: $(DISTFILES)
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	files="$(DISTFILES)"; for file in $$files; do \
@@ -78,7 +78,7 @@ dist: ./stamp-dist
 	cd $(distdir) && $(SHELL) ./setversion.sh $(DISTFILES)
 	cd $(distdir) && \
 		find . -type f ! -name MANIFEST -exec wc -c {} \; | \
-		sort +1 >MANIFEST
+		sort -k 2 >MANIFEST
 	-@rm -f $(distdir).tar.gz.bak dvbcut.tar.gz
 	-@mv -f $(distdir).tar.gz $(distdir).tar.gz.bak
 	tar cvohfz $(distdir).tar.gz --numeric-owner --owner=0 --group=0 $(distdir)
@@ -92,4 +92,12 @@ check-dist:
 	$(MAKE) -C $(distdir)
 	$(MAKE) -C $(distdir) check
 	$(MAKE) -C $(distdir) dist
+	diff $(distdir)/MANIFEST $(distdir)/$(distdir)/MANIFEST
+
+bindist: all
+	dir=$(distdir)-`arch`; \
+	rm -rf $$dir; \
+	make install DESTDIR=`pwd`/$$dir && \
+	cd $$dir && \
+	tar cvofz ../$$dir.tar.gz --numeric-owner --owner=0 --group=0 *
 
