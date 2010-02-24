@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-dvbcut">
+    <comment xml:lang="en">DVBcut project file</comment>
+    <comment xml:lang="de">DVBcut-Projektdatei</comment>
+    <!-- use high priority to give this precedence over other XML files -->
+    <magic priority="100">
+      <match type="string" value="&lt;!DOCTYPE dvbcut&gt;" offset="0:47"/>
+    </magic>
+    <glob pattern="*.dvbcut"/>
+    <glob pattern="*.DVBCUT"/>
+    <sub-class-of type="text/xml"/>
+  </mime-type>
+</mime-info>

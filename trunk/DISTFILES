@@ -26,10 +26,12 @@ debian/docs
 debian/menu
 debian/rules
 dvbcut.1
+dvbcut.desktop.in
 dvbcut.kdevelop
 dvbcut.kdevelop.filelist
 dvbcut.kdevelop.pcs
 dvbcut.kdevses
+dvbcut.xml
 ffmpeg.src/COPYING
 ffmpeg.src/CREDITS
 ffmpeg.src/Changelog
