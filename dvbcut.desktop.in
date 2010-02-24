@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=DVBcut
+GenericName=DVB Cutting Program
+NoDisplay=false
+Comment=Cut DVB streams
+Icon=@prefix@/share/dvbcut/icons/dvbcut.svg
+TryExec=@prefix@/bin/dvbcut
+Exec=@prefix@/bin/dvbcut %F
+Terminal=false
+MimeType=application/x-dvbcut;
+Categories=AudioVideo;AudioVideoEditing;Qt;
+StartupWMClass=Dvbcut

@@ -1,3 +1,16 @@
+2010-02-24  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* DISTFILES:
+		Add new files.
+	* dvbcut.desktop.in:
+		Add desktop file template.
+	* dvbcut.xml:
+		Add mime type declaration for application/x-dvbcut.
+	* makefile.in:
+		Install new files.
+	* configure.in:
+		Create dvbcut.desktop from dvbcut.desktop.in.
+
 2009-06-28  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* makefile.in:
