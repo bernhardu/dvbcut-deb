@@ -26,8 +26,10 @@ bindir = @bindir@
 datadir = @datadir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
+pkgdatadir = $(datadir)/dvbcut
 
 installdirs = $(DESTDIR)$(man1dir) \
+	$(DESTDIR)$(pkgdatadir)/icons \
 	$(DESTDIR)/usr/share/applications \
 	$(DESTDIR)/usr/share/mime/packages
 
@@ -45,6 +47,7 @@ dep-local:
 install-local: $(installdirs) dvbcut.1 dvbcut.desktop dvbcut.xml
 	$(INSTALL_DATA) dvbcut.1 $(DESTDIR)$(man1dir)/dvbcut.1
 	$(INSTALL_DATA) dvbcut.desktop $(DESTDIR)/usr/share/applications
+	$(INSTALL_DATA) dvbcut.svg $(DESTDIR)$(pkgdatadir)/icons
 	$(INSTALL_DATA) dvbcut.xml $(DESTDIR)/usr/share/mime/packages
 	-update-mime-database $(DESTDIR)/usr/share/mime
 

@@ -1,3 +1,12 @@
+2010-02-25  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* DISTFILES:
+		Add dvbcut.svg.
+	* dvbcut.svg:
+		Icon contributed by Franmcesco Fumanti.
+	* makefile.in:
+		Install icon.
+
 2010-02-24  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* DISTFILES:
