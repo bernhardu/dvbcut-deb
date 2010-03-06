@@ -1,3 +1,10 @@
+2010-03-06  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* DISTFILES:
+		Add dvbcut.ico.
+	* dvbcut.ico:
+		Converted icon for Windows.
+
 2010-02-25  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* DISTFILES:
