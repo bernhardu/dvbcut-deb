@@ -27,6 +27,7 @@ debian/menu
 debian/rules
 dvbcut.1
 dvbcut.desktop.in
+dvbcut.ico
 dvbcut.kdevelop
 dvbcut.kdevelop.filelist
 dvbcut.kdevelop.pcs
