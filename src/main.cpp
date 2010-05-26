@@ -171,7 +171,7 @@ main(int argc, char *argv[]) {
       return 1;
     }
 
-    index::index idx(*mpg);
+    class index idx(*mpg);
     int pics = idx.generate();
     if (pics <= 0) {
       fprintf(stderr, "%s: %s: %s\n", argv0, mpgfilename.c_str(),
