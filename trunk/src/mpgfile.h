@@ -49,7 +49,7 @@ protected:
   stream s[MAXAVSTREAMS];
   int videostreams, audiostreams;
   int initialoffset;
-  index::index idx;
+  class index idx;
   int pictures;
 
   mpgfile(inbuffer &b, int initial_offset);

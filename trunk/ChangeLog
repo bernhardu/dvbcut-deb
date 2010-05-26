@@ -1,3 +1,10 @@
+2010-05-26  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/main.cpp:
+	* src/mpgfile.h:
+		Replace `index::index' with `class index' to make
+		gcc 4.5 happy.
+
 2010-03-06  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* DISTFILES:
