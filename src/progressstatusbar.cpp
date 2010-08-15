@@ -26,7 +26,7 @@
 #include <cstdarg>
 #include <cstdlib>
 #include <qstatusbar.h>
-#include <qprogressbar.h>
+#include <q3progressbar.h>
 #include <qapplication.h>
 #include <qpushbutton.h>
 #include <qlabel.h>
@@ -46,7 +46,7 @@ progressstatusbar::progressstatusbar(QStatusBar *bar)
   cancelbutton->setMaximumWidth(80);
   statusbar->addWidget(cancelbutton,true);
 
-  progressbar=new QProgressBar(statusbar);
+  progressbar=new Q3ProgressBar(statusbar);
   progressbar->setTotalSteps(1000);
   progressbar->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum));
   progressbar->setMinimumWidth(160);
@@ -66,7 +66,7 @@ progressstatusbar::~progressstatusbar()
   delete progressbar;
   delete cancelbutton;
   delete label;
-  statusbar->clear();
+  statusbar->clearMessage();
   }
 
 

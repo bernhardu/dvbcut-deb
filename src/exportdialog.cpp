@@ -22,21 +22,28 @@
 #include <qfiledialog.h>
 #include "exportdialog.h"
 
-exportdialog::exportdialog(const std::string &filename, QWidget *parent, const char *name)
-    :exportdialogbase(parent, name, true)
+exportdialog::exportdialog(const QString &filename, QWidget *parent, const char *name)
+    :QDialog(parent, name, true)
   {
-  filenameline->setText(filename);
+    ui = new Ui::exportdialogbase();
+    ui->setupUi(this);
+    ui->filenameline->setText(filename);
+  }
+  
+exportdialog::~exportdialog()
+  {
+    delete ui;
   }
 
 void exportdialog::fileselector()
   {
   QString newfilename(QFileDialog::getSaveFileName(
-                        filenameline->text(),
+                        ui->filenameline->text(),
                         "MPEG program streams (*.mpg)"
                         ";;All files (*)",
                         this,0,
                         "Export video..." ));
 
-  if (newfilename)
-    filenameline->setText(newfilename);
+  if (!newfilename.isEmpty())
+    ui->filenameline->setText(newfilename);
   }

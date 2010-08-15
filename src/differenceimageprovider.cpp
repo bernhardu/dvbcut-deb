@@ -63,7 +63,7 @@ void differenceimageprovider::decodepicture(int picture, bool decodeallgop)
     delete *it;
 
     if (im.size()!=baseimg.size())
-      im=im.scale(baseimg.size());
+      im=im.scaled(baseimg.size());
 
     if (im.depth()==32 && baseimg.depth()==32)
       for (int y=0;y<baseimg.height();++y) {
@@ -84,7 +84,7 @@ void differenceimageprovider::decodepicture(int picture, bool decodeallgop)
 
 
     if ((RTTI!=IMAGEPROVIDER_DIFFERENCE_UNSCALED && displaywidth!=im.width())||(viewscalefactor!=1.0))
-      im=im.scale(int(((RTTI!=IMAGEPROVIDER_DIFFERENCE_UNSCALED)?displaywidth:im.width())/viewscalefactor+0.5),
+      im=im.scaled(int(((RTTI!=IMAGEPROVIDER_DIFFERENCE_UNSCALED)?displaywidth:im.width())/viewscalefactor+0.5),
 	int(im.height()/viewscalefactor+0.5));
     framecache.push_front(framecacheitem(startpic++,im));
     }

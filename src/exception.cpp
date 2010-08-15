@@ -46,5 +46,5 @@ void dvbcut_exception::show() const
   if (extype.empty())  
     extype="DVBCUT error";
 
-  QMessageBox::critical(NULL,extype,what(),QMessageBox::Abort,QMessageBox::NoButton);
+  QMessageBox::critical(NULL,QString::fromStdString(extype),what(),QMessageBox::Abort,QMessageBox::NoButton);
 }

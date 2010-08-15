@@ -16,47 +16,24 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/* $Id$ */
+#include <qlineedit.h>
+#include <qfiledialog.h>
+#include "mplayererrorbase.h"
 
-#ifndef _DVBCUT_PROGRESSSTATUSBAR_H
-#define _DVBCUT_PROGRESSSTATUSBAR_H
-
-#include <qobject.h>
-#include "logoutput.h"
-
-class QStatusBar;
-class Q3ProgressBar;
-class QPushButton;
-class QLabel;
-
-/**
-@author Sven Over
-*/
-class progressstatusbar : public QObject, public logoutput
+mplayererrorbase::mplayererrorbase(QWidget *parent)
+    :QDialog(parent)
   {
-  Q_OBJECT
+    ui = new Ui::mplayererrorbase();
+    ui->setupUi(this);
+    this->setVisible(true);
+  }
 
-protected:
-  bool cancelwasclicked;
-  QStatusBar *statusbar;
-  Q3ProgressBar *progressbar;
-  QPushButton *cancelbutton;
-  QLabel *label;
-
-public:
-  progressstatusbar(QStatusBar *bar);
-  ~progressstatusbar();
-
-  virtual bool cancelled()
-    {
-    return cancelwasclicked;
-    }
-  virtual void finish();
-  virtual void print(const char *fmt, ...);
-
-public slots:
-  virtual void setprogress(int permille);
-  virtual void clickedcancel();
-  };
-
-#endif
+mplayererrorbase::~mplayererrorbase()
+  {
+    delete ui;
+  }
+  
+void mplayererrorbase::setText(QString text)
+  {
+    ui->textbrowser->setText(text);
+  }

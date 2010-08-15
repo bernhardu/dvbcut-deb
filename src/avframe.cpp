@@ -116,9 +116,9 @@ QImage avframe::getqimage(bool scaled, double viewscalefactor)
 
   if ((scaled && w!=dw)||(viewscalefactor!=1.0)) {
 #ifdef SMOOTHSCALE
-    im = im.smoothScale(int((scaled?dw:w)/viewscalefactor+0.5), int(h/viewscalefactor+0.5));
+    im = im.scaled(int((scaled?dw:w)/viewscalefactor+0.5), int(h/viewscalefactor+0.5), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 #else
-    im = im.scale(int((scaled?dw:w)/viewscalefactor+0.5), int(h/viewscalefactor+0.5));
+    im = im.scaled(int((scaled?dw:w)/viewscalefactor+0.5), int(h/viewscalefactor+0.5));
 #endif
     }
 

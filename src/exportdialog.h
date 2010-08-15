@@ -22,13 +22,17 @@
 #define _DVBCUT_EXPORTDIALOG_H
 
 #include <string>
-#include "exportdialogbase.h"
+#include "ui_exportdialogbase.h"
 
-class exportdialog: public exportdialogbase
+class exportdialog: public QDialog
   {
   Q_OBJECT
 public:
-  exportdialog(const std::string &filename, QWidget *parent = 0, const char *name = 0);
+  exportdialog(const QString &filename, QWidget *parent = 0, const char *name = 0);
+  ~exportdialog();
+  Ui::exportdialogbase* ui;
+  
+private:
 
 public slots:
   virtual void fileselector();

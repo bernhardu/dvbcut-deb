@@ -22,16 +22,16 @@
 #define _DVBCUT_EVENTLISTIEM_H_
 
 #include <qpixmap.h>
-#include <qlistbox.h>
+#include <q3listbox.h>
 #include "pts.h"
 
-class EventListItem : public QListBoxItem
+class EventListItem : public Q3ListBoxItem
   {
 public:
   enum eventtype { none, start, stop, chapter, bookmark };
 
 public:
-  EventListItem( QListBox *listbox, const QPixmap &pixmap, eventtype type, int picture, int picturetype, pts_t _pts );
+  EventListItem( Q3ListBox *listbox, const QPixmap &pixmap, eventtype type, int picture, int picturetype, pts_t _pts );
   ~EventListItem();
 
   const QPixmap *pixmap() const
@@ -56,8 +56,8 @@ public:
     return;
     }
 
-  int	 height( const QListBox *lb ) const;
-  int	 width( const QListBox *lb )  const;
+  int	 height( const Q3ListBox *lb ) const;
+  int	 width( const Q3ListBox *lb )  const;
 
   int rtti() const;
   static int RTTI()
@@ -77,7 +77,7 @@ private:
 
   QString getstring() const;
 
-  static QListBoxItem *afterwhich(QListBox *lb, int picture);
+  static Q3ListBoxItem *afterwhich(Q3ListBox *lb, int picture);
   };
 
 #endif // ifndef _EVENTLISTIEM_H_

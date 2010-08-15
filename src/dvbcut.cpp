@@ -39,7 +39,7 @@
 #include <qstring.h>
 #include <qlineedit.h>
 #include <qprocess.h>
-#include <qpopupmenu.h>
+#include <q3popupmenu.h>
 #include <qpushbutton.h>
 #include <qaction.h>
 #include <qtextbrowser.h>
@@ -122,9 +122,9 @@ void dvbcut::setbusy(bool b)
 // **************************************************************************
 // ***  dvbcut::dvbcut (private constructor)
 
-dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
-  :dvbcutbase(parent, name, fl),
-    audiotrackpopup(0), recentfilespopup(0), editconvertpopup(0), audiotrackmenuid(-1),
+dvbcut::dvbcut(QWidget *parent, const char *name, Qt::WFlags fl)
+    :Q3MainWindow(parent),
+    audiotrackpopup(0), recentfilespopup(0), editconvertpopup(0), audiotrackmenu(0),
     buf(8 << 20, 128 << 20),
     mpg(0), pictures(0),
     curpic(~0), showimage(true), fine(false),
@@ -132,35 +132,46 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
     mplayer_process(0), imgp(0), busy(0),
     viewscalefactor(1.0),
     nogui(false)
-{
+  {
+    ui = new Ui::dvbcutbase();
+    ui->setupUi(this);
 #ifndef HAVE_LIB_AO
-  playAudio1Action->setEnabled(false);
-  playAudio2Action->setEnabled(false);
-  playAudio1Action->removeFrom(playToolbar);
-  playAudio2Action->removeFrom(playToolbar);
-  playAudio1Action->removeFrom(playMenu);
-  playAudio2Action->removeFrom(playMenu);
+  ui->playAudio1Action->setEnabled(false);
+  ui->playAudio2Action->setEnabled(false);
+  ui->playToolbar->removeAction(ui->playAudio1Action);
+  ui->playToolbar->removeAction(ui->playAudio2Action);
+  ui->playMenu->removeAction(ui->playAudio1Action);
+  ui->playMenu->removeAction(ui->playAudio2Action);
 #endif // ! HAVE_LIB_AO
 
-  audiotrackpopup=new QPopupMenu(this);
-  playMenu->insertSeparator();
-  audiotrackmenuid=playMenu->insertItem(QString("Audio track"),audiotrackpopup);
+  audiotrackpopup=new QMenu(QString("Audio track"), this);
+  ui->playMenu->insertSeparator();
+  audiotrackmenu=ui->playMenu->addMenu(audiotrackpopup);
   connect( audiotrackpopup, SIGNAL( activated(int) ), this, SLOT( audiotrackchosen(int) ) );
 
-  recentfilespopup=new QPopupMenu(this);
-  fileMenu->insertItem(QString("Open recent..."),recentfilespopup,-1,2);
+  recentfilespopup=new QMenu(QString("Open recent..."), this);
+  ui->fileMenu->insertMenu(ui->fileSaveAction, recentfilespopup);
   connect( recentfilespopup, SIGNAL( activated(int) ), this, SLOT( loadrecentfile(int) ) );
   connect( recentfilespopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshowrecentfiles() ) );
 
-  editconvertpopup=new QPopupMenu(this);
-  editMenu->insertItem(QString("Convert bookmarks"),editconvertpopup,-1,8);
+  editconvertpopup=new QMenu(QString("Convert bookmarks"), this);
+  ui->editMenu->insertMenu(ui->editBookmarkAction, editconvertpopup);
   connect( editconvertpopup, SIGNAL( activated(int) ), this, SLOT( editConvert(int) ) );
   connect( editconvertpopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshoweditconvert() ) );
+  
+  ui->fileOpenAction->setIcon(QIcon::fromTheme("document-open"));
+  ui->fileSaveAction->setIcon(QIcon::fromTheme("document-save"));
+  ui->fileSaveAsAction->setIcon(QIcon::fromTheme("document-save-as"));
+  ui->snapshotSaveAction->setIcon(QIcon::fromTheme("camera-photo"));
+  ui->playPlayAction->setIcon(QIcon::fromTheme("media-playback-start"));
+  ui->playStopAction->setIcon(QIcon::fromTheme("media-playback-pause"));
+  ui->playAudio1Action->setIcon(QIcon::fromTheme("media-seek-backward"));
+  ui->playAudio2Action->setIcon(QIcon::fromTheme("media-seek-forward"));
 
   setviewscalefactor(settings().viewscalefactor);
 
   // install event handler
-  linslider->installEventFilter(this);
+  ui->linslider->installEventFilter(this);
 
   // set caption
   setCaption(QString(VERSION_STRING));
@@ -172,7 +183,7 @@ dvbcut::dvbcut(QWidget *parent, const char *name, WFlags fl)
 dvbcut::~dvbcut()
 {
   if (mplayer_process) {
-    mplayer_process->tryTerminate();
+    mplayer_process->terminate();
     delete mplayer_process;
   }
 
@@ -187,6 +198,8 @@ dvbcut::~dvbcut()
     delete imgp;
   if (mpg)
     delete mpg;
+  if(ui)
+    delete ui;
 }
 
 // **************************************************************************
@@ -213,18 +226,18 @@ void dvbcut::fileSaveAs()
       prefix = prefix.substr(0, lastdot);
     prjfilen = prefix + ".dvbcut";
     int nr = 0;
-    while (QFileInfo(QString(prjfilen)).exists())
+    while (QFileInfo(QString::fromStdString(prjfilen)).exists())
       prjfilen = prefix + "_" + ((const char*)QString::number(++nr)) + ".dvbcut";
   }
 
   QString s=QFileDialog::getSaveFileName(
-    prjfilen,
+    QString::fromStdString(prjfilen),
     settings().prjfilter,
     this,
     "Save project as...",
     "Choose the name of the project file" );
 
-  if (!s)
+  if (s.isNull())
     return;
 
   if (QFileInfo(s).exists() && question(
@@ -245,10 +258,12 @@ void dvbcut::fileSave()
     return;
   }
 
-  QFile outfile(prjfilen);
-  if (!outfile.open(IO_WriteOnly)) {
-    critical("Failed to write project file - dvbcut",
-      QString(prjfilen) + ":\nCould not open file");
+  QFile outfile(QString::fromStdString(prjfilen));
+  if (!outfile.open(QIODevice::WriteOnly)) {
+    QMessageBox::critical(this,"Failed to write project file - dvbcut",QString::fromStdString(prjfilen)+
+                          ":\nCould not open file",
+                          QMessageBox::Abort,
+                          QMessageBox::NoButton);
     return;
   }
 
@@ -264,18 +279,18 @@ void dvbcut::fileSave()
   std::list<std::string>::const_iterator it = mpgfilen.begin();
   while (it != mpgfilen.end()) {
     QDomElement elem = doc.createElement("mpgfile");
-    elem.setAttribute("path", *it);
+    elem.setAttribute("path", QString::fromStdString(*it));
     root.appendChild(elem);
     ++it;
   }
 
   if (!idxfilen.empty()) {
     QDomElement elem = doc.createElement("idxfile");
-    elem.setAttribute("path", idxfilen);
+    elem.setAttribute("path", QString::fromStdString(idxfilen));
     root.appendChild(elem);
   }
 
-  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
     if (item->rtti()==EventListItem::RTTI()) {
       QString elemname;
       EventListItem *eli=(EventListItem*)item;
@@ -300,7 +315,7 @@ void dvbcut::fileSave()
   QTextStream stream(&outfile);
   stream.setEncoding(QTextStream::Latin1);
   stream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-  stream << doc.toCString();
+  stream << doc.toString().toStdString().c_str();
   outfile.close();
 }
 
@@ -316,7 +331,7 @@ void dvbcut::chapterSnapshotsSave()
 {
   int found=0;
   std::vector<int> piclist;
-  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
     if (item->rtti()==EventListItem::RTTI()) {
       EventListItem *eli=(EventListItem*)item;
       if (eli->geteventtype()==EventListItem::chapter) {
@@ -345,15 +360,15 @@ void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
   if (picfilen.isEmpty()) {
     if(settings().snapshot_prefix.isEmpty()) {
       if (!prjfilen.empty())
-        prefix = QString(prjfilen);
+        prefix = QString::fromStdString(prjfilen);
       else if (!mpgfilen.empty() && !mpgfilen.front().empty())
-        prefix = QString(mpgfilen.front());
+        prefix = QString::fromStdString(mpgfilen.front());
     } else
       prefix = settings().snapshot_prefix;
 
     if (!prefix.isEmpty()) {
-      int lastdot = prefix.findRev('.');
-      int lastslash = prefix.findRev('/');
+      int lastdot = prefix.lastIndexOf('.');
+      int lastslash = prefix.lastIndexOf('/');
       if (lastdot >= 0 && lastdot > lastslash)
         prefix = prefix.left(lastdot);
       int nr = first;
@@ -395,13 +410,13 @@ void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
     else
       p = imageprovider(*mpg, new dvbcutbusy(this), false, viewscalefactor).getimage(pic,fine);
     if(p.save(s,type,quality))
-      statusBar()->message("Saved snapshot: " + s);
+      statusBar()->showMessage("Saved snapshot: " + s);
     else
-      statusBar()->message("*** Unable to save snapshot: " + s + "! ***");
+      statusBar()->showMessage("*** Unable to save snapshot: " + s + "! ***");
  
     // try to "increment" the choosen filename for next snapshot (or use old name as default)
     // No usage of "delim", so it's possible to choose any prefix in front of the number field!
-    i = s.findRev(QRegExp("\\d{"+QString::number(width)+","+QString::number(width)+"}\\."+ext+"$"));
+    i = s.lastIndexOf(QRegExp("\\d{"+QString::number(width)+","+QString::number(width)+"}\\."+ext+"$"));
     if (i>0) {
       nr = s.mid(i,width).toInt(&ok,10);
       if (ok)
@@ -512,31 +527,31 @@ void dvbcut::fileExport()
         newexpfilen=newexpfilen.substr(0,lastdot);
       expfilen=newexpfilen+".mpg";
       int nr=0;
-      while (QFileInfo(QString(expfilen)).exists())
+      while (QFileInfo(QString::fromStdString(expfilen)).exists())
         expfilen=newexpfilen+"_"+((const char*)QString::number(++nr))+".mpg";
     }
   }
 
-  std::auto_ptr<exportdialog> expd(new exportdialog(expfilen,this));
-  expd->muxercombo->insertItem("MPEG program stream/DVD (DVBCUT multiplexer)");
-  expd->muxercombo->insertItem("MPEG program stream (DVBCUT multiplexer)");
-  expd->muxercombo->insertItem("MPEG program stream/DVD (libavformat)");
-  expd->muxercombo->insertItem("MPEG transport stream (libavformat)");
+  std::auto_ptr<exportdialog> expd(new exportdialog(QString::fromStdString(expfilen),this));
+  expd->ui->muxercombo->insertItem("MPEG program stream/DVD (DVBCUT multiplexer)");
+  expd->ui->muxercombo->insertItem("MPEG program stream (DVBCUT multiplexer)");
+  expd->ui->muxercombo->insertItem("MPEG program stream/DVD (libavformat)");
+  expd->ui->muxercombo->insertItem("MPEG transport stream (libavformat)");
 #ifndef __WIN32__
   // add possible user configured pipe commands 
-  int pipe_items_start=expd->muxercombo->count();
+  int pipe_items_start=expd->ui->muxercombo->count();
   for (unsigned int i = 0; i < settings().pipe_command.size(); ++i)
-    expd->muxercombo->insertItem(settings().pipe_label[i]);
+    expd->ui->muxercombo->insertItem(settings().pipe_label[i]);
 #endif
 
   if (settings().export_format < 0
-      || settings().export_format >= expd->muxercombo->count())
+      || settings().export_format >= expd->ui->muxercombo->count())
     settings().export_format = 0;
-  expd->muxercombo->setCurrentItem(settings().export_format);
+  expd->ui->muxercombo->setCurrentItem(settings().export_format);
 
   for(int a=0;a<mpg->getaudiostreams();++a) {
-    expd->audiolist->insertItem(mpg->getstreaminfo(audiostream(a)).c_str());
-    expd->audiolist->setSelected(a,true);
+    expd->ui->audiolist->insertItem(mpg->getstreaminfo(audiostream(a)).c_str());
+    expd->ui->audiolist->setSelected(a,true);
   }
 
   int expfmt = 0;
@@ -545,14 +560,14 @@ void dvbcut::fileExport()
     if (!expd->exec())
       return;
 
-    settings().export_format = expd->muxercombo->currentItem();
-    expfmt = expd->muxercombo->currentItem();
+    settings().export_format = expd->ui->muxercombo->currentItem();
+    expfmt = expd->ui->muxercombo->currentItem();
 
-    expfilen=(const char *)(expd->filenameline->text());
+    expfilen=(const char *)(expd->ui->filenameline->text());
     if (expfilen.empty())
       return;
     expd->hide();
-  } else if (exportformat > 0 && exportformat < expd->muxercombo->count()) 
+  } else if (exportformat > 0 && exportformat < expd->ui->muxercombo->count()) 
     expfmt = exportformat;  
 
   // create usable chapter lists 
@@ -641,9 +656,9 @@ void dvbcut::fileExport()
     }
   } else
 #endif
-  if (QFileInfo(expfilen).exists() && question(
+  if (QFileInfo(QString::fromStdString(expfilen)).exists() && question(
       "File exists - dvbcut",
-      expfilen+"\nalready exists. "
+      QString::fromStdString(expfilen)+"\nalready exists. "
           "Overwrite?") !=
       QMessageBox::Yes)
     return;
@@ -655,7 +670,7 @@ void dvbcut::fileExport()
   }
   else {
     prgwin = new progresswindow(this);
-    prgwin->setCaption(QString("export - " + expfilen));
+    prgwin->setCaption(QString("export - " + QString::fromStdString(expfilen)));
     log = prgwin;
   }
 
@@ -665,7 +680,7 @@ void dvbcut::fileExport()
   uint32_t audiostreammask(0);
 
   for(int a=0;a<mpg->getaudiostreams();++a)
-    if (expd->audiolist->isSelected(a))
+    if (expd->ui->audiolist->isSelected(a))
       audiostreammask|=1u<<a;
 
   std::string out_file = (child_pid < 0) ? expfilen :
@@ -763,7 +778,7 @@ void dvbcut::fileExport()
       int irc = system(expcmd.c_str());
       if(irc!=0) { 
         critical("Post processing error - dvbcut","Post processing command:\n"+
-                 expcmd+"\n returned non-zero exit code: " +QString::number(irc));
+                 QString::fromStdString(expcmd)+"\n returned non-zero exit code: " +QString::number(irc));
         log->print("Command reported some problems... please check!");
       } 
       //else      
@@ -816,7 +831,7 @@ void dvbcut::fileClose()
 void dvbcut::addEventListItem(int pic, EventListItem::eventtype type)
 {
   //check if requested EventListItem is already in list to avoid doubles!
-  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
     if (item->rtti()==EventListItem::RTTI()) {
       EventListItem *eli=(EventListItem*)item;
       if (pic==eli->getpicture() && type==eli->geteventtype()) 
@@ -828,8 +843,8 @@ void dvbcut::addEventListItem(int pic, EventListItem::eventtype type)
     p = imgp->getimage(pic);
   else
     p = imageprovider(*mpg, new dvbcutbusy(this), false, 4).getimage(pic);
-
-  new EventListItem(eventlist, p, type, pic, (*mpg)[pic].getpicturetype(),
+  
+  new EventListItem(ui->eventlist, p, type, pic, (*mpg)[pic].getpicturetype(),
                     (*mpg)[pic].getpts() - firstpts);
 }
 
@@ -897,7 +912,7 @@ void dvbcut::editAutoChapters()
           p1 = p2;
           p2 = imgp->getimage(pic,fine);
           if (p2.size()!=p1.size())
-            p2=p2.scale(p1.size());
+            p2=p2.scaled(p1.size());
 
           // calculate color distance between two consecutive frames
           double dist=0.;
@@ -920,7 +935,7 @@ void dvbcut::editAutoChapters()
           //fprintf(stderr,"%d, DIST=%f\n",pic,dist); 
           if(dist>settings().chapter_threshold) { 
             inpic=pic;
-            statusBar()->message(QString().sprintf("%d. Scene change @ %d, DIST=%f\n",chapters+1,inpic,dist));   
+            statusBar()->showMessage(QString().sprintf("%d. Scene change @ %d, DIST=%f\n",chapters+1,inpic,dist));   
             break;
           }  
         }
@@ -943,7 +958,7 @@ void dvbcut::editSuggest()
     found++;
   }
   if (!found)  
-    statusBar()->message(QString("*** No aspect ratio changes detected! ***"));   
+    statusBar()->showMessage(QString("*** No aspect ratio changes detected! ***"));   
 }
 
 void dvbcut::editImport()
@@ -955,7 +970,7 @@ void dvbcut::editImport()
     found++;
   }
   if (!found)  
-    statusBar()->message(QString("*** No valid bookmarks available/found! ***"));
+    statusBar()->showMessage(QString("*** No valid bookmarks available/found! ***"));
 }
 
 
@@ -975,7 +990,7 @@ void dvbcut::editConvert(int option)
   
   int found=0;
   std::vector<int> cutlist;
-  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
     if (item->rtti()==EventListItem::RTTI()) {
       EventListItem *eli=(EventListItem*)item;
       if (eli->geteventtype()==EventListItem::bookmark) {
@@ -988,10 +1003,10 @@ void dvbcut::editConvert(int option)
     addStartStopItems(cutlist, option);
 
     if (found%2) 
-      statusBar()->message(QString("*** No matching stop marker!!! ***"));
+      statusBar()->showMessage(QString("*** No matching stop marker!!! ***"));
   }  
   else
-    statusBar()->message(QString("*** No bookmarks to convert! ***"));  
+    statusBar()->showMessage(QString("*** No bookmarks to convert! ***"));  
 }
 
 void dvbcut::addStartStopItems(std::vector<int> cutlist, int option)
@@ -1005,10 +1020,10 @@ void dvbcut::addStartStopItems(std::vector<int> cutlist, int option)
     alternate=false;   
  
   // make sure list is sorted... 
-  sort(cutlist.begin(),cutlist.end());
+  std::sort(cutlist.begin(),cutlist.end());
 
   // ...AND there are no old START/STOP pairs!!!
-  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
     if (item->rtti()==EventListItem::RTTI()) {
       EventListItem *eli=(EventListItem*)item;
       if (eli->geteventtype()==EventListItem::start || eli->geteventtype()==EventListItem::stop) 
@@ -1040,9 +1055,9 @@ void dvbcut::addStartStopItems(std::vector<int> cutlist, int option)
 
 void dvbcut::viewDifference()
 {
-  viewNormalAction->setOn(false);
-  viewUnscaledAction->setOn(false);
-  viewDifferenceAction->setOn(true);
+  ui->viewNormalAction->setChecked(false);
+  ui->viewUnscaledAction->setChecked(false);
+  ui->viewDifferenceAction->setChecked(true);
 
   if (imgp)
     delete imgp;
@@ -1053,9 +1068,9 @@ void dvbcut::viewDifference()
 
 void dvbcut::viewUnscaled()
 {
-  viewNormalAction->setOn(false);
-  viewUnscaledAction->setOn(true);
-  viewDifferenceAction->setOn(false);
+  ui->viewNormalAction->setChecked(false);
+  ui->viewUnscaledAction->setChecked(true);
+  ui->viewDifferenceAction->setChecked(false);
 
   if (!imgp || imgp->rtti()!=IMAGEPROVIDER_UNSCALED) {
     if (imgp)
@@ -1068,9 +1083,9 @@ void dvbcut::viewUnscaled()
 
 void dvbcut::viewNormal()
 {
-  viewNormalAction->setOn(true);
-  viewUnscaledAction->setOn(false);
-  viewDifferenceAction->setOn(false);
+  ui->viewNormalAction->setChecked(true);
+  ui->viewUnscaledAction->setChecked(false);
+  ui->viewDifferenceAction->setChecked(false);
 
   if (!imgp || imgp->rtti()!=IMAGEPROVIDER_STANDARD) {
     if (imgp)
@@ -1115,88 +1130,81 @@ void dvbcut::playPlay()
   if (mplayer_process)
     return;
 
-  eventlist->setEnabled(false);
-  linslider->setEnabled(false);
-  jogslider->setEnabled(false);
-  gobutton->setEnabled(false);
-  goinput->setEnabled(false);
-  gobutton2->setEnabled(false);
-  goinput2->setEnabled(false);
+
+  ui->eventlist->setEnabled(false);
+  ui->linslider->setEnabled(false);
+  ui->jogslider->setEnabled(false);
+  ui->gobutton->setEnabled(false);
+  ui->goinput->setEnabled(false);
+  ui->gobutton2->setEnabled(false);
+  ui->goinput2->setEnabled(false);
 
 #ifdef HAVE_LIB_AO
 
-  playAudio1Action->setEnabled(false);
-  playAudio2Action->setEnabled(false);
+  ui->playAudio1Action->setEnabled(false);
+  ui->playAudio2Action->setEnabled(false);
 #endif // HAVE_LIB_AO
 
-  playPlayAction->setEnabled(false);
-  playStopAction->setEnabled(true);
-  menubar->setItemEnabled(audiotrackmenuid,false);
+  ui->playPlayAction->setEnabled(false);
+  ui->playStopAction->setEnabled(true);
+  audiotrackmenu->setEnabled(false);
 
-  fileOpenAction->setEnabled(false);
-  fileSaveAction->setEnabled(false);
-  fileSaveAsAction->setEnabled(false);
-  snapshotSaveAction->setEnabled(false);
-  chapterSnapshotsSaveAction->setEnabled(false);
-  fileExportAction->setEnabled(false);
+  ui->fileOpenAction->setEnabled(false);
+  ui->fileSaveAction->setEnabled(false);
+  ui->fileSaveAsAction->setEnabled(false);
+  ui->snapshotSaveAction->setEnabled(false);
+  ui->chapterSnapshotsSaveAction->setEnabled(false);
+  ui->fileExportAction->setEnabled(false);
 
   showimage=false;
-  imagedisplay->setPixmap(QPixmap());
-  imagedisplay->grabKeyboard();
+  ui->imagedisplay->setPixmap(QPixmap());
+  ui->imagedisplay->grabKeyboard();
 
   fine=true;
-  linslider->setValue(mpg->lastiframe(curpic));
+  ui->linslider->setValue(mpg->lastiframe(curpic));
   dvbcut_off_t offset=(*mpg)[curpic].getpos().packetposition();
   mplayer_curpts=(*mpg)[curpic].getpts();
 
+  QString process("mplayer");
+  QStringList arguments;
+  
+  arguments << "-noconsolecontrols";
   dvbcut_off_t partoffset;
   int partindex = buf.getfilenum(offset, partoffset);
   if (partindex == -1)
     return;	// what else can we do?
 
-  mplayer_process=new QProcess(QString("mplayer"));
-  mplayer_process->addArgument("-noconsolecontrols");
 #ifdef __WIN32__
-  mplayer_process->addArgument("-vo");
-  mplayer_process->addArgument("directx:noaccel");
+  arguments << "-vo" << "directx:noaccel";
 #endif
-  mplayer_process->addArgument("-wid");
-  mplayer_process->addArgument(QString().sprintf("0x%x",int(imagedisplay->winId())));
-  mplayer_process->addArgument("-sb");
-  mplayer_process->addArgument(QString::number(offset - partoffset));
-  mplayer_process->addArgument("-geometry");
-  mplayer_process->addArgument(QString().sprintf("%dx%d+0+0",int(imagedisplay->width()),int(imagedisplay->height())));
+  arguments << "-wid" << QString().sprintf("0x%x",int(ui->imagedisplay->winId()));
+  arguments << "-sb" << QString::number(offset - partoffset);
+  arguments << "-geometry" << QString().sprintf("%dx%d+0+0",int(ui->imagedisplay->width()),int(ui->imagedisplay->height()));
 
   if (currentaudiotrack>=0 && currentaudiotrack<mpg->getaudiostreams()) {
-    mplayer_process->addArgument("-aid");
-    mplayer_process->addArgument(QString().sprintf("0x%x",int(mpg->mplayeraudioid(currentaudiotrack))));
-  }
-
+    arguments << "-aid" << QString().sprintf("0x%x",int(mpg->mplayeraudioid(currentaudiotrack)));
+    }
+    
   // for now, pass all filenames from the current one up to the last one
   std::list<std::string>::const_iterator it = mpgfilen.begin();
   for (int i = 0; it != mpgfilen.end(); ++i, ++it)
     if (i >= partindex)
-      mplayer_process->addArgument(QString(*it));
- 
-  mplayer_process->setCommunication(QProcess::Stdout|QProcess::Stderr|QProcess::DupStderr);
-
-  connect(mplayer_process, SIGNAL(processExited()), this, SLOT(mplayer_exited()));
-  connect(mplayer_process, SIGNAL(readyReadStdout()), this, SLOT(mplayer_readstdout()));
+      arguments << QString::fromStdString(*it); 
+  
+  mplayer_process=new QProcess(this);
+  mplayer_process->setReadChannel(QProcess::StandardOutput);
+  mplayer_process->setProcessChannelMode(QProcess::MergedChannels);
+  connect(mplayer_process, SIGNAL(finished(int)), this, SLOT(mplayer_exited()));
+  connect(mplayer_process, SIGNAL(readyReadStandardOutput()), this, SLOT(mplayer_readstdout()));
 
   mplayer_success=false;
-
-  if (!mplayer_process->start()) {
-    delete mplayer_process;
-    mplayer_process=0;
-    mplayer_exited();
-    return;
-  }
+  mplayer_process->start(process, arguments);
 }
 
 void dvbcut::playStop()
 {
   if (mplayer_process)
-    mplayer_process->tryTerminate();
+    mplayer_process->terminate();
 }
 
 void dvbcut::playAudio1()
@@ -1255,7 +1263,7 @@ void dvbcut::jogsliderreleased()
 {
   jogsliding=false;
   jogmiddlepic=curpic;
-  jogslider->setValue(0);
+  ui->jogslider->setValue(0);
 }
 
 void dvbcut::jogslidervalue(int v)
@@ -1301,24 +1309,23 @@ void dvbcut::jogslidervalue(int v)
   } else
     fine=true;
 
-    if (curpic!=newpic)
-      linslider->setValue(newpic);
+  if (curpic!=newpic)
+    ui->linslider->setValue(newpic);
 
     fine=false;
 }
 
-
-void dvbcut::doubleclickedeventlist(QListBoxItem *lbi)
+void dvbcut::doubleclickedeventlist(Q3ListBoxItem *lbi)
 {
   if (lbi->rtti()!=EventListItem::RTTI())
     return;
 
   fine=true;
-  linslider->setValue(((EventListItem*)lbi)->getpicture());
+  ui->linslider->setValue(((EventListItem*)lbi)->getpicture());
   fine=false;
 }
 
-void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
+void dvbcut::eventlistcontextmenu(Q3ListBoxItem *lbi, const QPoint &point)
 {
   if (!lbi)
     return;
@@ -1327,7 +1334,7 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
   // is it a problem to have no "const EventListItem &eli=..."? Needed for seteventtype()...! 
   EventListItem &eli=*static_cast<EventListItem*>(lbi);
 
-  QPopupMenu popup(eventlist);
+  Q3PopupMenu popup(ui->eventlist);
   popup.insertItem("Go to",1);
   popup.insertItem("Delete",2);
   popup.insertItem("Delete others",3);
@@ -1341,14 +1348,14 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
   popup.insertItem("Convert to bookmark",11);
   popup.insertItem("Display difference from this picture",12);
 
-  QListBox *lb=lbi->listBox();
-  QListBoxItem *first=lb->firstItem(),*current,*next;
+  Q3ListBox *lb=lbi->listBox();
+  Q3ListBoxItem *first=lb->firstItem(),*current,*next;
   EventListItem::eventtype cmptype=EventListItem::none, cmptype2=EventListItem::none;
 
   switch (popup.exec(point)) {
     case 1:
       fine=true;
-      linslider->setValue(eli.getpicture());
+      ui->linslider->setValue(eli.getpicture());
       fine=false;
       break;
 
@@ -1418,9 +1425,9 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
         delete imgp;
       imgp=new differenceimageprovider(*mpg,eli.getpicture(),new dvbcutbusy(this),false,viewscalefactor);
       updateimagedisplay();
-      viewNormalAction->setOn(false);
-      viewUnscaledAction->setOn(false);
-      viewDifferenceAction->setOn(true);
+      ui->viewNormalAction->setChecked(false);
+      ui->viewUnscaledAction->setChecked(false);
+      ui->viewDifferenceAction->setChecked(true);
       break;
   }
 
@@ -1428,19 +1435,19 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
 
 void dvbcut::clickedgo()
 {
-  QString text=goinput->text();
-  text.stripWhiteSpace();
+  QString text=ui->goinput->text();
+  text.trimmed();
   bool okay=false;
   int inpic;
   if (text.contains(':') || text.contains('.')) {
     okay=true;
-    inpic=string2pts(text)/getTimePerFrame();
+    inpic=string2pts(text.toStdString())/getTimePerFrame();
   }
   else
     inpic=text.toInt(&okay,0);
   if (okay) {
     fine=true;
-    linslider->setValue(inpic);
+    ui->linslider->setValue(inpic);
     fine=false;
   }
   //goinput->clear();
@@ -1448,13 +1455,13 @@ void dvbcut::clickedgo()
 
 void dvbcut::clickedgo2()
 {
-  QString text=goinput2->text();
-  text.stripWhiteSpace();
+  QString text=ui->goinput2->text();
+  text.trimmed();
   bool okay=false;
   int inpic, outpic;
   if (text.contains(':') || text.contains('.')) {
     okay=true;
-    outpic=string2pts(text)/getTimePerFrame();
+    outpic=string2pts(text.toStdString())/getTimePerFrame();
   }
   else
     outpic=text.toInt(&okay,0);
@@ -1464,7 +1471,7 @@ void dvbcut::clickedgo2()
       std::upper_bound(quick_picture_lookup.begin(),quick_picture_lookup.end(),outpic,quick_picture_lookup_s::cmp_outpicture());
     inpic=outpic-it->outpicture+it->stoppicture;   
     fine=true;
-    linslider->setValue(inpic);
+    ui->linslider->setValue(inpic);
     fine=false;
   }
   //goinput2->clear();
@@ -1475,42 +1482,44 @@ void dvbcut::mplayer_exited()
   if (mplayer_process) {
     if (!mplayer_success)// && !mplayer_process->normalExit())
     {
-      mplayererrorbase *meb=new mplayererrorbase(this,0,false,WDestructiveClose);
-      meb->textbrowser->setText(mplayer_out);
-      meb->show();
+      mplayererrorbase *meb=new mplayererrorbase(this);
+      meb->setText(mplayer_out);
     }
-
-
-    delete mplayer_process;
+    mplayer_process->deleteLater();
     mplayer_process=0;
   }
-
-  eventlist->setEnabled(true);
-  linslider->setEnabled(true);
-  jogslider->setEnabled(true);
-  gobutton->setEnabled(true);
-  goinput->setEnabled(true);
-  gobutton2->setEnabled(true);
-  goinput2->setEnabled(true);
+  
+  ui->eventlist->setEnabled(true);
+  ui->linslider->setEnabled(true);
+  ui->jogslider->setEnabled(true);
+  ui->gobutton->setEnabled(true);
+  ui->goinput->setEnabled(true);
+  ui->eventlist->setEnabled(true);
+  ui->linslider->setEnabled(true);
+  ui->jogslider->setEnabled(true);
+  ui->gobutton->setEnabled(true);
+  ui->goinput->setEnabled(true);
+  ui->gobutton2->setEnabled(true);
+  ui->goinput2->setEnabled(true);
 
 #ifdef HAVE_LIB_AO
 
-  playAudio1Action->setEnabled(true);
-  playAudio2Action->setEnabled(true);
+  ui->playAudio1Action->setEnabled(true);
+  ui->playAudio2Action->setEnabled(true);
 #endif // HAVE_LIB_AO
 
-  playPlayAction->setEnabled(true);
-  playStopAction->setEnabled(false);
-  menubar->setItemEnabled(audiotrackmenuid,true);
+  ui->playPlayAction->setEnabled(true);
+  ui->playStopAction->setEnabled(false);
+  audiotrackmenu->setEnabled(true);
 
-  fileOpenAction->setEnabled(true);
-  fileSaveAction->setEnabled(true);
-  fileSaveAsAction->setEnabled(true);
-  snapshotSaveAction->setEnabled(true);
-  chapterSnapshotsSaveAction->setEnabled(true);
-  fileExportAction->setEnabled(true);
+  ui->fileOpenAction->setEnabled(true);
+  ui->fileSaveAction->setEnabled(true);
+  ui->fileSaveAsAction->setEnabled(true);
+  ui->snapshotSaveAction->setEnabled(true);
+  ui->chapterSnapshotsSaveAction->setEnabled(true);
+  ui->fileExportAction->setEnabled(true);
 
-  imagedisplay->releaseKeyboard();
+  ui->imagedisplay->releaseKeyboard();
 
   int cp=curpic;
   jogmiddlepic=curpic;
@@ -1518,7 +1527,7 @@ void dvbcut::mplayer_exited()
   showimage=true;
   fine=true;
   linslidervalue(cp);
-  linslider->setValue(cp);
+  ui->linslider->setValue(cp);
   fine=false;
 }
 
@@ -1527,19 +1536,19 @@ void dvbcut::mplayer_readstdout()
   if (!mplayer_process)
     return;
 
-  QString line(mplayer_process->readStdout());
+  QString line(mplayer_process->readAllStandardOutput());
   if (!line.length())
     return;
 
   if (!mplayer_success)
     mplayer_out += line;
 
-  int pos=line.find("V:");
+  int pos=line.indexOf("V:");
   if (pos<0)
     return;
 
   line.remove(0,pos+2);
-  line=line.stripWhiteSpace();
+  line=line.trimmed();
   for(pos=0;pos<(signed)line.length();++pos)
     if ((line[pos]<'0' || line[pos]>'9')&&line[pos]!='.')
       break;
@@ -1572,7 +1581,7 @@ void dvbcut::mplayer_readstdout()
       mplayer_curpts=(*mpg)[--cp].getpts();
   }
 
-  linslider->setValue(cp);
+  ui->linslider->setValue(cp);
 }
 
 void dvbcut::updateimagedisplay()
@@ -1580,9 +1589,9 @@ void dvbcut::updateimagedisplay()
   if (showimage) {
     if (!imgp)
       imgp=new imageprovider(*mpg,new dvbcutbusy(this),false,viewscalefactor);
-    QPixmap px=imgp->getimage(curpic,fine);
-    imagedisplay->setMinimumSize(px.size());
-    imagedisplay->setPixmap(px);
+    QImage px=imgp->getimage(curpic,fine);
+    ui->imagedisplay->setMinimumSize(px.size());
+    ui->imagedisplay->setPixmap(QPixmap::fromImage(px));
     qApp->processEvents();
   }
 }
@@ -1601,10 +1610,10 @@ void dvbcut::abouttoshowrecentfiles()
   recentfilespopup->clear();
   QString menuitem;
   for(unsigned int id=0; id<settings().recentfiles.size(); id++) {
-    menuitem=QString(settings().recentfiles[id].first.front());
+    menuitem=QString(QString::fromStdString(settings().recentfiles[id].first.front()));
     if(settings().recentfiles[id].first.size()>1)
       menuitem += " ... (+" + QString::number(settings().recentfiles[id].first.size()-1) + ")";
-    recentfilespopup->insertItem(menuitem,(signed)id);    
+    recentfilespopup->addAction(menuitem);    
   }   
 }
 
@@ -1638,7 +1647,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
     // remember last directory if requested
     if (settings().lastdir_update) {
       QString dir = fn.front();
-      int n = dir.findRev('/');
+      int n = dir.lastIndexOf('/');
       if (n > 0)
         dir = dir.left(n);
       // adding a slash is NEEDED for top level directories (win or linux), and doesn't matter otherwise!
@@ -1656,7 +1665,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   std::string filename = filenames.front();
 
   // a valid file name has been entered
-  setCaption(QString(VERSION_STRING " - " + filename));
+  setCaption(QString(VERSION_STRING " - " + QString::fromStdString(filename)));
 
   // reset inbuffer
   buf.reset();
@@ -1672,76 +1681,75 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
     delete imgp;
     imgp=0;
   }
-  eventlist->clear();
-  imagedisplay->setBackgroundMode(Qt::PaletteBackground);
-  imagedisplay->setMinimumSize(QSize(0,0));
-  imagedisplay->setPixmap(QPixmap());
-  pictimelabel->clear();
-  pictimelabel2->clear();
-  picinfolabel->clear();
-  picinfolabel2->clear();
-  linslider->setValue(0);
-  jogslider->setValue(0);
+  ui->eventlist->clear();
+  ui->imagedisplay->setBackgroundMode(Qt::PaletteBackground);
+  ui->imagedisplay->setMinimumSize(QSize(0,0));
+  ui->imagedisplay->setPixmap(QPixmap());
+  ui->pictimelabel->clear();
+  ui->pictimelabel2->clear();
+  ui->picinfolabel->clear();
+  ui->picinfolabel2->clear();
+  ui->linslider->setValue(0);
+  ui->jogslider->setValue(0);
 
-  viewNormalAction->setOn(true);
-  viewUnscaledAction->setOn(false);
-  viewDifferenceAction->setOn(false);
+  ui->viewNormalAction->setChecked(true);
+  ui->viewUnscaledAction->setChecked(false);
+  ui->viewDifferenceAction->setChecked(false);
 
-  fileOpenAction->setEnabled(false);
-  fileSaveAction->setEnabled(false);
-  fileSaveAsAction->setEnabled(false);
-  snapshotSaveAction->setEnabled(false);
-  chapterSnapshotsSaveAction->setEnabled(false);
+  ui->fileOpenAction->setEnabled(false);
+  ui->fileSaveAction->setEnabled(false);
+  ui->fileSaveAsAction->setEnabled(false);
+  ui->snapshotSaveAction->setEnabled(false);
+  ui->chapterSnapshotsSaveAction->setEnabled(false);
   // enable closing even if no file was loaded (mr)
   //fileCloseAction->setEnabled(false);
-  fileExportAction->setEnabled(false);
-  playPlayAction->setEnabled(false);
-  playStopAction->setEnabled(false);
-  menubar->setItemEnabled(audiotrackmenuid,false);
+  ui->fileExportAction->setEnabled(false);
+  ui->playPlayAction->setEnabled(false);
+  ui->playStopAction->setEnabled(false);
+  audiotrackmenu->setEnabled(false);
   audiotrackpopup->clear();
-  editStartAction->setEnabled(false);
-  editStopAction->setEnabled(false);
-  editChapterAction->setEnabled(false);
-  editBookmarkAction->setEnabled(false);
-  editAutoChaptersAction->setEnabled(false);
-  editSuggestAction->setEnabled(false);
-  editImportAction->setEnabled(false);
+  ui->editStartAction->setEnabled(false);
+  ui->editStopAction->setEnabled(false);
+  ui->editChapterAction->setEnabled(false);
+  ui->editBookmarkAction->setEnabled(false);
+  ui->editAutoChaptersAction->setEnabled(false);
+  ui->editSuggestAction->setEnabled(false);
+  ui->editImportAction->setEnabled(false);
   //editConvertAction->setEnabled(false);
 
 #ifdef HAVE_LIB_AO
 
-  playAudio1Action->setEnabled(false);
-  playAudio2Action->setEnabled(false);
+  ui->playAudio1Action->setEnabled(false);
+  ui->playAudio2Action->setEnabled(false);
 #endif // HAVE_LIB_AO
 
-  viewNormalAction->setEnabled(false);
-  viewUnscaledAction->setEnabled(false);
-  viewDifferenceAction->setEnabled(false);
+  ui->viewNormalAction->setEnabled(false);
+  ui->viewUnscaledAction->setEnabled(false);
+  ui->viewDifferenceAction->setEnabled(false);
 
-  eventlist->setEnabled(false);
-  imagedisplay->setEnabled(false);
-  pictimelabel->setEnabled(false);
-  pictimelabel2->setEnabled(false);
-  picinfolabel->setEnabled(false);
-  picinfolabel2->setEnabled(false);
-  goinput->setEnabled(false);
-  gobutton->setEnabled(false);
-  goinput2->setEnabled(false);
-  gobutton2->setEnabled(false);
-  linslider->setEnabled(false);
-  jogslider->setEnabled(false);
+  ui->eventlist->setEnabled(false);
+  ui->imagedisplay->setEnabled(false);
+  ui->pictimelabel->setEnabled(false);
+  ui->pictimelabel2->setEnabled(false);
+  ui->picinfolabel->setEnabled(false);
+  ui->picinfolabel2->setEnabled(false);
+  ui->goinput->setEnabled(false);
+  ui->gobutton->setEnabled(false);
+  ui->goinput2->setEnabled(false);
+  ui->gobutton2->setEnabled(false);
+  ui->linslider->setEnabled(false);
+  ui->jogslider->setEnabled(false);
 
   std::string prjfilename;
   QDomDocument domdoc;
   {
-    QFile infile(filename);
-    if (infile.open(IO_ReadOnly)) {
+    QFile infile(QString::fromStdString(filename));
+    if (infile.open(QIODevice::ReadOnly)) {
+      char buff[512];
       QString line;
-      while (line.length()==0) {
-        if (infile.readLine(line,512)<=0)
-          break;
-        line=line.stripWhiteSpace();
-      }
+      qint64 readBytes = infile.readLine(buff,512);
+      if(readBytes>0)
+        line = QString::fromAscii(buff, readBytes);
       if (line.startsWith(QString("<!DOCTYPE"))
        || line.startsWith(QString("<?xml"))) {
         infile.at(0);
@@ -1750,8 +1758,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
           QDomElement docelem = domdoc.documentElement();
           if (docelem.tagName() != "dvbcut") {
             critical("Failed to read project file - dvbcut",
-	      QString(filename) + ":\nNot a valid dvbcut project file");
-            fileOpenAction->setEnabled(true);
+	      QString::fromStdString(filename) + ":\nNot a valid dvbcut project file");
+            ui->fileOpenAction->setEnabled(true);
             return;
           }
 	  // parse elements, new-style first
@@ -1807,16 +1815,16 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	  // sanity check
 	  if (filenames.empty()) {
 	    critical("Failed to read project file - dvbcut",
-	      QString(filename) + ":\nNo MPEG filename given in project file");
-	    fileOpenAction->setEnabled(true);
+	      QString::fromStdString(filename) + ":\nNo MPEG filename given in project file");
+	    ui->fileOpenAction->setEnabled(true);
 	    return;
 	  }
           prjfilename = filename;
         }
         else {
           critical("Failed to read project file - dvbcut",
-	    QString(filename) + ":\n" + errormsg);
-          fileOpenAction->setEnabled(true);
+	    QString::fromStdString(filename) + ":\n" + errormsg);
+          ui->fileOpenAction->setEnabled(true);
           return;
         }
       }
@@ -1842,7 +1850,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 
   if (!mpg) {
     critical("Failed to open file - dvbcut", errormessage);
-    fileOpenAction->setEnabled(true);
+    ui->fileOpenAction->setEnabled(true);
     return;
   }
 
@@ -1859,19 +1867,19 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	   */
 	  QUrl u;
 	  u.setProtocol(QString("file"));
-	  u.setPath(QString(idxfilename));
+	  u.setPath(QString::fromStdString(idxfilename));
 	  if (chdir((const char*)u.dirPath()) == -1) chdir("/");
-	  QString relname = QString("file:") + u.fileName();
+	  QString relname = u.fileName();
 	  QString s=QFileDialog::getSaveFileName(
 		  relname,
 		  settings().idxfilter,
 		  this,
 		  "Choose index file...",
 		  "Choose the name of the index file" );
-	  if (!s) {
+	  if (s.isEmpty()) {
 		delete mpg;
 		mpg=0;
-		fileOpenAction->setEnabled(true);
+		ui->fileOpenAction->setEnabled(true);
 		return;
 	  }
 	  idxfilename=(const char*)s;
@@ -1895,21 +1903,21 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
       delete mpg;
       mpg=0;
       critical("Failed to open file - dvbcut",errorstring);
-      fileOpenAction->setEnabled(true);
+      ui->fileOpenAction->setEnabled(true);
       return;
     }
     if (pictures==-2) {
       delete mpg;
       mpg=0;
       critical("Invalid index file - dvbcut", errorstring);
-      fileOpenAction->setEnabled(true);
+      ui->fileOpenAction->setEnabled(true);
       return;
     }
     if (pictures<=-3) {
       delete mpg;
       mpg=0;
       critical("Index file mismatch - dvbcut", errorstring);
-      fileOpenAction->setEnabled(true);
+      ui->fileOpenAction->setEnabled(true);
       return;
     }
   }
@@ -1928,7 +1936,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
     if (psb.cancelled()) {
       delete mpg;
       mpg=0;
-      fileOpenAction->setEnabled(true);
+      ui->fileOpenAction->setEnabled(true);
       return;
     }
 
@@ -1936,11 +1944,11 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
       delete mpg;
       mpg=0;
       critical("Error creating index - dvbcut",
-	       QString("Cannot create index for\n")+filename+":\n"+errorstring);
-      fileOpenAction->setEnabled(true);
+	       QString("Cannot create index for\n")+QString::fromStdString(filename)+":\n"+QString::fromStdString(errorstring));
+      ui->fileOpenAction->setEnabled(true);
       return;
     } else if (!errorstring.empty()) {
-      critical("Error saving index file - dvbcut", QString(errorstring));
+      critical("Error saving index file - dvbcut", QString::fromStdString(errorstring));
     }
   }
 
@@ -1948,8 +1956,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
     delete mpg;
     mpg=0;
     critical("Invalid MPEG file - dvbcut",
-	     QString("The chosen file\n")+filename+"\ndoes not contain any video");
-    fileOpenAction->setEnabled(true);
+	     QString("The chosen file\n")+QString::fromStdString(filename)+"\ndoes not contain any video");
+    ui->fileOpenAction->setEnabled(true);
     return;
   }
 
@@ -1973,19 +1981,19 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   timeperframe=(*mpg)[1].getpts()-(*mpg)[0].getpts();
 
   double fps=27.e6/double(mpgfile::frameratescr[(*mpg)[0].getframerate()]);
-  linslider->setMaxValue(pictures-1);
-  linslider->setLineStep(int(300*fps));
-  linslider->setPageStep(int(900*fps));
+  ui->linslider->setMaximum(pictures-1);
+  ui->linslider->setSingleStep(int(300*fps));
+  ui->linslider->setPageStep(int(900*fps));
   if (settings().lin_interval > 0)
-    linslider->setTickInterval(int(settings().lin_interval*fps));
+    ui->linslider->setTickInterval(int(settings().lin_interval*fps));
 
   //alpha=log(jog_maximum)/double(100000-jog_offset);
   // with alternative function
   alpha=log(settings().jog_maximum)/100000.;
   if (settings().jog_interval > 0 && settings().jog_interval <= 100000) 
-    jogslider->setTickInterval(int(100000/settings().jog_interval));
+    ui->jogslider->setTickInterval(int(100000/settings().jog_interval));
 
-  imagedisplay->setBackgroundMode(Qt::NoBackground);
+  ui->imagedisplay->setBackgroundMode(Qt::NoBackground);
   curpic=~0;
   showimage=true;
   fine=false;
@@ -1994,12 +2002,12 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   imgp=new imageprovider(*mpg,new dvbcutbusy(this),false,viewscalefactor);
 
   linslidervalue(0);
-  linslider->setValue(0);
-  jogslider->setValue(0);
+  ui->linslider->setValue(0);
+  ui->jogslider->setValue(0);
 
   {
-    EventListItem *eli=new EventListItem(0,imgp->getimage(0),EventListItem::start,9999999,2,0);
-    eventlist->setMinimumWidth(eli->width(eventlist)+24);
+    EventListItem *eli=new EventListItem(0,QPixmap::fromImage(imgp->getimage(0)),EventListItem::start,9999999,2,0);
+    ui->eventlist->setMinimumWidth(eli->width(ui->eventlist)+24);
     delete eli;
   }
 
@@ -2023,12 +2031,12 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
       QString str=e.attribute("picture","-1");
       if (str.contains(':') || str.contains('.')) {
         okay=true;
-        picnum=string2pts(str)/getTimePerFrame();
+        picnum=string2pts(str.toStdString())/getTimePerFrame();
       }
       else
         picnum=str.toInt(&okay,0);
       if (okay && picnum>=0 && picnum<pictures) {
-        new EventListItem(eventlist,imgp->getimage(picnum),evt,picnum,(*mpg)[picnum].getpicturetype(),(*mpg)[picnum].getpts()-firstpts);
+        new EventListItem(ui->eventlist,QPixmap::fromImage(imgp->getimage(picnum)),evt,picnum,(*mpg)[picnum].getpicturetype(),(*mpg)[picnum].getpts()-firstpts);
         qApp->processEvents();
       }
     }
@@ -2036,56 +2044,56 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 
   update_quick_picture_lookup_table();
 
-  fileOpenAction->setEnabled(true);
-  fileSaveAction->setEnabled(true);
-  fileSaveAsAction->setEnabled(true);
-  snapshotSaveAction->setEnabled(true);
-  chapterSnapshotsSaveAction->setEnabled(true);
-  fileCloseAction->setEnabled(true);
-  fileExportAction->setEnabled(true);
-  playPlayAction->setEnabled(true);
-  menubar->setItemEnabled(audiotrackmenuid,true);
-  playStopAction->setEnabled(false);
-  editStartAction->setEnabled(true);
-  editStopAction->setEnabled(true);
-  editChapterAction->setEnabled(true);
-  editBookmarkAction->setEnabled(true);
-  editAutoChaptersAction->setEnabled(true);
-  editSuggestAction->setEnabled(true);
-  editImportAction->setEnabled(true);
+  ui->fileOpenAction->setEnabled(true);
+  ui->fileSaveAction->setEnabled(true);
+  ui->fileSaveAsAction->setEnabled(true);
+  ui->snapshotSaveAction->setEnabled(true);
+  ui->chapterSnapshotsSaveAction->setEnabled(true);
+  ui->fileCloseAction->setEnabled(true);
+  ui->fileExportAction->setEnabled(true);
+  ui->playPlayAction->setEnabled(true);
+  audiotrackmenu->setEnabled(true);
+  ui->playStopAction->setEnabled(false);
+  ui->editStartAction->setEnabled(true);
+  ui->editStopAction->setEnabled(true);
+  ui->editChapterAction->setEnabled(true);
+  ui->editBookmarkAction->setEnabled(true);
+  ui->editAutoChaptersAction->setEnabled(true);
+  ui->editSuggestAction->setEnabled(true);
+  ui->editImportAction->setEnabled(true);
   //editConvertAction->setEnabled(true);
-  viewNormalAction->setEnabled(true);
-  viewUnscaledAction->setEnabled(true);
-  viewDifferenceAction->setEnabled(true);
+  ui->viewNormalAction->setEnabled(true);
+  ui->viewUnscaledAction->setEnabled(true);
+  ui->viewDifferenceAction->setEnabled(true);
 
 #ifdef HAVE_LIB_AO
 
   if (mpg->getaudiostreams()) {
-    playAudio1Action->setEnabled(true);
-    playAudio2Action->setEnabled(true);
+    ui->playAudio1Action->setEnabled(true);
+    ui->playAudio2Action->setEnabled(true);
   }
 #endif // HAVE_LIB_AO
 
-  eventlist->setEnabled(true);
-  imagedisplay->setEnabled(true);
-  pictimelabel->setEnabled(true);
-  pictimelabel2->setEnabled(true);
-  picinfolabel->setEnabled(true);
-  picinfolabel2->setEnabled(true);
-  goinput->setEnabled(true);
-  gobutton->setEnabled(true);
-  goinput2->setEnabled(true);
-  gobutton2->setEnabled(true);
-  linslider->setEnabled(true);
-  jogslider->setEnabled(true);
+  ui->eventlist->setEnabled(true);
+  ui->imagedisplay->setEnabled(true);
+  ui->pictimelabel->setEnabled(true);
+  ui->pictimelabel2->setEnabled(true);
+  ui->picinfolabel->setEnabled(true);
+  ui->picinfolabel2->setEnabled(true);
+  ui->goinput->setEnabled(true);
+  ui->gobutton->setEnabled(true);
+  ui->goinput2->setEnabled(true);
+  ui->gobutton2->setEnabled(true);
+  ui->linslider->setEnabled(true);
+  ui->jogslider->setEnabled(true);
 
   //   audiotrackmenuids.clear();
   for(int a=0;a<mpg->getaudiostreams();++a) {
     //     audiotrackmenuids.push_back(audiotrackpopup->insertItem(QString(mpg->getstreaminfo(audiostream(a)))));
-    audiotrackpopup->insertItem(QString(mpg->getstreaminfo(audiostream(a))),a);
+    audiotrackpopup->insertItem(QString::fromStdString(mpg->getstreaminfo(audiostream(a))),a);
   }
   if (mpg->getaudiostreams()>0) {
-    audiotrackpopup->setItemChecked(0,true);
+    audiotrackpopup->actions().at(0)->setChecked(true);
     currentaudiotrack=0;
   } else
     currentaudiotrack=-1;
@@ -2115,10 +2123,10 @@ void dvbcut::setviewscalefactor(double factor)
 {
   if (factor<=0.0)
     factor=1.0;
-  viewFullSizeAction->setOn(factor==1.0);
-  viewHalfSizeAction->setOn(factor==2.0);
-  viewQuarterSizeAction->setOn(factor==4.0);
-  viewCustomSizeAction->setOn(factor==settings().viewscalefactor_custom);
+  ui->viewFullSizeAction->setChecked(factor==1.0);
+  ui->viewHalfSizeAction->setChecked(factor==2.0);
+  ui->viewQuarterSizeAction->setChecked(factor==4.0);
+  ui->viewCustomSizeAction->setChecked(factor==settings().viewscalefactor_custom);
 
   settings().viewscalefactor = factor;
 
@@ -2136,32 +2144,32 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
   int delta = 0;
   int incr = WHEEL_INCR_NORMAL;
 
-  if (e->type() == QEvent::Wheel && watched != jogslider) {
+  if (e->type() == QEvent::Wheel && watched != ui->jogslider) {
     QWheelEvent *we = (QWheelEvent*)e;
     // Note: delta is a multiple of 120 (see Qt documentation)
     delta = we->delta();
-      if (we->state() & AltButton)
+      if (we->state() & Qt::Key_Alt)
       incr = WHEEL_INCR_ALT;
-      else if (we->state() & ControlButton)
+      else if (we->state() & Qt::Key_Control)
       incr = WHEEL_INCR_CTRL;
-      else if (we->state() & ShiftButton)
+      else if (we->state() & Qt::Key_Shift)
       incr = WHEEL_INCR_SHIFT;
   }
   else if (e->type() == QEvent::KeyPress) {
     QKeyEvent *ke = (QKeyEvent*)e;
     delta = ke->count() * settings().wheel_delta;
-    if (ke->key() == Key_Right)
+    if (ke->key() == Qt::Key_Right)
       delta = -delta;
-    else if (ke->key() != Key_Left)
+    else if (ke->key() != Qt::Key_Left)
       myEvent = false;
-    if (ke->state() & AltButton)
+    if (ke->state() & Qt::Key_Alt)
       incr = WHEEL_INCR_ALT;
-    else if (ke->state() & ControlButton)
+    else if (ke->state() & Qt::Key_Control)
       incr = WHEEL_INCR_CTRL;
-    else if (ke->state() & ShiftButton)
+    else if (ke->state() & Qt::Key_Shift)
       incr = WHEEL_INCR_SHIFT;
   }
-      else
+  else
     myEvent = false;
 
   if (myEvent) {
@@ -2177,14 +2185,15 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
 	  newpos = 0;
 	else if (newpos >= pictures)
 	  newpos = pictures - 1;
-        linslider->setValue(newpos);
+        ui->linslider->setValue(newpos);
         fine = save;
       }
       return true;
     }
 
   // propagate to base class
-  return dvbcutbase::eventFilter(watched, e);
+  //return ui->eventFilter(watched, e);
+  return Q3MainWindow::eventFilter(watched, e);
 }
 
 int
@@ -2196,6 +2205,11 @@ dvbcut::question(const QString & caption, const QString & text)
   }
   return QMessageBox::question(this, caption, text, QMessageBox::Yes,
     QMessageBox::No | QMessageBox::Default | QMessageBox::Escape);
+}
+
+int
+dvbcut::critical(const QString & caption, const std::string & text) {
+  return critical(caption,  QString::fromStdString(text));
 }
 
 int
@@ -2281,24 +2295,24 @@ void dvbcut::update_time_display()
     + " " + timestr(pts);
   QString outtime =
     QString(mark) + " " + timestr(outpts);
-  pictimelabel->setText(curtime);
-  pictimelabel2->setText(outtime);
-  goinput->setText(QString::number(curpic));
-  goinput2->setText(QString::number(outpic));
+  ui->pictimelabel->setText(curtime);
+  ui->pictimelabel2->setText(outtime);
+  ui->goinput->setText(QString::number(curpic));
+  ui->goinput2->setText(QString::number(outpic));
   
   int res=idx.getresolution();	// are found video resolutions stored in index?
   if (res) {	
     // new index with resolution bits set and lookup table at the end			  
-    picinfolabel->setText(QString::number(mpg->getwidth(res)) + "x" 
+    ui->picinfolabel->setText(QString::number(mpg->getwidth(res)) + "x" 
                         + QString::number(mpg->getheight(res)));
   } else {
     // in case of an old index file type (or if we don't want to change the index format/encoding?)
     // ==> get info directly from each image (which could be somewhat slower?!?)
     QImage p = imageprovider(*mpg, new dvbcutbusy(this), true).getimage(curpic,false);   
-    picinfolabel->setText(QString::number(p.width()) + "x" 
+    ui->picinfolabel->setText(QString::number(p.width()) + "x" 
                         + QString::number(p.height()));
   }
-  picinfolabel2->setText(QString(FR[idx.getframerate()]) + "fps, "
+  ui->picinfolabel2->setText(QString(FR[idx.getframerate()]) + "fps, "
                       + QString(AR[idx.getaspectratio()]));
 
   }
@@ -2330,7 +2344,7 @@ void dvbcut::update_quick_picture_lookup_table() {
     startpts=0; 
   }
   
-  for (QListBoxItem *item=eventlist->firstItem();item;item=item->next())
+  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
     if (item->rtti()==EventListItem::RTTI()) {
     const EventListItem &eli=*static_cast<const EventListItem*>(item);
     switch (eli.geteventtype()) {
@@ -2402,8 +2416,8 @@ void dvbcut::helpAboutAction_activated()
       "</span></body></html>").arg(VERSION_STRING));
 }
 
-#include <qhbox.h>
-#include <qvbox.h>
+#include <q3hbox.h>
+#include <q3vbox.h>
 #include <qdialog.h>
 #include <qtextbrowser.h>
 #include <qpushbutton.h>
@@ -2413,10 +2427,10 @@ public:
   helpDialog(QWidget *parent, const char *name, QString file)
   : QDialog(parent, name)
   {
-    vbox = new QVBox(this);
+    vbox = new Q3VBox(this);
     vbox->resize(640, 480);
     viewer = new QTextBrowser(vbox);
-    hbox = new QHBox(vbox);
+    hbox = new Q3HBox(vbox);
     prev = new QPushButton(tr("Prev"), hbox);
     next = new QPushButton(tr("Next"), hbox);
     home = new QPushButton(tr("Home"), hbox);
@@ -2442,8 +2456,8 @@ public:
     delete vbox;
   }
 private:
-  QVBox *vbox;
-  QHBox *hbox;
+  Q3VBox *vbox;
+  Q3HBox *hbox;
   QTextBrowser *viewer;
   QPushButton *prev, *next, *home, *close;
 };

@@ -23,10 +23,10 @@
 
 #include <string>
 #include <qstring.h>
-#include "progresswindowbase.h"
+#include "ui_progresswindowbase.h"
 #include "logoutput.h"
 
-class progresswindow: public progresswindowbase, public logoutput
+class progresswindow: public QDialog, public logoutput
   {
   Q_OBJECT
 protected:
@@ -35,8 +35,10 @@ protected:
 
   static QString quotetext(const char* text);
   void closeEvent(QCloseEvent *e);
+  Ui::progresswindowbase* ui;
 public:
   progresswindow(QWidget *parent = 0, const char *name = 0);
+  ~progresswindow();
   virtual bool cancelled()
     {
     return cancelwasclicked;

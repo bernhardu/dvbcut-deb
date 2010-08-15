@@ -25,14 +25,14 @@
 #include <vector>
 #include <list>
 #include "mpgfile.h"
-#include "dvbcutbase.h"
+#include "ui_dvbcutbase.h"
 #include "pts.h"
 #include "eventlistitem.h"
 
 class QProcess;
 class imageprovider;
 
-class dvbcut: public dvbcutbase
+class dvbcut: public Q3MainWindow
   {
   Q_OBJECT
 
@@ -73,9 +73,9 @@ public:
 protected:
   quick_picture_lookup_t quick_picture_lookup;
   std::list<pts_t> chapterlist;
-
-  QPopupMenu *audiotrackpopup,*recentfilespopup,*editconvertpopup;
-  int audiotrackmenuid;
+  
+  QMenu *audiotrackpopup,*recentfilespopup,*editconvertpopup;
+  QAction* audiotrackmenu;
   inbuffer buf;
   mpgfile *mpg;
   int pictures;
@@ -101,8 +101,9 @@ protected:
   bool nogui;
   int exportformat; 
   bool start_bof; 
-  bool stop_eof; 
-
+  bool stop_eof;
+  Ui::dvbcutbase* ui;
+  
 protected:
   //   QPixmap getpixmap(int picture, bool allgop=false);
   void exportvideo(const char *fmt);
@@ -118,6 +119,7 @@ protected:
   // QMessagebox interface
   int question(const QString & caption, const QString & text);
   int critical(const QString & caption, const QString & text);
+  int critical(const QString & caption, const std::string & text);
 
   // filename handling
   void make_canonical(std::string &filename);
@@ -136,7 +138,7 @@ protected slots:
 	
 public:
   ~dvbcut();
-  dvbcut(QWidget *parent = 0, const char *name = 0, WFlags fl = WType_TopLevel|WDestructiveClose );
+  dvbcut(QWidget *parent = 0, const char *name = 0, Qt::WFlags fl = Qt::Window);
   void open(std::list<std::string> filenames=std::list<std::string>(), 
             std::string idxfilename=std::string(), std::string expfilename=std::string());
   void setbusy(bool b=true);
@@ -180,8 +182,8 @@ public slots:
   virtual void jogsliderreleased();
   virtual void jogslidervalue(int);
   virtual void linslidervalue(int);
-  virtual void doubleclickedeventlist(QListBoxItem *lbi);
-  virtual void eventlistcontextmenu(QListBoxItem *, const QPoint &);
+  virtual void doubleclickedeventlist(Q3ListBoxItem *lbi);
+  virtual void eventlistcontextmenu(Q3ListBoxItem *, const QPoint &);
   virtual void mplayer_exited();
   virtual void mplayer_readstdout();
   virtual void clickedgo();

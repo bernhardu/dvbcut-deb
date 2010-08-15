@@ -33,28 +33,36 @@
 #include "progresswindow.h"
 
 progresswindow::progresswindow(QWidget *parent, const char *name)
-    :progresswindowbase(parent, name, true), logoutput(),
+    :QDialog(parent, name, true), logoutput(),
     cancelwasclicked(false), waitingforclose(false)
   {
-  QStyleSheetItem *item;
-  item = new QStyleSheetItem( logbrowser->styleSheet(), "h" );
+  ui = new Ui::progresswindowbase();
+  ui->setupUi(this);
+  
+  Q3StyleSheetItem *item;
+  item = new Q3StyleSheetItem( ui->logbrowser->styleSheet(), "h" );
   item->setFontWeight( QFont::Bold );
   item->setFontUnderline( TRUE );
 
-  item = new QStyleSheetItem( logbrowser->styleSheet(), "info" );
+  item = new Q3StyleSheetItem( ui->logbrowser->styleSheet(), "info" );
 
-  item = new QStyleSheetItem( logbrowser->styleSheet(), "warn" );
+  item = new Q3StyleSheetItem( ui->logbrowser->styleSheet(), "warn" );
   item->setColor( "red" );
 
-  item = new QStyleSheetItem( logbrowser->styleSheet(), "error" );
+  item = new Q3StyleSheetItem( ui->logbrowser->styleSheet(), "error" );
   item->setColor( "red" );
   item->setFontWeight( QFont::Bold );
   item->setFontUnderline( TRUE );
 
-  cancelbutton->setPaletteBackgroundColor( QColor( 255,0,0 ) );
+  ui->cancelbutton->setPaletteBackgroundColor( QColor( 255,0,0 ) );
 
   show();
   qApp->processEvents();
+  }
+
+progresswindow::~progresswindow()
+  {
+  delete ui;
   }
 
 void progresswindow::closeEvent(QCloseEvent *e)
@@ -67,11 +75,11 @@ void progresswindow::closeEvent(QCloseEvent *e)
 
 void progresswindow::finish()
   {
-  cancelbutton->setEnabled(false);
+  ui->cancelbutton->setEnabled(false);
   waitingforclose=true;
-  cancelbutton->setText( tr( "Close" ) );
-  cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
-  cancelbutton->setEnabled(true);
+  ui->cancelbutton->setText( tr( "Close" ) );
+  ui->cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
+  ui->cancelbutton->setEnabled(true);
   exec();
   }
 
@@ -80,7 +88,7 @@ void progresswindow::setprogress(int permille)
   if (permille==currentprogress)
     return;
   currentprogress=permille;
-  progressbar->setProgress(permille);
+  ui->progressbar->setProgress(permille);
   qApp->processEvents();
   }
 
@@ -93,9 +101,9 @@ void progresswindow::print(const char *fmt, ...)
     return;
 
   if (*text)
-    logbrowser->append(quotetext(text));
+    ui->logbrowser->append(quotetext(text));
   else
-    logbrowser->append("<br>");
+    ui->logbrowser->append("<br>");
   free(text);
   qApp->processEvents();
   }
@@ -108,7 +116,7 @@ void progresswindow::printheading(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
-  logbrowser->append(QString("<h>")+quotetext(text)+"</h>");
+  ui->logbrowser->append(QString("<h>")+quotetext(text)+"</h>");
   free(text);
   qApp->processEvents();
   }
@@ -121,7 +129,7 @@ void progresswindow::printinfo(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
-  logbrowser->append(QString("<info>")+quotetext(text)+"</info>");
+  ui->logbrowser->append(QString("<info>")+quotetext(text)+"</info>");
   free(text);
   qApp->processEvents();
   }
@@ -134,7 +142,7 @@ void progresswindow::printerror(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
-  logbrowser->append(QString("<error>")+quotetext(text)+"</error>");
+  ui->logbrowser->append(QString("<error>")+quotetext(text)+"</error>");
   free(text);
   qApp->processEvents();
   }
@@ -147,7 +155,7 @@ void progresswindow::printwarning(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
-  logbrowser->append(QString("<warn>")+quotetext(text)+"</warn>");
+  ui->logbrowser->append(QString("<warn>")+quotetext(text)+"</warn>");
   free(text);
   qApp->processEvents();
   }
@@ -157,11 +165,11 @@ void progresswindow::clickedcancel()
   if ((cancelwasclicked==false) && (waitingforclose==false)) {
     // button function is cancel
     cancelwasclicked=true;
-    cancelbutton->setEnabled(false);
+    ui->cancelbutton->setEnabled(false);
     qApp->processEvents();
-    cancelbutton->setText( tr( "Close" ) );
-    cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
-    cancelbutton->setEnabled(true);
+    ui->cancelbutton->setText( tr( "Close" ) );
+    ui->cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
+    ui->cancelbutton->setEnabled(true);
   } else {
     // button function is close
     close();

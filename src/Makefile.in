@@ -54,38 +54,37 @@ QTDIR = @QTDIR@
 
 PATH := $(QTDIR)/bin:$(PATH)
 
-%.h: %.ui
-	uic -o $@ $<
+ui_%.h: %.ui
+	uic-qt4 -o $@ $<
 
 uic_%.cpp: %.h
-	uic -impl $< -o $@ $*.ui
+	uic-qt4 -o $@ $<
 
 moc_%.cpp: %.h
-	moc -o $@ $<
+	moc-qt4 -o $@ $<
 
 MOC = \
 	moc_dvbcut.cpp \
-	moc_dvbcutbase.cpp \
 	moc_exportdialog.cpp \
-	moc_exportdialogbase.cpp \
 	moc_mplayererrorbase.cpp \
 	moc_progressstatusbar.cpp \
 	moc_progresswindow.cpp \
-	moc_progresswindowbase.cpp
 
 UIC = \
-	uic_dvbcutbase.cpp \
-	uic_exportdialogbase.cpp \
-	uic_mplayererrorbase.cpp \
-	uic_progresswindowbase.cpp
+	ui_dvbcutbase.h \
+	ui_exportdialogbase.h \
+	ui_mplayererrorbase.h \
+	ui_progresswindowbase.h
 
+QRC = \
+	qrc_icons.cpp
 SRCS = \
 	avframe.cpp differenceimageprovider.cpp buffer.cpp \
 	dvbcut.cpp eventlistitem.cpp exception.cpp exportdialog.cpp \
 	imageprovider.cpp index.cpp lavfmuxer.cpp logoutput.cpp \
-	main.cpp mpegmuxer.cpp mpgfile.cpp playaudio.cpp \
+	main.cpp mpegmuxer.cpp mpgfile.cpp mplayererrorbase.cpp playaudio.cpp \
 	progressstatusbar.cpp progresswindow.cpp psfile.cpp \
-	pts.cpp streamdata.cpp tsfile.cpp settings.cpp $(MOC) $(UIC) \
+	pts.cpp streamdata.cpp tsfile.cpp settings.cpp $(MOC) $(QRC) \
 	$(STDLIB)
 
 OBJS = $(SRCS:.cpp=.$(OBJEXT))
@@ -106,11 +105,14 @@ $(installdirs):
 $(topdir)/bin:
 	mkdir $@
 
+qrc_icons.cpp:
+	rcc -name icons -o $@ ../icons/icons.qrc
+
 $(topdir)/bin/dvbcut$(EXEEXT): dvbcut$(EXEEXT)
 	$(INSTALL_PROGRAM) dvbcut$(EXEEXT) $(topdir)/bin/dvbcut$(EXEEXT)
 	$(STRIP) $(topdir)/bin/dvbcut$(EXEEXT)
 
-dvbcut$(EXEEXT): $(SRCS) $(OBJS)
+dvbcut$(EXEEXT): $(SRCS) $(UIC) $(OBJS)
 	$(CXX) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
 
 ffmpeg_internal: $(topdir)/ffmpeg/lib/libavcodec.a
@@ -168,13 +170,9 @@ stamp-depend: $(SRCS)
 # static dependencies:
 
 moc_dvbcut.cpp: dvbcut.h
-moc_dvbcutbase.cpp: dvbcutbase.h
 moc_exportdialog.cpp: exportdialog.h
-moc_exportdialogbase.cpp: exportdialogbase.h
-moc_mplayererrorbase.cpp: mplayererrorbase.h
 moc_progressstatusbar.cpp: progressstatusbar.h
 moc_progresswindow.cpp: progresswindow.h
-moc_progresswindowbase.cpp: progresswindowbase.h
 uic_dvbcutbase.cpp: dvbcutbase.h
 uic_exportdialogbase.cpp: exportdialogbase.h
 uic_mplayererrorbase.cpp: mplayererrorbase.h
@@ -185,8 +183,6 @@ mplayererrorbase.h: mplayererrorbase.ui
 progresswindowbase.h: progresswindowbase.ui
 
 dvbcut.$(OBJEXT): version.h
-version.h: $(SRCS)
-	cd $(topdir) && $(MAKE) $(subdir)/version.h
 
 distfiles: \
 	dvbcutbase.h \
@@ -194,7 +190,6 @@ distfiles: \
 	moc_dvbcut.cpp \
 	moc_dvbcutbase.cpp \
 	moc_exportdialog.cpp \
-	moc_exportdialogbase.cpp \
 	moc_mplayererrorbase.cpp \
 	moc_progressstatusbar.cpp \
 	moc_progresswindow.cpp \
@@ -205,4 +200,5 @@ distfiles: \
 	uic_exportdialogbase.cpp \
 	uic_mplayererrorbase.cpp \
 	uic_progresswindowbase.cpp \
+	qrc_icons.cpp \
 	version.h
