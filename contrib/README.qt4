@@ -1,0 +1,14 @@
+From: Raik Bieniek <raik.bieniek@googlemail.com>
+To: dvbcut-devel@lists.sourceforge.net
+Date: Sun, 15 Aug 2010 12:17:14 +0200
+Subject: [DVBCUT-devel] [PATCH] qt4 support
+
+Hi,
+
+i've created a patch for SVN revision 170 that makes it possible to build 
+dvbcut with Qt4 libraries. I don't know much about autotools so i used cmake 
+as build system.
+
+Regards,
+Raik
+
