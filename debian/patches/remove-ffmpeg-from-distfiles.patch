@@ -1,3 +1,7 @@
+From: Reinhard Tartler <siretart@tauware.de>
+Subject: remove ffmpeg from distfiles
+Forwarded: not-needed
+
 diff --git a/DISTFILES b/DISTFILES
 index 09321e3..c2602b5 100644
 --- a/DISTFILES
