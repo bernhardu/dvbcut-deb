@@ -4,14 +4,14 @@ Priority: optional
 Maintainer: Debian multimedia packages maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Reinhard Tartler <siretart@tauware.de>
 Build-Depends: debhelper (>= 7),
+	       liba52-0.7.4-dev,
+	       libao-dev,
 	       libavcodec-dev,
 	       libavformat-dev,
+	       libmad0-dev,
 	       libpostproc-dev,
 	       libqt3-mt-dev,
 	       qt3-dev-tools,
-	       libao-dev,
-	       libmad0-dev,
-	       liba52-0.7.4-dev,
 	       scons
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/dvbcut.git
 Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/dvbcut.git;a=summary
