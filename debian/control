@@ -16,7 +16,7 @@ Build-Depends: debhelper (>= 7),
  scons
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/dvbcut.git
 Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/dvbcut.git;a=summary
-Homepage: http://dvbcut.sourceforge.net/x
+Homepage: http://dvbcut.sourceforge.net/
 Standards-Version: 3.9.1
 
 Package: dvbcut
