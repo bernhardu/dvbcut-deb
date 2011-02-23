@@ -1,8 +1,16 @@
-dvbcut (0.5.4+r146-1) UNRELEASED; urgency=low
+dvbcut (0.5.4+svn146-1) unstable; urgency=low
 
   * Package dvbcut for debian. Closes: #457272
+  * Add homepage field
+  * Add watch file
+  * Bump standards version, no changes needed
+  * Bump debhelper compat level to 7
+  * Add libswscale-dev to build depends
+  * Use Source Format 3.0 (quilt)
+  * Fix FTBFS with gcc-4.4
+  * update config.sub and config.guess
 
- -- Reinhard Tartler <siretart@tauware.de>  Fri, 16 Jan 2009 11:47:44 +0100
+ -- Reinhard Tartler <siretart@tauware.de>  Wed, 23 Feb 2011 11:53:19 +0100
 
 dvbcut (0.5.4+r146-0ubuntu1~ppa) intrepid; urgency=low
 
