@@ -3,7 +3,8 @@ Section: graphics
 Priority: optional
 Maintainer: Debian multimedia packages maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Reinhard Tartler <siretart@tauware.de>
-Build-Depends: debhelper (>= 7),
+Build-Depends: autotools-dev,
+ debhelper (>= 7),
  liba52-0.7.4-dev,
  libao-dev,
  libavcodec-dev,

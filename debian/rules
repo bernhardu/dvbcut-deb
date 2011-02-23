@@ -10,6 +10,8 @@ ORIG_TAR_GZ := ../$(DEB_SOURCE)_$(UPSTREAM_VERSION)+svn$(SVN_VERSION).orig.tar.g
 build: build-stamp
 build-stamp:
 	dh_testdir
+	cp -v /usr/share/misc/config.sub .
+	cp -v /usr/share/misc/config.guess .
 	$(MAKE) FFMPEG=/usr
 	touch build-stamp
 
@@ -17,7 +19,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	[ ! -f Makefile ] || $(MAKE) distclean FFMPEG=/usr
-	dh_clean build-stamp
+	dh_clean build-stamp config.sub config.guess
 
 install: build
 	dh_testdir
