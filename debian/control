@@ -11,6 +11,7 @@ Build-Depends: debhelper (>= 7),
  libmad0-dev,
  libpostproc-dev,
  libqt3-mt-dev,
+ libswscale-dev,
  qt3-dev-tools,
  scons
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/dvbcut.git
