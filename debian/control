@@ -3,7 +3,7 @@ Section: graphics
 Priority: optional
 Maintainer: Debian multimedia packages maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Reinhard Tartler <siretart@tauware.de>
-Build-Depends: debhelper (>= 4.0.0),
+Build-Depends: debhelper (>= 7),
 	       libavcodec-dev,
 	       libavformat-dev,
 	       libpostproc-dev,
