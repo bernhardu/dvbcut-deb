@@ -1,5 +1,10 @@
 2011-04-22  Michael Riepe  <too-tired@users.sourceforge.net>
 
+	* src/dvbcut.cpp:
+		Remove `const'.
+
+2011-04-22  Michael Riepe  <too-tired@users.sourceforge.net>
+
 	* src/settings.cpp:
 		Add .m2t extension.
 
