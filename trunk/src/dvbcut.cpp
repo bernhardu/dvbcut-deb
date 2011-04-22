@@ -1325,7 +1325,7 @@ void dvbcut::eventlistcontextmenu(QListBoxItem *lbi, const QPoint &point)
   if (lbi->rtti()!=EventListItem::RTTI())
     return;
   // is it a problem to have no "const EventListItem &eli=..."? Needed for seteventtype()...! 
-  EventListItem &eli=*static_cast<const EventListItem*>(lbi);
+  EventListItem &eli=*static_cast<EventListItem*>(lbi);
 
   QPopupMenu popup(eventlist);
   popup.insertItem("Go to",1);
