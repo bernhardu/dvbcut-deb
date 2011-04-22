@@ -1,3 +1,8 @@
+2011-04-22  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/settings.cpp:
+		Add .m2t extension.
+
 2010-05-26  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/main.cpp:

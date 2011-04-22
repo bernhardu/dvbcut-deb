@@ -33,9 +33,9 @@
 #define DVBCUT_QSETTINGS_PATH "/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT "/"
 
 #define DVBCUT_DEFAULT_LOADFILTER \
-	"Recognized files (*.dvbcut *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;" \
+	"Recognized files (*.dvbcut *.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;" \
 	"dvbcut project files (*.dvbcut);;" \
-	"MPEG files (*.mpg *.rec* *.ts *.tts* *.trp *.vdr);;" \
+	"MPEG files (*.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;" \
 	"All files (*)"
 #define DVBCUT_DEFAULT_IDXFILTER \
 	"dvbcut index files (*.idx);;All files (*)"
