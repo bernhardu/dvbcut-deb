@@ -1,3 +1,9 @@
+2011-04-24  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* makefile.in:
+	* src/Makefile.in:
+		Add datarootdir variable.
+
 2011-04-22  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/dvbcut.cpp:
