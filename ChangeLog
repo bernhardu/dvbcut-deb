@@ -1,3 +1,8 @@
+2011-04-24  David Timms  <dtimms@iinet.net.au>  (mr)
+
+	* src/progresswindow.cpp:
+		Dual-function cancel/close button.
+
 2011-04-24  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* makefile.in:
