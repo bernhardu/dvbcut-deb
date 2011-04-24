@@ -1,5 +1,5 @@
 # Makefile - Makefile template for Linux/Unix
-# Copyright (c) 2007 - 2009 Michael Riepe
+# Copyright (c) 2007 - 2011 Michael Riepe
 #  
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 datadir = @datadir@
+datarootdir = @datarootdir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
 helpdir = $(prefix)/share/help
