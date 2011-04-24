@@ -51,6 +51,8 @@ progresswindow::progresswindow(QWidget *parent, const char *name)
   item->setFontWeight( QFont::Bold );
   item->setFontUnderline( TRUE );
 
+  cancelbutton->setPaletteBackgroundColor( QColor( 255,0,0 ) );
+
   show();
   qApp->processEvents();
   }
@@ -67,6 +69,9 @@ void progresswindow::finish()
   {
   cancelbutton->setEnabled(false);
   waitingforclose=true;
+  cancelbutton->setText( tr( "Close" ) );
+  cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
+  cancelbutton->setEnabled(true);
   exec();
   }
 
@@ -149,9 +154,18 @@ void progresswindow::printwarning(const char *fmt, ...)
 
 void progresswindow::clickedcancel()
   {
-  cancelwasclicked=true;
-  cancelbutton->setEnabled(false);
-  qApp->processEvents();
+  if ((cancelwasclicked==false) && (waitingforclose==false)) {
+    // button function is cancel
+    cancelwasclicked=true;
+    cancelbutton->setEnabled(false);
+    qApp->processEvents();
+    cancelbutton->setText( tr( "Close" ) );
+    cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
+    cancelbutton->setEnabled(true);
+  } else {
+    // button function is close
+    close();
+  }
   }
 
 QString progresswindow::quotetext(const char *text)
