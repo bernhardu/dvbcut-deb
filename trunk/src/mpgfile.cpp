@@ -69,8 +69,10 @@ mpgfile::open(inbuffer &b, std::string *errormessage) {
   }
 
   int initialoffset;
-  if ((initialoffset=tsfile::probe(b))>=0) // is this an mpeg transport stream?
-    return new tsfile(b, initialoffset);
+  // 2011-04-24: check packet sizes from 188 up to 208. --mr
+  for (int stride = TSPACKETSIZE; stride <= MAXPACKETSIZE; stride += 4)
+    if ((initialoffset=tsfile::probe(b, stride))>=0) // is this an mpeg transport stream?
+      return new tsfile(b, initialoffset, stride);
   if ((initialoffset=psfile::probe(b))>=0) // is this an mpeg program stream?
     return new psfile(b, initialoffset);
 

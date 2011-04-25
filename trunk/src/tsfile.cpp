@@ -25,9 +25,14 @@
 #include <utility>
 #include <algorithm>
 #include <cstring>
+#include <cassert>
 
-tsfile::tsfile(inbuffer &b, int initial_offset) : mpgfile(b, initial_offset)
+tsfile::tsfile(inbuffer &b, int initial_offset, int stride) : mpgfile(b, initial_offset)
 {
+  assert(stride >= TSPACKETSIZE);
+  assert(stride <= MAXPACKETSIZE);
+  packetsize = stride;
+
   for(unsigned int i=0;i<8192;++i)
     streamnumber[i]=-1;
 
@@ -40,6 +45,7 @@ tsfile::tsfile(inbuffer &b, int initial_offset) : mpgfile(b, initial_offset)
     fprintf(stderr,"Found Topfield %s recording (%d bytes header, %d bookmarks)\n",model[irc/100],initial_offset,irc%100);  
   else 
     fprintf(stderr,"Analyzed transport stream, %d bytes of initial data (IRC=%d)\n",initial_offset,irc);
+  fprintf(stderr, "Using %d-byte packets\n", packetsize);
 
   // Find video PID and audio PID(s)
   buf.providedata(buf.getsize(), initialoffset);
@@ -50,17 +56,19 @@ tsfile::tsfile(inbuffer &b, int initial_offset) : mpgfile(b, initial_offset)
   int vid=-1;
   bool apid[8192]={};
   std::list<std::pair<int,int> > audios;
-  int inpackets=buf.inbytes()/TSPACKETSIZE;
+  int inpackets=buf.inbytes()/packetsize;
   if (inpackets>40000)
     inpackets=40000;
+  const uint8_t *d = (const uint8_t*)buf.data();
   for(int i=0;i<inpackets;++i) {
-    const tspacket &p=((const tspacket*)buf.data())[i];
-    if (p.transport_error_indicator())
+    const tspacket *p = (const tspacket*)d;
+    d += packetsize;
+    if (p->transport_error_indicator())
       continue;	// drop invalid packet --mr
-    int pid=p.pid();
+    int pid=p->pid();
     if (apid[pid])
       continue;	// already had this pid --mr
-    int sid=p.sid();
+    int sid=p->sid();
     if (sid<0)
       continue;
 
@@ -69,8 +77,8 @@ tsfile::tsfile(inbuffer &b, int initial_offset) : mpgfile(b, initial_offset)
       apid[pid]=true;
     }
     else if (sid==0xbd) {	// private stream 1, possibly AC3 audio stream
-      const uint8_t *payload=(const uint8_t*) p.payload();
-      const uint16_t plen = p.payload_length();
+      const uint8_t *payload=(const uint8_t*) p->payload();
+      const uint16_t plen = p->payload_length();
       if (plen >= 9
        && plen >= 11 + payload[8]
        && payload[9 + payload[8]] == 0x0b
@@ -126,10 +134,10 @@ int tsfile::streamreader(streamhandle &s)
   for(;;) {
     dvbcut_off_t packetpos=s.fileposition;
       {
-      int pd=buf.providedata(TSPACKETSIZE,packetpos);
+      int pd=buf.providedata(packetsize,packetpos);
       if (pd<0)
         return pd;
-      if (pd<TSPACKETSIZE)
+      if (pd<packetsize)
         return returnvalue;
       }
 
@@ -152,7 +160,7 @@ int tsfile::streamreader(streamhandle &s)
       for (ts = 0; ts < 2048; ++ts)
         {
         int pos;
-        for (pos = ts;pos < 4096;pos += TSPACKETSIZE)
+        for (pos = ts;pos < 4096;pos += packetsize)
           if (data[ pos ] != TSSYNCBYTE)
             break;
         if (pos >= 4096) // from here, we are in sync again
@@ -165,7 +173,7 @@ int tsfile::streamreader(streamhandle &s)
       continue;
       }
 
-    s.fileposition+=TSPACKETSIZE;
+    s.fileposition+=packetsize;
 
     // Abandon invalid packets --mr
     if (p->transport_error_indicator())
@@ -233,7 +241,8 @@ int tsfile::streamreader(streamhandle &s)
 /// this data is assumed to be a transport stream.
 /// It returns the buffer offset at which the transport stream starts, or -1 if
 /// no transport stream was identified.
-int tsfile::probe(inbuffer &buf) {
+/// 2011-04-24: use variable packet size supplied by caller. --mr
+int tsfile::probe(inbuffer &buf, int stride) {
   int latestsync=buf.inbytes()-2048;
   if (latestsync>(8<<10))
     latestsync=8<<10;
@@ -244,7 +253,7 @@ int tsfile::probe(inbuffer &buf) {
   for (ts = 0; ts < latestsync; ++ts) {
     int testupto=ts+2048;
     int pos;
-    for (pos = ts;pos < testupto;pos += TSPACKETSIZE)
+    for (pos = ts;pos < testupto;pos += stride)
       if (data[ pos ] != TSSYNCBYTE)
         break;
     if (pos >= testupto) // this is a MPEG TS file
@@ -261,6 +270,9 @@ tsfile::isTOPFIELD(const uint8_t *header, int len, std::string recfile) {
   unsigned int magic, version, unit=0;
   unsigned int frequency, symbolrate, modulation;
   int boff=len, off=0, type=0, hlen=0, verbose=0, irc;
+
+  // topfields use 188-byte packets.
+  if (packetsize != TSPACKETSIZE) return -1;
 
   if(verbose) fprintf(stderr,"Header length of %s: %d\n",recfile.c_str(),len);
   
@@ -417,9 +429,9 @@ tsfile::get_si_table(uint8_t *tbl, size_t max, size_t &index, int pid, int tid) 
   size_t len = buf.inbytes();
   uint8_t cc = 0xff;
   size_t size = 0;
-  while (index + TSPACKETSIZE <= len) {
+  while (index + packetsize <= len) {
     const tspacket *p = (const tspacket*)&d[index];
-    index += TSPACKETSIZE;
+    index += packetsize;
     // check packet
     if (p->transport_error_indicator()
      || p->pid() != pid
@@ -518,11 +530,11 @@ tsfile::check_si_tables() {
   bool pids[8192] = {};
 
   // limit buffer size
-  if (len > 40000 * TSPACKETSIZE)
-    len = 40000 * TSPACKETSIZE;
+  if (len > 40000 * packetsize)
+    len = 40000 * packetsize;
 
   // find all PIDs
-  for (unsigned i = 0; i + TSPACKETSIZE <= len; i += TSPACKETSIZE) {
+  for (unsigned i = 0; i + packetsize <= len; i += packetsize) {
     const tspacket *p = (const tspacket*)&d[i];
     if (!p->transport_error_indicator())
       pids[p->pid()] = true;

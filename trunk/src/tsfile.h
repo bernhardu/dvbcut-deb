@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include "mpgfile.h"
+#define MAXPACKETSIZE (208)
 #define TSPACKETSIZE (188)
 #define TSSYNCBYTE (0x47)
 
@@ -49,7 +50,7 @@ class tsfile : public mpgfile
   {
 protected:
   struct tspacket {
-    uint8_t data[TSPACKETSIZE];
+    uint8_t data[MAXPACKETSIZE];
 
     int pid() const {
       return ((data[1]&0x1f)<<8) | data[2];
@@ -100,6 +101,8 @@ protected:
     }
   };
 
+  unsigned int packetsize; // usually 188, but sometimes more
+
   int streamnumber[8192]; // TS pids are 0..8191
 
   bool check_si_tables();
@@ -114,11 +117,11 @@ protected:
   std::vector<pts_t> time_bookmarks;        // to store the bookmarks as time stamps
 
 public:
-  tsfile(inbuffer &b, int initial_offset);
+  tsfile(inbuffer &b, int initial_offset, int stride);
 
   ~tsfile();
   int streamreader(class streamhandle &s);
-  static int probe(inbuffer &buf);
+  static int probe(inbuffer &buf, int stride);
   virtual int mplayeraudioid(int astr) {
     return s[audiostream(astr)].id;
   }
