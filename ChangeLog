@@ -1,3 +1,12 @@
+2011-04-25  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/mpgfile.cpp:
+	* src/tsfile.h:
+	* src/tsfile.cpp:
+		Handle TS packet sizes other than 188.
+	* VERSION:
+		Bump up to 0.6.2-alpha.
+
 2011-04-24  David Timms  <dtimms@iinet.net.au>  (mr)
 
 	* src/progresswindow.cpp:
