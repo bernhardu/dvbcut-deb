@@ -18,6 +18,7 @@
 
 /* $Id$ */
 
+#include <cstring>
 #include <stdint.h>
 #include <algorithm>
 #include <string>
@@ -43,7 +44,7 @@ public:
       ao_close(m_device);
   }
 
-  void play(int channels, int samplerate, int16_t *data, int frames)
+  void play(int channels, int samplerate, int16_t *data, int bytes)
   {
     if ((not m_device) or channels!=m_channels or samplerate!=m_samplerate)
     {
@@ -54,6 +55,8 @@ public:
       }
 
       ao_sample_format format;
+      // zero-initialize
+      memset(&format, 0, sizeof(format));
 
       format.bits = 16;
       format.channels = channels;
@@ -68,7 +71,7 @@ public:
         throw dvbcut_exception("Error setting up audio output");
     }
 
-    ao_play(m_device, (char*) data, frames);
+    ao_play(m_device, (char*) data, bytes);
   }
 };
 
