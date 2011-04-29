@@ -1,3 +1,8 @@
+2011-04-29  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/playaudio.cpp:
+		Fix segfault with libao >= 1.0.
+
 2011-04-25  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/mpgfile.cpp:
