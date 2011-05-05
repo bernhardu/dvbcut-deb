@@ -1,3 +1,14 @@
+dvbcut (0.5.4+svn146-2) UNRELEASED; urgency=low
+
+  * Team upload.
+  * Add patch to fix build failure with GCC4.5 (Closes: #622079).
+  * Add gbp config file.
+  * debian/control:
+    - Correct team's name.
+    - Bump Standards.
+
+ -- Alessio Treglia <alessio@debian.org>  Thu, 05 May 2011 14:17:47 +0200
+
 dvbcut (0.5.4+svn146-1) unstable; urgency=low
 
   * Package dvbcut for debian. Closes: #457272
