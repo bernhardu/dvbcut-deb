@@ -1,2 +1,3 @@
 remove-ffmpeg-from-distfiles.patch
 fix-ftbfs-gcc4.4.patch
+fix-ftbfs-gcc4.5.patch
