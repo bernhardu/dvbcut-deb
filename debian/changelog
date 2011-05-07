@@ -1,3 +1,9 @@
+dvbcut (0.5.4+svn170-1) UNRELEASED; urgency=low
+
+  * New upstream version
+
+ -- Reinhard Tartler <siretart@tauware.de>  Sat, 07 May 2011 08:43:07 +0200
+
 dvbcut (0.5.4+svn146-2) unstable; urgency=low
 
   * Team upload.
