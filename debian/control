@@ -11,9 +11,9 @@ Build-Depends: autotools-dev,
  libavformat-dev,
  libmad0-dev,
  libpostproc-dev,
- libqt3-mt-dev,
+ libqt4-dev,
  libswscale-dev,
- qt3-dev-tools,
+ qt4-dev-tools,
  scons
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/dvbcut.git
 Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/dvbcut.git;a=summary
