@@ -161,8 +161,17 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
       while (decodebytes>0)
       {
         frameFinished=0;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,23,0)
+        AVPacket pkt;
+        av_init_packet( &pkt );
+        pkt.data = (uint8_t*) data;
+        pkt.size = decodebytes;
+        int bytesDecoded=avcodec_decode_video2( S->avcc, avf,
+                                        &frameFinished, &pkt );
+#else
         int bytesDecoded=avcodec_decode_video(S->avcc, avf, &frameFinished,
                                               (uint8_t*) data, decodebytes);
+#endif
         if (bytesDecoded<0)
         {
           fprintf(stderr,"libavcodec error while decoding frame #%d\n",pic);
@@ -201,7 +210,16 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
   if (pic < stop)
   {
     int frameFinished=0;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,23,0)
+    AVPacket pkt;
+    av_init_packet( &pkt );
+    pkt.data = NULL;
+    pkt.size = 0;
+    avcodec_decode_video2( S->avcc, avf,
+                                        &frameFinished, &pkt );
+#else
     avcodec_decode_video(S->avcc, avf, &frameFinished, NULL, 0);
+#endif
     if (frameFinished)
     {
       if (last_cpn!=avf->coded_picture_number)
@@ -248,7 +266,7 @@ void mpgfile::initcodeccontexts(int vid)
     stream *S=&s[VIDEOSTREAM];
     S->id=vid;
     S->allocavcc();
-    S->avcc->codec_type=CODEC_TYPE_VIDEO;
+    S->avcc->codec_type=AVMEDIA_TYPE_VIDEO;
     S->avcc->codec_id=CODEC_ID_MPEG2VIDEO;
     S->dec=avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
     S->enc=avcodec_find_encoder(CODEC_ID_MPEG2VIDEO);

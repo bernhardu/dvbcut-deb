@@ -73,7 +73,7 @@ public:
     avp.dts=dts;
     avp.stream_index=st[str].stream_index;
     if (flags & MUXER_FLAG_KEY)
-      avp.flags |= PKT_FLAG_KEY;
+      avp.flags |= AV_PKT_FLAG_KEY;
 
     int rv=av_interleaved_write_frame(avfc,&avp);
 
