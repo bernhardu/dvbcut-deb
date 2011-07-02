@@ -1,0 +1,112 @@
+Description: fix FTBFS with libav 0.7 by replacing deprecated functions with
+ their substitute.
+Author: Fabrice Coutadeur <fabricesp@ubuntu.com>
+Bug-Debian: http://bugs.debian.org/632415
+Forwarded: no
+
+--- dvbcut-0.5.4+svn146.orig/src/lavfmuxer.h
++++ dvbcut-0.5.4+svn146/src/lavfmuxer.h
+@@ -73,7 +73,7 @@ public:
+     avp.dts=dts;
+     avp.stream_index=st[str].stream_index;
+     if (flags & MUXER_FLAG_KEY)
+-      avp.flags |= PKT_FLAG_KEY;
++      avp.flags |= AV_PKT_FLAG_KEY;
+ 
+     int rv=av_interleaved_write_frame(avfc,&avp);
+ 
+--- dvbcut-0.5.4+svn146.orig/src/lavfmuxer.cpp
++++ dvbcut-0.5.4+svn146/src/lavfmuxer.cpp
+@@ -34,12 +34,12 @@ extern "C" {
+ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg, const char *filename)
+     : muxer(), avfc(0), fileopened(false)
+   {
+-  fmt = guess_format(format, NULL, NULL);
++  fmt = av_guess_format(format, NULL, NULL);
+   if (!fmt) {
+     return;
+     }
+ 
+-  avfc=av_alloc_format_context();
++  avfc=avformat_alloc_context();
+   if (!avfc)
+     return;
+ 
+@@ -73,7 +73,7 @@ lavfmuxer::lavfmuxer(const char *format,
+         av_free(s->codec);
+       s->codec = avcodec_alloc_context();
+       avcodec_get_context_defaults(s->codec);
+-      s->codec->codec_type=CODEC_TYPE_AUDIO;
++      s->codec->codec_type=AVMEDIA_TYPE_AUDIO;
+       s->codec->codec_id = (mpg.getstreamtype(astr)==streamtype::ac3audio) ?
+ 	CODEC_ID_AC3 : CODEC_ID_MP2;
+       s->codec->rc_buffer_size = 224*1024*8;
+@@ -92,6 +92,14 @@ lavfmuxer::lavfmuxer(const char *format,
+ 	    int16_t samples[AVCODEC_MAX_AUDIO_FRAME_SIZE/sizeof(int16_t)];
+ 	    int frame_size=sizeof(samples);
+ 	    //fprintf(stderr, "** decode audio size=%d\n", sd->inbytes());
++#if LIBAVCODEC_VERSION_INT > ((52<<16)+(25<<8)+0)
++	    AVPacket pkt;
++ 	    av_init_packet( &pkt );
++	    pkt.data = (uint8_t*) sd->getdata();
++	    pkt.size = sd->inbytes();
++	    avcodec_decode_audio3
++	      (s->codec,samples,&frame_size, &pkt);
++#else
+ #if LIBAVCODEC_VERSION_INT >= ((52<<16)+(0<<8)+0)
+ 	    avcodec_decode_audio2
+ #else
+@@ -100,6 +108,7 @@ lavfmuxer::lavfmuxer(const char *format,
+ 	      (s->codec,samples,&frame_size,
+ 	       (uint8_t*) sd->getdata(),sd->inbytes());
+ 	    avcodec_close(s->codec);
++#endif
+ 	  }
+ 	  break;
+ 	}
+--- dvbcut-0.5.4+svn146.orig/src/mpgfile.cpp
++++ dvbcut-0.5.4+svn146/src/mpgfile.cpp
+@@ -159,8 +159,17 @@ void mpgfile::decodegop(int start, int s
+       while (decodebytes>0)
+       {
+         frameFinished=0;
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,23,0)
++        AVPacket pkt;
++        av_init_packet( &pkt );
++        pkt.data = (uint8_t*) data;
++        pkt.size = decodebytes;
++        int bytesDecoded=avcodec_decode_video2( S->avcc, avf,
++                                        &frameFinished, &pkt );
++#else
+         int bytesDecoded=avcodec_decode_video(S->avcc, avf, &frameFinished,
+                                               (uint8_t*) data, decodebytes);
++#endif
+         if (bytesDecoded<0)
+         {
+           fprintf(stderr,"libavcodec error while decoding frame #%d\n",pic);
+@@ -199,7 +208,16 @@ void mpgfile::decodegop(int start, int s
+   if (pic < stop)
+   {
+     int frameFinished=0;
++#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,23,0)
++    AVPacket pkt;
++    av_init_packet( &pkt );
++    pkt.data = NULL;
++    pkt.size = 0;
++    avcodec_decode_video2( S->avcc, avf,
++                                        &frameFinished, &pkt );
++#else
+     avcodec_decode_video(S->avcc, avf, &frameFinished, NULL, 0);
++#endif
+     if (frameFinished)
+     {
+       if (last_cpn!=avf->coded_picture_number)
+@@ -246,7 +264,7 @@ void mpgfile::initcodeccontexts(int vid)
+     stream *S=&s[VIDEOSTREAM];
+     S->id=vid;
+     S->allocavcc();
+-    S->avcc->codec_type=CODEC_TYPE_VIDEO;
++    S->avcc->codec_type=AVMEDIA_TYPE_VIDEO;
+     S->avcc->codec_id=CODEC_ID_MPEG2VIDEO;
+     S->dec=avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
+     S->enc=avcodec_find_encoder(CODEC_ID_MPEG2VIDEO);
