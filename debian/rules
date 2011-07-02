@@ -10,27 +10,24 @@ ORIG_TAR_GZ := ../$(DEB_SOURCE)_$(UPSTREAM_VERSION)+svn$(SVN_VERSION).orig.tar.g
 build: build-stamp
 build-stamp:
 	dh_testdir
-	cp -v /usr/share/misc/config.sub .
-	cp -v /usr/share/misc/config.guess .
-	$(MAKE) FFMPEG=/usr
+	mkdir -p build
+	cd build && cmake -DCMAKE_COLOR_MAKEFILE=OFF -DCMAKE_INSTALL_PREFIX="/usr" ..
+	$(MAKE) -C build
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
-	[ ! -f makefile ] || $(MAKE) distclean FFMPEG=/usr
-	dh_clean build-stamp config.sub config.guess
+	rm -rf build
+	dh_clean build-stamp
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_prep
 	dh_installdirs
-
-	$(MAKE) install PREFIX=/usr \
-		FFMPEG=/usr \
-		MANPATH=/usr/share/man \
-		DESTDIR=$(CURDIR)/debian/dvbcut
+	dh_install build/src/dvbcut usr/bin
+	dh_installman dvbcut.1
 
 get-orig-source:
 	TMPDIR=`mktemp -d` && \
