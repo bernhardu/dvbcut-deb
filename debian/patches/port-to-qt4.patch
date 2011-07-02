@@ -20,7 +20,6 @@ Raik
 +cmake_minimum_required(VERSION 2.4.0)
 +
 +add_subdirectory(src)
-\ No newline at end of file
 --- /dev/null
 +++ b/icons/icons.qrc
 @@ -0,0 +1,8 @@
@@ -34,7 +33,7 @@ Raik
 +</RCC>
 --- /dev/null
 +++ b/src/CMakeLists.txt
-@@ -0,0 +1,87 @@
+@@ -0,0 +1,89 @@
 +find_package(Qt4 REQUIRED)
 +
 +set(QT_USE_QTGUI true)
@@ -51,10 +50,12 @@ Raik
 +find_library(LIB_AVCODEC avcodec)
 +find_library(LIB_AVFORMAT avformat)
 +find_library(LIB_SWSCALE swscale)
++find_library(LIB_AVUTIL avutil)
 +set(FFMPEG_LIBRARIES
 +  ${LIB_AVCODEC}
 +  ${LIB_AVFORMAT}
 +  ${LIB_SWSCALE}
++  ${LIB_AVUTIL}
 +)
 +
 +find_library(LIB_AO ao)
@@ -122,7 +123,6 @@ Raik
 +install(TARGETS dvbcut
 +  RUNTIME DESTINATION bin
 +)
-\ No newline at end of file
 --- a/src/avframe.cpp
 +++ b/src/avframe.cpp
 @@ -116,9 +116,9 @@ QImage avframe::getqimage(bool scaled, d
@@ -4736,150 +4736,6 @@ Raik
      if (next->rtti()==RTTI())
        if ( ((EventListItem*)(next))->pic > picture)
          break;
---- /dev/null
-+++ b/src/eventlistitem.cpp.orig
-@@ -0,0 +1,141 @@
-+/*  dvbcut
-+    Copyright (c) 2005 Sven Over <svenover@svenover.de>
-+ 
-+    This program is free software; you can redistribute it and/or modify
-+    it under the terms of the GNU General Public License as published by
-+    the Free Software Foundation; either version 2 of the License, or
-+    (at your option) any later version.
-+ 
-+    This program is distributed in the hope that it will be useful,
-+    but WITHOUT ANY WARRANTY; without even the implied warranty of
-+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+    GNU General Public License for more details.
-+ 
-+    You should have received a copy of the GNU General Public License
-+    along with this program; if not, write to the Free Software
-+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+*/
-+
-+/* $Id: eventlistitem.cpp 86 2007-10-12 13:09:35Z too-tired $ */
-+
-+#include <qsimplerichtext.h>
-+#include <qapplication.h>
-+#include <qpainter.h>
-+#include <qimage.h>
-+#include "eventlistitem.h"
-+#include "settings.h"
-+
-+EventListItem::EventListItem( QListBox *listbox, const QPixmap &pixmap,
-+                              eventtype type, int picture, int picturetype, pts_t _pts ) :
-+    QListBoxItem(listbox, afterwhich(listbox,picture)), pm(pixmap), evtype(type), pic(picture), pictype(picturetype), pts(_pts)
-+  {
-+  if (pm.width()>160 || pm.height()>90)
-+    pm=pm.convertToImage().smoothScale(130,90,QImage::ScaleMin);
-+  }
-+
-+EventListItem::~EventListItem()
-+  {}
-+
-+
-+int EventListItem::rtti() const
-+  {
-+  return RTTI();
-+  }
-+
-+
-+
-+void EventListItem::paint( QPainter *painter )
-+  {
-+  int itemHeight = height( listBox() );
-+  int x=3;
-+
-+  if (evtype == stop) {
-+    QColor color(224, 224, 224);
-+    QBrush brush(color);
-+    painter->fillRect(0, 0, width(listBox()), itemHeight, brush);
-+    }
-+
-+  if ( !pm.isNull() ) {
-+    painter->drawPixmap( x, (itemHeight-pm.height())/2, pm);
-+    x+=pm.width()+3;
-+    }
-+
-+  if (listBox()) {
-+    QSimpleRichText rt(getstring(),listBox()->font());
-+    rt.setWidth(1000);
-+
-+    QColorGroup cg(listBox()->colorGroup());
-+
-+    if (isSelected()) {
-+      QColor c=cg.color(QColorGroup::Text);
-+      cg.setColor(QColorGroup::Text,cg.color(QColorGroup::HighlightedText));
-+      cg.setColor(QColorGroup::HighlightedText,c);
-+      }
-+
-+    rt.draw(painter,x,(itemHeight-rt.height())/2,QRect(),cg);
-+    }
-+
-+  }
-+
-+int EventListItem::height( const QListBox*  ) const
-+  {
-+  int h=0;
-+
-+  if (!pm.isNull())
-+    h=pm.height();
-+
-+  return QMAX( h+6, QApplication::globalStrut().height() );
-+  }
-+
-+int EventListItem::width( const QListBox* lb ) const
-+  {
-+  int width=3;
-+
-+  if (!pm.isNull())
-+    width += pm.width()+3;
-+
-+  if (lb) {
-+    QSimpleRichText rt(getstring(),lb->font());
-+    rt.setWidth(1000); //drawinglistbox->width());
-+    width+=rt.widthUsed()+3;
-+    }
-+
-+  return QMAX( width,
-+               QApplication::globalStrut().width() );
-+  }
-+
-+QString EventListItem::getstring() const
-+  {
-+  QString label;
-+  if (evtype==start)
-+    label = settings().start_label;
-+  else if (evtype==stop)
-+    label = settings().stop_label;
-+  else if (evtype==chapter)
-+    label = settings().chapter_label;
-+  else if (evtype==bookmark)
-+    label = settings().bookmark_label;
-+
-+  return label + QString().sprintf("<br>%02d:%02d:%02d.%03d<br>%d (%c)",
-+                           int(pts/(3600*90000)),
-+                           int(pts/(60*90000))%60,
-+                           int(pts/90000)%60,
-+                           int(pts/90)%1000,
-+                           pic,
-+                           ((const char *)".IPB....")[pictype&7]);
-+  }
-+
-+QListBoxItem *EventListItem::afterwhich(QListBox *lb, int picture)
-+  {
-+  if (!lb)
-+    return 0;
-+  QListBoxItem *after=0;
-+
-+  for (QListBoxItem *next=lb->firstItem();next;after=next,next=next->next())
-+    if (next->rtti()==RTTI())
-+      if ( ((EventListItem*)(next))->pic > picture)
-+        break;
-+
-+  return after;
-+  }
-+
 --- a/src/eventlistitem.h
 +++ b/src/eventlistitem.h
 @@ -22,16 +22,16 @@
@@ -5444,7 +5300,6 @@ Raik
 +  {
 +    ui->textbrowser->setText(text);
 +  }
-\ No newline at end of file
 --- /dev/null
 +++ b/src/mplayererrorbase.h
 @@ -0,0 +1,37 @@
@@ -5766,7 +5621,7 @@ Raik
 +  {
 +  delete ui;
 +  }
-+  
++
  void progresswindow::closeEvent(QCloseEvent *e)
    {
    if (waitingforclose)
@@ -6454,4 +6309,3 @@ Raik
 +#define REVISION	"1"
 +
 +#endif //_DVBCUT_VERSION_H
-\ No newline at end of file
