@@ -1,8 +1,14 @@
-dvbcut (0.5.4+svn170-1) UNRELEASED; urgency=low
+dvbcut (0.5.4+svn170-1) experimental; urgency=low
 
   * New upstream version
+  * Drop patches that are already applied in this upstream version
+  * Apply patch from upstream to support qt4
+  * Build against qt4
+  * Add patch to build against Libav 0.7, Closes: #632415
+    Thanks to Fabrice Coutadeur <fabricesp@ubuntu.com>
+  * Tighten build dependencies to build against Libav 0.7
 
- -- Reinhard Tartler <siretart@tauware.de>  Sat, 07 May 2011 08:43:07 +0200
+ -- Reinhard Tartler <siretart@tauware.de>  Sat, 02 Jul 2011 10:59:23 +0200
 
 dvbcut (0.5.4+svn146-2) unstable; urgency=low
 
