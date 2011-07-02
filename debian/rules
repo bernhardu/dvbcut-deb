@@ -18,7 +18,7 @@ build-stamp:
 clean:
 	dh_testdir
 	dh_testroot
-	[ ! -f Makefile ] || $(MAKE) distclean FFMPEG=/usr
+	[ ! -f makefile ] || $(MAKE) distclean FFMPEG=/usr
 	dh_clean build-stamp config.sub config.guess
 
 install: build
