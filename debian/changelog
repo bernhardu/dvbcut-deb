@@ -1,3 +1,9 @@
+dvbcut (0.5.4+svn170-2) unstable; urgency=low
+
+  * Upload to unstable.
+
+ -- Reinhard Tartler <siretart@tauware.de>  Fri, 02 Sep 2011 11:22:19 +0200
+
 dvbcut (0.5.4+svn170-1) experimental; urgency=low
 
   * New upstream version
