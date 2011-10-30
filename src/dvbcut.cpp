@@ -1592,6 +1592,7 @@ void dvbcut::updateimagedisplay()
     QImage px=imgp->getimage(curpic,fine);
     ui->imagedisplay->setMinimumSize(px.size());
     ui->imagedisplay->setPixmap(QPixmap::fromImage(px));
+    ui->imagedisplay->update();
     qApp->processEvents();
   }
 }

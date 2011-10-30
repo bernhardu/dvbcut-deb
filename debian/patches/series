@@ -1,4 +1,3 @@
-updateimagedisplayfix.patch
 libav9.patch
 libav10.patch
 bug753347_initialize-pkt-variable-in-mpgfile__recodevideo-to-avoid-crash.patch
