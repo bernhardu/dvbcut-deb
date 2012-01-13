@@ -1491,7 +1491,7 @@ Raik
      myEvent = false;
  
    if (myEvent) {
-@@ -2177,14 +2185,14 @@ bool dvbcut::eventFilter(QObject *watche
+@@ -2177,14 +2185,15 @@ bool dvbcut::eventFilter(QObject *watche
  	  newpos = 0;
  	else if (newpos >= pictures)
  	  newpos = pictures - 1;
@@ -1505,10 +1505,11 @@ Raik
    // propagate to base class
 -  return dvbcutbase::eventFilter(watched, e);
 +  //return ui->eventFilter(watched, e);
++  return Q3MainWindow::eventFilter(watched, e);
  }
  
  int
-@@ -2199,6 +2207,11 @@ dvbcut::question(const QString & caption
+@@ -2199,6 +2208,11 @@ dvbcut::question(const QString & caption
  }
  
  int
@@ -1520,7 +1521,7 @@ Raik
  dvbcut::critical(const QString & caption, const QString & text)
  {
    if (nogui) {
-@@ -2281,24 +2294,24 @@ void dvbcut::update_time_display()
+@@ -2281,24 +2295,24 @@ void dvbcut::update_time_display()
      + " " + timestr(pts);
    QString outtime =
      QString(mark) + " " + timestr(outpts);
@@ -1552,7 +1553,7 @@ Raik
                        + QString(AR[idx.getaspectratio()]));
  
    }
-@@ -2330,7 +2343,7 @@ void dvbcut::update_quick_picture_lookup
+@@ -2330,7 +2344,7 @@ void dvbcut::update_quick_picture_lookup
      startpts=0; 
    }
    
@@ -1561,7 +1562,7 @@ Raik
      if (item->rtti()==EventListItem::RTTI()) {
      const EventListItem &eli=*static_cast<const EventListItem*>(item);
      switch (eli.geteventtype()) {
-@@ -2402,8 +2415,8 @@ void dvbcut::helpAboutAction_activated()
+@@ -2402,8 +2416,8 @@ void dvbcut::helpAboutAction_activated()
        "</span></body></html>").arg(VERSION_STRING));
  }
  
@@ -1572,7 +1573,7 @@ Raik
  #include <qdialog.h>
  #include <qtextbrowser.h>
  #include <qpushbutton.h>
-@@ -2413,10 +2426,10 @@ public:
+@@ -2413,10 +2427,10 @@ public:
    helpDialog(QWidget *parent, const char *name, QString file)
    : QDialog(parent, name)
    {
@@ -1585,7 +1586,7 @@ Raik
      prev = new QPushButton(tr("Prev"), hbox);
      next = new QPushButton(tr("Next"), hbox);
      home = new QPushButton(tr("Home"), hbox);
-@@ -2442,8 +2455,8 @@ public:
+@@ -2442,8 +2456,8 @@ public:
      delete vbox;
    }
  private:
