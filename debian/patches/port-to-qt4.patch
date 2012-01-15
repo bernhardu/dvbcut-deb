@@ -4662,7 +4662,7 @@ Raik
 +++ b/src/eventlistitem.cpp
 @@ -18,19 +18,19 @@
  
- /* $Id: eventlistitem.cpp 86 2007-10-12 13:09:35Z too-tired $ */
+ /* $Id$ */
  
 -#include <qsimplerichtext.h>
 +#include <q3simplerichtext.h>
@@ -5584,7 +5584,7 @@ Raik
  
 --- a/src/progresswindow.cpp
 +++ b/src/progresswindow.cpp
-@@ -33,20 +33,23 @@
+@@ -33,30 +33,38 @@
  #include "progresswindow.h"
  
  progresswindow::progresswindow(QWidget *parent, const char *name)
@@ -5614,7 +5614,11 @@ Raik
    item->setColor( "red" );
    item->setFontWeight( QFont::Bold );
    item->setFontUnderline( TRUE );
-@@ -55,6 +58,11 @@ progresswindow::progresswindow(QWidget *
+ 
+-  cancelbutton->setPaletteBackgroundColor( QColor( 255,0,0 ) );
++  ui->cancelbutton->setPaletteBackgroundColor( QColor( 255,0,0 ) );
+ 
+   show();
    qApp->processEvents();
    }
  
@@ -5626,16 +5630,23 @@ Raik
  void progresswindow::closeEvent(QCloseEvent *e)
    {
    if (waitingforclose)
-@@ -65,7 +73,7 @@ void progresswindow::closeEvent(QCloseEv
+@@ -67,11 +75,11 @@ void progresswindow::closeEvent(QCloseEv
  
  void progresswindow::finish()
    {
 -  cancelbutton->setEnabled(false);
 +  ui->cancelbutton->setEnabled(false);
    waitingforclose=true;
+-  cancelbutton->setText( tr( "Close" ) );
+-  cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
+-  cancelbutton->setEnabled(true);
++  ui->cancelbutton->setText( tr( "Close" ) );
++  ui->cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
++  ui->cancelbutton->setEnabled(true);
    exec();
    }
-@@ -75,7 +83,7 @@ void progresswindow::setprogress(int per
+ 
+@@ -80,7 +88,7 @@ void progresswindow::setprogress(int per
    if (permille==currentprogress)
      return;
    currentprogress=permille;
@@ -5644,7 +5655,7 @@ Raik
    qApp->processEvents();
    }
  
-@@ -88,9 +96,9 @@ void progresswindow::print(const char *f
+@@ -93,9 +101,9 @@ void progresswindow::print(const char *f
      return;
  
    if (*text)
@@ -5656,7 +5667,7 @@ Raik
    free(text);
    qApp->processEvents();
    }
-@@ -103,7 +111,7 @@ void progresswindow::printheading(const
+@@ -108,7 +116,7 @@ void progresswindow::printheading(const
    if (vasprintf(&text,fmt,ap)<0 || (text==0))
      return;
  
@@ -5665,7 +5676,7 @@ Raik
    free(text);
    qApp->processEvents();
    }
-@@ -116,7 +124,7 @@ void progresswindow::printinfo(const cha
+@@ -121,7 +129,7 @@ void progresswindow::printinfo(const cha
    if (vasprintf(&text,fmt,ap)<0 || (text==0))
      return;
  
@@ -5674,7 +5685,7 @@ Raik
    free(text);
    qApp->processEvents();
    }
-@@ -129,7 +137,7 @@ void progresswindow::printerror(const ch
+@@ -134,7 +142,7 @@ void progresswindow::printerror(const ch
    if (vasprintf(&text,fmt,ap)<0 || (text==0))
      return;
  
@@ -5683,7 +5694,7 @@ Raik
    free(text);
    qApp->processEvents();
    }
-@@ -142,7 +150,7 @@ void progresswindow::printwarning(const
+@@ -147,7 +155,7 @@ void progresswindow::printwarning(const
    if (vasprintf(&text,fmt,ap)<0 || (text==0))
      return;
  
@@ -5692,15 +5703,22 @@ Raik
    free(text);
    qApp->processEvents();
    }
-@@ -150,7 +158,7 @@ void progresswindow::printwarning(const
- void progresswindow::clickedcancel()
-   {
-   cancelwasclicked=true;
--  cancelbutton->setEnabled(false);
-+  ui->cancelbutton->setEnabled(false);
-   qApp->processEvents();
-   }
- 
+@@ -157,11 +165,11 @@ void progresswindow::clickedcancel()
+   if ((cancelwasclicked==false) && (waitingforclose==false)) {
+     // button function is cancel
+     cancelwasclicked=true;
+-    cancelbutton->setEnabled(false);
++    ui->cancelbutton->setEnabled(false);
+     qApp->processEvents();
+-    cancelbutton->setText( tr( "Close" ) );
+-    cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
+-    cancelbutton->setEnabled(true);
++    ui->cancelbutton->setText( tr( "Close" ) );
++    ui->cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
++    ui->cancelbutton->setEnabled(true);
+   } else {
+     // button function is close
+     close();
 --- a/src/progresswindow.h
 +++ b/src/progresswindow.h
 @@ -23,10 +23,10 @@
