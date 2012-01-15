@@ -1,3 +1,16 @@
+dvbcut (0.5.4+svn178-1) UNRELEASED; urgency=low
+
+  * Imported Upstream version 0.5.4+svn178.
+    - Drop fix-ftbfs-gcc4.6 patch as it has been integrated upstream
+    - Refresh port-to-qt4 patch
+  * Update port-to-qt4 patch to make dvbcut usable in wheeezy (Closes: #641992,
+    LP: #896811). Thanks Jindrich Makovicka for the patch!
+  * port-to-qt4.patch: updated to get rid of file: prefix in the index filename
+  * debian/rules: updated to add build-indep and build-arch recommended targets.
+    This fixes a lintian warning.
+
+ -- Fabrice Coutadeur <coutadeurf@gmail.com>  Sun, 15 Jan 2012 07:11:07 +0100
+
 dvbcut (0.5.4+svn170-2) unstable; urgency=low
 
   * Upload to unstable.
