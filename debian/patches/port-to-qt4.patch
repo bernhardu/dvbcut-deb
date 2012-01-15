@@ -1200,16 +1200,18 @@ Raik
      return;
    }
  
-@@ -1859,7 +1867,7 @@ void dvbcut::open(std::list<std::string>
+@@ -1859,19 +1867,19 @@ void dvbcut::open(std::list<std::string>
  	   */
  	  QUrl u;
  	  u.setProtocol(QString("file"));
 -	  u.setPath(QString(idxfilename));
 +	  u.setPath(QString::fromStdString(idxfilename));
  	  if (chdir((const char*)u.dirPath()) == -1) chdir("/");
- 	  QString relname = QString("file:") + u.fileName();
+-	  QString relname = QString("file:") + u.fileName();
++	  QString relname = u.fileName();
  	  QString s=QFileDialog::getSaveFileName(
-@@ -1868,10 +1876,10 @@ void dvbcut::open(std::list<std::string>
+ 		  relname,
+ 		  settings().idxfilter,
  		  this,
  		  "Choose index file...",
  		  "Choose the name of the index file" );
