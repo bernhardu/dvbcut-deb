@@ -2,7 +2,7 @@ Source: dvbcut
 Section: graphics
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
-Uploaders: Reinhard Tartler <siretart@tauware.de>
+Uploaders: Reinhard Tartler <siretart@tauware.de>, Fabrice Coutadeur <coutadeurf@gmail.com>
 Build-Depends: autotools-dev,
  cmake,
  debhelper (>= 7),
