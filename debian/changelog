@@ -1,4 +1,4 @@
-dvbcut (0.5.4+svn178-1) UNRELEASED; urgency=low
+dvbcut (0.5.4+svn178-1) unstable; urgency=low
 
   * Imported Upstream version 0.5.4+svn178.
     - Drop fix-ftbfs-gcc4.6 patch as it has been integrated upstream
