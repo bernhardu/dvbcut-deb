@@ -21,6 +21,8 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -rf build
+	rm -rf ffmpeg.src
+	rm -rf ffmpeg-patches
 	dh_clean build-stamp
 
 install: build
