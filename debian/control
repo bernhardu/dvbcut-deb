@@ -2,8 +2,11 @@ Source: dvbcut
 Section: graphics
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
-Uploaders: Reinhard Tartler <siretart@tauware.de>, Fabrice Coutadeur <coutadeurf@gmail.com>
-Build-Depends: autotools-dev,
+Uploaders:
+ Reinhard Tartler <siretart@tauware.de>,
+ Fabrice Coutadeur <coutadeurf@gmail.com>
+Build-Depends:
+ autotools-dev,
  cmake,
  debhelper (>= 7),
  liba52-0.7.4-dev,
@@ -24,8 +27,7 @@ Standards-Version: 3.9.2
 
 Package: dvbcut
 Architecture: any
-Depends: ${shlibs:Depends},
- ${misc:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Recommends: mplayer
 Description: Qt application for cutting parts out of DVB streams
  DVBCUT is a Qt application that allows you to select certain parts of an
