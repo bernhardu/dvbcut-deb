@@ -6,6 +6,7 @@ UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed -r ' s/\+[^+]+$$//')
 SVN_VERSION := $(shell echo $(DEB_VERSION) | sed -r 's/^[0-9.:-]+\+r//; s/-[^-]+$$//' )
 SVN_URL := http://dvbcut.svn.sourceforge.net/svnroot/dvbcut/trunk
 ORIG_TAR_GZ := ../$(DEB_SOURCE)_$(UPSTREAM_VERSION)+svn$(SVN_VERSION).orig.tar.gz
+CMAKE_FLAGS := -DCMAKE_COLOR_MAKEFILE=OFF -DCMAKE_INSTALL_PREFIX="/usr"
 
 build: build-arch build-indep
 build-arch: build-stamp
@@ -13,7 +14,7 @@ build-indep: build-stamp
 build-stamp:
 	dh_testdir
 	mkdir -p build
-	cd build && cmake -DCMAKE_COLOR_MAKEFILE=OFF -DCMAKE_INSTALL_PREFIX="/usr" ..
+	cd build && cmake $(CMAKE_FLAGS) ..
 	$(MAKE) -C build
 	touch build-stamp
 
