@@ -1,6 +1,7 @@
 dvbcut (0.5.4+svn178-2) UNRELEASED; urgency=low
 
-  * 
+  [ Fabrice Coutadeur ]
+  * debian/rules: use tiny debhelper form
 
  -- Reinhard Tartler <siretart@tauware.de>  Sat, 21 Jan 2012 13:28:55 +0100
 

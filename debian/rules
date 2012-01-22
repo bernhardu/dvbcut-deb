@@ -8,34 +8,17 @@ SVN_URL := http://dvbcut.svn.sourceforge.net/svnroot/dvbcut/trunk
 ORIG_TAR_GZ := ../$(DEB_SOURCE)_$(UPSTREAM_VERSION)+svn$(SVN_VERSION).orig.tar.gz
 CFLAGS := $(shell dpkg-buildflags --get CFLAGS)
 CXXFLAGS := $(shell dpkg-buildflags --get CXXFLAGS)
-CMAKE_FLAGS := -DCMAKE_COLOR_MAKEFILE=OFF -DCMAKE_INSTALL_PREFIX="/usr" -DCMAKE_VERBOSE_MAKEFILE=1
-CMAKE_FLAGS += -DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)"
 
-build: build-arch build-indep
-build-arch: build-stamp
-build-indep: build-stamp
-build-stamp:
-	dh_testdir
-	mkdir -p build
-	cd build && cmake $(CMAKE_FLAGS) ..
-	$(MAKE) -C build
-	touch build-stamp
+%:
+	dh $@
 
-clean:
-	dh_testdir
-	dh_testroot
-	rm -rf build
+override_dh_auto_configure:
+	dh_auto_configure --buildsystem=cmake -- -DCMAKE_COLOR_MAKEFILE=OFF -DCMAKE_INSTALL_PREFIX="/usr" -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)"
+
+override_dh_auto_clean:
 	rm -rf ffmpeg.src
 	rm -rf ffmpeg-patches
-	dh_clean build-stamp
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_prep
-	dh_installdirs
-	dh_install build/src/dvbcut usr/bin
-	dh_installman dvbcut.1
+	dh_auto_clean
 
 get-orig-source:
 	TMPDIR=`mktemp -d` && \
@@ -45,25 +28,3 @@ get-orig-source:
 	rm -rf $${TMPDIR}/dvbcut/ffmpeg-patches && \
 	rm -rf $${TMPDIR}/dvbcut/debian && \
 	tar czvf $(ORIG_TAR_GZ) -C $${TMPDIR} dvbcut
-
-binary-indep: build install
-
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs ChangeLog
-	dh_installdocs
-	dh_installmenu
-	dh_installman
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install get-orig-source
