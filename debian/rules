@@ -13,11 +13,16 @@ CXXFLAGS := $(shell dpkg-buildflags --get CXXFLAGS)
 	dh $@
 
 override_dh_auto_configure:
-	dh_auto_configure --buildsystem=cmake -- -DCMAKE_COLOR_MAKEFILE=OFF -DCMAKE_INSTALL_PREFIX="/usr" -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)"
+	autoconf
+	cp -f /usr/share/misc/config.sub config.sub
+	cp -f /usr/share/misc/config.guess config.guess
+	dh_auto_configure --buildsystem=autoconf -- --with-ffmpeg=/usr
 
 override_dh_auto_clean:
 	rm -rf ffmpeg.src
 	rm -rf ffmpeg-patches
+	[ ! -f makefile ] || make -f makefile distclean
+	dh_clean config.sub config.guess
 	dh_auto_clean
 
 get-orig-source:
