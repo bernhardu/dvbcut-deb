@@ -25,6 +25,8 @@ override_dh_auto_clean:
 	dh_clean config.sub config.guess
 	dh_auto_clean
 
+override_dh_auto_install:
+
 get-orig-source:
 	TMPDIR=`mktemp -d` && \
 	trap 'rm -rf $${TMPDIR}' EXIT && \
