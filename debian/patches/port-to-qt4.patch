@@ -13,14 +13,6 @@ Raik
 
 
 --- /dev/null
-+++ b/CMakeLists.txt
-@@ -0,0 +1,5 @@
-+project(dvbcut) # the name of your project
-+
-+cmake_minimum_required(VERSION 2.4.0)
-+
-+add_subdirectory(src)
---- /dev/null
 +++ b/icons/icons.qrc
 @@ -0,0 +1,8 @@
 +<RCC>
@@ -31,98 +23,6 @@ Raik
 +        <file>stop.png</file>
 +    </qresource>
 +</RCC>
---- /dev/null
-+++ b/src/CMakeLists.txt
-@@ -0,0 +1,89 @@
-+find_package(Qt4 REQUIRED)
-+
-+set(QT_USE_QTGUI true)
-+set(QT_USE_QTCORE true)
-+set(QT_USE_QTXML true)
-+set(QT_USE_QT3SUPPORT true)
-+include(${QT_USE_FILE})
-+
-+include_directories(/usr/include/libavcodec)
-+include_directories(/usr/include/libavformat)
-+include_directories(/usr/include/libswscale)
-+include_directories(${CMAKE_CURRENT_BINARY_DIR})
-+
-+find_library(LIB_AVCODEC avcodec)
-+find_library(LIB_AVFORMAT avformat)
-+find_library(LIB_SWSCALE swscale)
-+find_library(LIB_AVUTIL avutil)
-+set(FFMPEG_LIBRARIES
-+  ${LIB_AVCODEC}
-+  ${LIB_AVFORMAT}
-+  ${LIB_SWSCALE}
-+  ${LIB_AVUTIL}
-+)
-+
-+find_library(LIB_AO ao)
-+find_library(LIB_MAD mad)
-+set(MISC_LIBRARIES
-+  ${LIB_AO}
-+  ${LIB_MAD}
-+)
-+
-+add_definitions(-D__STDC_CONSTANT_MACROS)
-+add_definitions(-D__STDC_LIMIT_MACROS)
-+
-+add_definitions(-DHAVE_LIB_SWSCALE)
-+add_definitions(-DHAVE_LIB_AO)
-+add_definitions(-DHAVE_LIB_MAD)
-+
-+set(dvbcut_SRCS
-+  avframe.cpp
-+  buffer.cpp
-+  differenceimageprovider.cpp
-+  dvbcut.cpp
-+  eventlistitem.cpp
-+  exception.cpp
-+  exportdialog.cpp
-+  imageprovider.cpp
-+  index.cpp
-+  lavfmuxer.cpp
-+  logoutput.cpp
-+  main.cpp
-+  mpegmuxer.cpp
-+  mpgfile.cpp
-+  mplayererrorbase.cpp
-+  playaudio.cpp
-+  progressstatusbar.cpp
-+  progresswindow.cpp
-+  psfile.cpp
-+  pts.cpp
-+  settings.cpp
-+  streamdata.cpp
-+  tsfile.cpp
-+)
-+
-+set(dvbcut_MOC_SRCS
-+  dvbcut.h
-+  exportdialog.h
-+  mplayererrorbase.h
-+  progresswindow.h
-+  progressstatusbar.h
-+)
-+
-+set(dvbcut_UIS
-+  dvbcutbase.ui
-+  exportdialogbase.ui
-+  mplayererrorbase.ui
-+  progresswindowbase.ui
-+)
-+
-+qt4_automoc(${dvbcut_SRCS})
-+qt4_wrap_ui(dvbcut_UIS_H ${dvbcut_UIS})
-+qt4_wrap_cpp(dvbcut_MOC_SRCS ${dvbcut_MOC_SRCS})
-+qt4_add_resources(dvbcut_RCC_SRCS ../icons/icons.qrc)
-+
-+add_executable(dvbcut ${dvbcut_SRCS} ${dvbcut_UIS_H} ${dvbcut_MOC_SRCS} ${dvbcut_RCC_SRCS}) 
-+target_link_libraries(dvbcut ${QT_LIBRARIES} ${FFMPEG_LIBRARIES} ${MISC_LIBRARIES})
-+install(TARGETS dvbcut
-+  RUNTIME DESTINATION bin
-+)
 --- a/src/avframe.cpp
 +++ b/src/avframe.cpp
 @@ -116,9 +116,9 @@ QImage avframe::getqimage(bool scaled, d
