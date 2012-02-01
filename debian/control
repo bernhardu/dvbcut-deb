@@ -7,7 +7,6 @@ Uploaders:
  Fabrice Coutadeur <coutadeurf@gmail.com>
 Build-Depends:
  autotools-dev,
- cmake,
  debhelper (>= 7.0.50~),
  liba52-0.7.4-dev,
  libao-dev,
