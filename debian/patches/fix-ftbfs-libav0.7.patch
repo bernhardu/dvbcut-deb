@@ -4,8 +4,8 @@ Author: Fabrice Coutadeur <fabricesp@ubuntu.com>
 Bug-Debian: http://bugs.debian.org/632415
 Forwarded: no
 
---- dvbcut-0.5.4+svn146.orig/src/lavfmuxer.h
-+++ dvbcut-0.5.4+svn146/src/lavfmuxer.h
+--- a/src/lavfmuxer.h
++++ b/src/lavfmuxer.h
 @@ -73,7 +73,7 @@ public:
      avp.dts=dts;
      avp.stream_index=st[str].stream_index;
@@ -15,8 +15,8 @@ Forwarded: no
  
      int rv=av_interleaved_write_frame(avfc,&avp);
  
---- dvbcut-0.5.4+svn146.orig/src/lavfmuxer.cpp
-+++ dvbcut-0.5.4+svn146/src/lavfmuxer.cpp
+--- a/src/lavfmuxer.cpp
++++ b/src/lavfmuxer.cpp
 @@ -34,12 +34,12 @@ extern "C" {
  lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg, const char *filename)
      : muxer(), avfc(0), fileopened(false)
@@ -64,9 +64,9 @@ Forwarded: no
  	  }
  	  break;
  	}
---- dvbcut-0.5.4+svn146.orig/src/mpgfile.cpp
-+++ dvbcut-0.5.4+svn146/src/mpgfile.cpp
-@@ -159,8 +159,17 @@ void mpgfile::decodegop(int start, int s
+--- a/src/mpgfile.cpp
++++ b/src/mpgfile.cpp
+@@ -161,8 +161,17 @@ void mpgfile::decodegop(int start, int s
        while (decodebytes>0)
        {
          frameFinished=0;
@@ -84,7 +84,7 @@ Forwarded: no
          if (bytesDecoded<0)
          {
            fprintf(stderr,"libavcodec error while decoding frame #%d\n",pic);
-@@ -199,7 +208,16 @@ void mpgfile::decodegop(int start, int s
+@@ -201,7 +210,16 @@ void mpgfile::decodegop(int start, int s
    if (pic < stop)
    {
      int frameFinished=0;
@@ -101,7 +101,7 @@ Forwarded: no
      if (frameFinished)
      {
        if (last_cpn!=avf->coded_picture_number)
-@@ -246,7 +264,7 @@ void mpgfile::initcodeccontexts(int vid)
+@@ -248,7 +266,7 @@ void mpgfile::initcodeccontexts(int vid)
      stream *S=&s[VIDEOSTREAM];
      S->id=vid;
      S->allocavcc();
