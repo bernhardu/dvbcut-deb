@@ -18,8 +18,7 @@ Build-Depends:
  libpostproc-dev (>> 4:0.7~),
  libqt4-dev,
  libswscale-dev (>> 4:0.7~),
- qt4-dev-tools,
- scons
+ qt4-dev-tools
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/dvbcut.git
 Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/dvbcut.git;a=summary
 Homepage: http://dvbcut.sourceforge.net/
