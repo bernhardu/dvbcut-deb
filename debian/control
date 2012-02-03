@@ -6,6 +6,7 @@ Uploaders:
  Reinhard Tartler <siretart@tauware.de>,
  Fabrice Coutadeur <coutadeurf@gmail.com>
 Build-Depends:
+ autoconf,
  autotools-dev,
  debhelper (>= 7.0.50~),
  liba52-0.7.4-dev,
