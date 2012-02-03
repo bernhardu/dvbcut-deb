@@ -22,7 +22,7 @@ override_dh_auto_clean:
 	rm -rf ffmpeg.src
 	rm -rf ffmpeg-patches
 	[ ! -f makefile ] || make -f makefile distclean
-	dh_clean config.sub config.guess
+	dh_clean config.sub config.guess bin/dvbcut configure dvbcut.desktop src/Makefile src/dvbcut src/qrc_icons.cpp
 	dh_auto_clean
 
 override_dh_auto_install:
