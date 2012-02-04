@@ -6230,3 +6230,181 @@ Raik
 +#define REVISION	"1"
 +
 +#endif //_DVBCUT_VERSION_H
+--- a/configure.in
++++ b/configure.in
+@@ -19,6 +19,7 @@ AC_PROG_CC
+ AC_PROG_CXX
+ AC_PROG_INSTALL
+ AC_CHECK_TOOL(STRIP, strip, :)
++AC_CHECK_TOOL(PKG_CONFIG, pkg-config, :)
+ 
+ AC_CYGWIN
+ AC_MINGW32
+@@ -144,21 +145,21 @@ dnl Checks for library functions.
+ AC_FUNC_MMAP
+ 
+ dnl external stuff
+-AC_ARG_WITH(qt3, [  --with-qt3=DIR          path to qt3 (default: QTDIR)],
++AC_ARG_WITH(qt4, [  --with-qt4=DIR          path to qt4 (default: QTDIR)],
+   [case $withval in
+-    no) AC_MSG_ERROR([dvbcut requires Qt3]);;
++    no) AC_MSG_ERROR([dvbcut requires Qt4]);;
+     yes) ;;
+     *) QTDIR=$withval;;
+   esac])
+ AC_SUBST(QTDIR)
+ QTINC=$QTDIR/include
+ QTLIB=$QTDIR/$mr_libdirname
+-AC_ARG_WITH(qt3-include, [  --with-qt3-include=DIR  path to qt3 include files],
++AC_ARG_WITH(qt4-include, [  --with-qt4-include=DIR  path to qt4 include files],
+   [case $withval in
+     yes|no) ;;
+     *) QTINC=$withval;;
+   esac])
+-AC_ARG_WITH(qt3-lib, [  --with-qt3-lib=DIR      path to qt3 libraries],
++AC_ARG_WITH(qt4-lib, [  --with-qt4-lib=DIR      path to qt4 libraries],
+   [case $withval in
+     yes|no) ;;
+     *) QTLIB=$withval;;
+@@ -167,11 +168,30 @@ AC_ARG_WITH(qt3-lib, [  --with-qt3-lib=D
+ CPPFLAGS="$CPPFLAGS -I$QTINC"
+ LDFLAGS="$LDFLAGS -L$QTLIB"
+ 
+-AC_CHECK_LIB(qt-mt, main,
+-  [LIBS="$LIBS -lqt-mt"],
+-  [AC_CHECK_LIB(qt, main,
+-    [LIBS="$LIBS -lqt"],
+-    [AC_MSG_ERROR([Qt library not found])])])
++AC_CHECK_LIB(QtCore, main,
++  [HAVE_QT4="yes"],
++  [AC_MSG_ERROR([QtCore library not found])])
++
++AC_CHECK_LIB(Qt3Support, main,
++  [HAVE_QT4="yes"],
++  [AC_MSG_ERROR([Qt3Support library not found])])
++
++AC_CHECK_LIB(QtGui, main,
++  [HAVE_QT4="yes"],
++  [AC_MSG_ERROR([QtGui library not found])])
++
++AC_CHECK_LIB(QtXml, main,
++  [HAVE_QT4="yes"],
++  [AC_MSG_ERROR([QtXml library not found])])
++
++if test "x$HAVE_QT4" = "xyes"; then 
++   QT_CXXFLAGS=`$PKG_CONFIG --cflags Qt3Support QtCore QtGui QtXml`
++   QT_LIBS=`$PKG_CONFIG --libs Qt3Support QtCore QtGui QtXml`
++   CPPFLAGS="$CPPFLAGS $QT_CXXFLAGS"
++   LIBS="$LIBS $QT_LIBS"
++else
++   AC_MSG_ERROR([cannot find Qt4 library >= 4.2])
++fi
+ 
+ AC_DEFINE(__STDC_LIMIT_MACROS, 1, [Required for C++])
+ AC_DEFINE(__STDC_CONSTANT_MACROS, 1, [Required for C++])
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -54,38 +54,37 @@ QTDIR = @QTDIR@
+ 
+ PATH := $(QTDIR)/bin:$(PATH)
+ 
+-%.h: %.ui
+-	uic -o $@ $<
++ui_%.h: %.ui
++	uic-qt4 -o $@ $<
+ 
+ uic_%.cpp: %.h
+-	uic -impl $< -o $@ $*.ui
++	uic-qt4 -o $@ $<
+ 
+ moc_%.cpp: %.h
+-	moc -o $@ $<
++	moc-qt4 -o $@ $<
+ 
+ MOC = \
+ 	moc_dvbcut.cpp \
+-	moc_dvbcutbase.cpp \
+ 	moc_exportdialog.cpp \
+-	moc_exportdialogbase.cpp \
+ 	moc_mplayererrorbase.cpp \
+ 	moc_progressstatusbar.cpp \
+ 	moc_progresswindow.cpp \
+-	moc_progresswindowbase.cpp
+ 
+ UIC = \
+-	uic_dvbcutbase.cpp \
+-	uic_exportdialogbase.cpp \
+-	uic_mplayererrorbase.cpp \
+-	uic_progresswindowbase.cpp
++	ui_dvbcutbase.h \
++	ui_exportdialogbase.h \
++	ui_mplayererrorbase.h \
++	ui_progresswindowbase.h
+ 
++QRC = \
++	qrc_icons.cpp
+ SRCS = \
+ 	avframe.cpp differenceimageprovider.cpp buffer.cpp \
+ 	dvbcut.cpp eventlistitem.cpp exception.cpp exportdialog.cpp \
+ 	imageprovider.cpp index.cpp lavfmuxer.cpp logoutput.cpp \
+-	main.cpp mpegmuxer.cpp mpgfile.cpp playaudio.cpp \
++	main.cpp mpegmuxer.cpp mpgfile.cpp mplayererrorbase.cpp playaudio.cpp \
+ 	progressstatusbar.cpp progresswindow.cpp psfile.cpp \
+-	pts.cpp streamdata.cpp tsfile.cpp settings.cpp $(MOC) $(UIC) \
++	pts.cpp streamdata.cpp tsfile.cpp settings.cpp $(MOC) $(QRC) \
+ 	$(STDLIB)
+ 
+ OBJS = $(SRCS:.cpp=.$(OBJEXT))
+@@ -106,11 +105,14 @@ $(installdirs):
+ $(topdir)/bin:
+ 	mkdir $@
+ 
++qrc_icons.cpp:
++	rcc -name icons -o $@ ../icons/icons.qrc
++
+ $(topdir)/bin/dvbcut$(EXEEXT): dvbcut$(EXEEXT)
+ 	$(INSTALL_PROGRAM) dvbcut$(EXEEXT) $(topdir)/bin/dvbcut$(EXEEXT)
+ 	$(STRIP) $(topdir)/bin/dvbcut$(EXEEXT)
+ 
+-dvbcut$(EXEEXT): $(SRCS) $(OBJS)
++dvbcut$(EXEEXT): $(SRCS) $(UIC) $(OBJS)
+ 	$(CXX) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
+ 
+ ffmpeg_internal: $(topdir)/ffmpeg/lib/libavcodec.a
+@@ -168,13 +170,9 @@ stamp-depend: $(SRCS)
+ # static dependencies:
+ 
+ moc_dvbcut.cpp: dvbcut.h
+-moc_dvbcutbase.cpp: dvbcutbase.h
+ moc_exportdialog.cpp: exportdialog.h
+-moc_exportdialogbase.cpp: exportdialogbase.h
+-moc_mplayererrorbase.cpp: mplayererrorbase.h
+ moc_progressstatusbar.cpp: progressstatusbar.h
+ moc_progresswindow.cpp: progresswindow.h
+-moc_progresswindowbase.cpp: progresswindowbase.h
+ uic_dvbcutbase.cpp: dvbcutbase.h
+ uic_exportdialogbase.cpp: exportdialogbase.h
+ uic_mplayererrorbase.cpp: mplayererrorbase.h
+@@ -185,8 +183,6 @@ mplayererrorbase.h: mplayererrorbase.ui
+ progresswindowbase.h: progresswindowbase.ui
+ 
+ dvbcut.$(OBJEXT): version.h
+-version.h: $(SRCS)
+-	cd $(topdir) && $(MAKE) $(subdir)/version.h
+ 
+ distfiles: \
+ 	dvbcutbase.h \
+@@ -194,7 +190,6 @@ distfiles: \
+ 	moc_dvbcut.cpp \
+ 	moc_dvbcutbase.cpp \
+ 	moc_exportdialog.cpp \
+-	moc_exportdialogbase.cpp \
+ 	moc_mplayererrorbase.cpp \
+ 	moc_progressstatusbar.cpp \
+ 	moc_progresswindow.cpp \
+@@ -205,4 +200,5 @@ distfiles: \
+ 	uic_exportdialogbase.cpp \
+ 	uic_mplayererrorbase.cpp \
+ 	uic_progresswindowbase.cpp \
++	qrc_icons.cpp \
+ 	version.h
