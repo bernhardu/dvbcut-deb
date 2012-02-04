@@ -1,7 +1,28 @@
 dvbcut (0.5.4+svn178-2) UNRELEASED; urgency=low
 
   [ Fabrice Coutadeur ]
-  * debian/rules: use tiny debhelper form
+  * Adapt package to use debhelper tiny form:
+    + debian/rules:
+      - use debhelper tiny form
+      - Adapt dh_auto_configure target for automake build system
+      - Delete generated files in override_dh_auto_clean to be able to build
+        dvbcut locally twice
+    + debian/dvbcut.menu: rename menu file to dvbcut.menu to makes it
+      automatically installable by debhelper
+    + debian/install: Manually installs files to avoid the local update of the
+      mime database
+  * Change back build system to autotools so that qt4 patch can be adopted
+    upstream.
+    + debian/control:
+      - Drop scons build dependency. It's not used anymore.
+      - Drop cmake dependency
+      - Added b-d on autoconf to generate configure script
+      - Added b-d on pkg-config, used to get qt4 libs and includes
+    + port-to-qt4.patch:
+      - Drop cmake files from qt4 patch
+      - Update configure and src/Makefile.in for qt4
+  * Refresh fix-ftbfs-libav0.7 patch to use -pab as quilt arg. This makes futru
+    refreshes lighter.
 
  -- Reinhard Tartler <siretart@tauware.de>  Sat, 21 Jan 2012 13:28:55 +0100
 
