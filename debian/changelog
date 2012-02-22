@@ -23,8 +23,11 @@ dvbcut (0.5.4+svn178-2) unstable; urgency=low
       - Update configure and src/Makefile.in for qt4
     + This allows the automatic installation of desktop file and icon 
       (Closes: #660009)
-  * Refresh fix-ftbfs-libav0.7 patch to use -pab as quilt arg. This makes futru
+  * Refresh fix-ftbfs-libav0.7 patch to use -pab as quilt arg. This makes futur
     refreshes lighter.
+  * Rename docs ot dvbcut.doc, install to dvbcut.install and manpages to
+    dvbcut.manpages to follow debhelper recommendations. thanks bojo42 for the
+    tip.
 
  -- Reinhard Tartler <siretart@tauware.de>  Sat, 21 Jan 2012 13:28:55 +0100
 
