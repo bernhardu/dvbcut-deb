@@ -9,8 +9,9 @@ dvbcut (0.5.4+svn178-2) unstable; urgency=low
         dvbcut locally twice
     + debian/dvbcut.menu: rename menu file to dvbcut.menu to makes it
       automatically installable by debhelper
-    + debian/install: Manually installs files to avoid the local update of the
-      mime database
+    + debian/dvbcut.install: rename install file to dvbcut.install as stated in
+      the debhelper manpage and Manually installs files to avoid the local
+      update of the mime database
   * Change back build system to autotools so that qt4 patch can be adopted
     upstream (Closes: #656793).
     + debian/control:
@@ -25,9 +26,8 @@ dvbcut (0.5.4+svn178-2) unstable; urgency=low
       (Closes: #660009)
   * Refresh fix-ftbfs-libav0.7 patch to use -pab as quilt arg. This makes futur
     refreshes lighter.
-  * Rename docs ot dvbcut.doc, install to dvbcut.install and manpages to
-    dvbcut.manpages to follow debhelper recommendations. thanks bojo42 for the
-    tip.
+  * Rename docs to dvbcut.docs and manpages to dvbcut.manpages to follow
+    debhelper recommendations. thanks bojo42 for the tip.
 
  -- Reinhard Tartler <siretart@tauware.de>  Sat, 21 Jan 2012 13:28:55 +0100
 
