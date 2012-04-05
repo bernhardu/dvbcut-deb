@@ -1,0 +1,15 @@
+Description: fix FTBFS with gcc 4.7 by including a missing header. This fixes a
+ 'STDIN_FILENO' and 'STDOUT_FILENO' not declared error.
+Author: Fabrice Coutadeur <coutadeurf@gmail.com>
+Index: dvbcut/src/main.cpp
+===================================================================
+--- dvbcut.orig/src/main.cpp	2012-04-05 07:09:21.352193665 +0000
++++ dvbcut/src/main.cpp	2012-04-05 09:05:47.224446573 +0000
+@@ -25,6 +25,7 @@
+ #include <clocale>
+ #include <string>
+ #include <list>
++#include <unistd.h>
+ 
+ #ifdef HAVE_LIB_AO
+ #include <ao/ao.h>
