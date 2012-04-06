@@ -28,6 +28,8 @@ dvbcut (0.5.4+svn178-2) unstable; urgency=low
     refreshes lighter.
   * Rename docs to dvbcut.docs and manpages to dvbcut.manpages to follow
     debhelper recommendations. thanks bojo42 for the tip.
+  * fix_gcc_4.7.patch: fix FTBFS with gcc 4.7 because of missing include.
+    (Closes: #667154)
 
  -- Reinhard Tartler <siretart@tauware.de>  Sat, 21 Jan 2012 13:28:55 +0100
 
