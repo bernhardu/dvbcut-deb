@@ -1,0 +1,19 @@
+Description: Force update the picture of the videostream.
+From: https://bugs.launchpad.net/ubuntu/+source/dvbcut/+bug/875030/comments/3
+Bug-Ubuntu: https://launchpad.net/bugs/875030
+Bug: http://sourceforge.net/support/tracker.php?aid=3520951
+Reviewed-by: Alessio Treglia <alessio@debian.org>
+---
+ src/dvbcut.cpp |    1 +
+ 1 file changed, 1 insertion(+)
+
+--- dvbcut.orig/src/dvbcut.cpp
++++ dvbcut/src/dvbcut.cpp
+@@ -1592,6 +1592,7 @@ void dvbcut::updateimagedisplay()
+     QImage px=imgp->getimage(curpic,fine);
+     ui->imagedisplay->setMinimumSize(px.size());
+     ui->imagedisplay->setPixmap(QPixmap::fromImage(px));
++    ui->imagedisplay->update();
+     qApp->processEvents();
+   }
+ }
