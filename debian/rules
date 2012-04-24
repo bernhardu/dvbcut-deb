@@ -10,19 +10,16 @@ CFLAGS := $(shell dpkg-buildflags --get CFLAGS)
 CXXFLAGS := $(shell dpkg-buildflags --get CXXFLAGS)
 
 %:
-	dh $@
+	dh $@ --buildsystem=autoconf --with=autoreconf
 
 override_dh_auto_configure:
-	autoconf
-	cp -f /usr/share/misc/config.sub config.sub
-	cp -f /usr/share/misc/config.guess config.guess
-	dh_auto_configure --buildsystem=autoconf -- --with-ffmpeg=/usr
+	dh_auto_configure -- --with-ffmpeg=/usr
 
 override_dh_auto_clean:
 	rm -rf ffmpeg.src
 	rm -rf ffmpeg-patches
 	[ ! -f makefile ] || make -f makefile distclean
-	dh_clean config.sub config.guess bin/dvbcut configure dvbcut.desktop src/Makefile src/dvbcut src/qrc_icons.cpp
+	dh_clean bin/dvbcut dvbcut.desktop src/Makefile src/dvbcut src/qrc_icons.cpp
 	dh_auto_clean
 
 override_dh_auto_install:
