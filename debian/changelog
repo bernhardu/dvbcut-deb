@@ -1,3 +1,9 @@
+dvbcut (0.5.4+svn178-3) UNRELEASED; urgency=low
+
+  * start new upload
+
+ -- Alessio Treglia <alessio@debian.org>  Wed, 25 Apr 2012 01:10:49 +0200
+
 dvbcut (0.5.4+svn178-2) unstable; urgency=low
 
   * Team upload.
