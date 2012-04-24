@@ -1,26 +1,34 @@
-This is dvbcut, written by Sven Over <svenover@svenover.de> and
-currently maintained by Michael Riepe <too-tired@users.sourceforge.net>.
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: dvbcut
+Source: https://dvbcut.svn.sourceforge.net/svnroot/dvbcut
 
-The original source can always be found at:
-	http://dvbcut.sourceforge.net/
+Files: *
+Copyright:
+ 2006-2009 Michael Riepe
+ 2005-2007 Sven Over <svenover@svenover.de>
+License: GPL-2+
 
-Copyright (C) 2005  Sven Over
+Files: debian/*
+Copyright:
+ 2012 Reinhard Tartler <siretart@tauware.de>
+ 2012 Alessio Treglia <alessio@debian.org>
+ 2009-2012 Fabrice Coutadeur <coutadeurf@gmail.com>
+ 2005-2007 Sven Over <svenover@svenover.de>
+License: GPL-2+
 
-License:
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this package; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-On Debian systems, the complete text of the GNU General
-Public License can be found in `/usr/share/common-licenses/GPL'.
+License: GPL-2+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+Comment:
+ On Debian systems, the complete text of the GNU General
+ Public License can be found in `/usr/share/common-licenses/GPL'.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>
