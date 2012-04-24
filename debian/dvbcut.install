@@ -1,5 +1,5 @@
-src/dvbcut usr/bin
-src/dvbcut_en.html usr/share/help
 dvbcut.desktop usr/share/applications
 dvbcut.svg usr/share/dvbcut/icons
 dvbcut.xml usr/share/mime/packages
+src/dvbcut usr/bin
+src/dvbcut_en.html usr/share/help

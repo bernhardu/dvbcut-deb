@@ -27,8 +27,11 @@ Standards-Version: 3.9.2
 
 Package: dvbcut
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}
-Recommends: mplayer
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends}
+Recommends:
+ mplayer
 Description: Qt application for cutting parts out of DVB streams
  DVBcut is a Qt application that allows you to select certain parts of an
  MPEG transport stream (as received via Digital Video Broadcasting, DVB) and
