@@ -35,6 +35,8 @@ dvbcut (0.5.4+svn178-2) unstable; urgency=low
 
   [ Alessio Treglia ]
   * Add patch to fix "Unable to open stream" error. (LP: #875030)
+  * Update debian/copyright to copyright format 1.0.
+  * Bump Standards.
 
  -- Alessio Treglia <alessio@debian.org>  Tue, 24 Apr 2012 12:54:45 +0200
 
