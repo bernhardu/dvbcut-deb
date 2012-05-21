@@ -26,6 +26,8 @@
 #include <string>
 #include <list>
 
+#include <unistd.h>
+
 #ifdef HAVE_LIB_AO
 #include <ao/ao.h>
 #endif // HAVE_LIB_AO

@@ -1,3 +1,8 @@
+2012-05-21  Michael Riepe  <too-tired@users.sourceforge.net>
+
+	* src/main.cpp:
+		Fix compilation with gcc 4.7.
+
 2011-04-29  Michael Riepe  <too-tired@users.sourceforge.net>
 
 	* src/playaudio.cpp:
