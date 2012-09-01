@@ -201,15 +201,23 @@ Nepodařilo se otevřít soubor</translation>
         <source>Unable to set up muxer!</source>
         <translation>Selhala inicializace muxeru!</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="dvbcut.cpp" line="1588"/>
-        <source>%1. Exporting %2 pictures: %3 .. %4</source>
-        <translation>%1. Exportuji %2 snímků: %3 .. %4</translation>
+        <source>%1. Exporting %n pictures: %2 .. %3</source>
+        <translation>
+            <numerusform>%1. Exportuji %n snímek: %2 .. %3</numerusform>
+            <numerusform>%1. Exportuji %n snímky: %2 .. %3</numerusform>
+            <numerusform>%1. Exportuji %n snímků: %2 .. %3</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="dvbcut.cpp" line="1598"/>
-        <source>Saved %1 pictures (%2:%3:%4.%5)</source>
-        <translation>Uloženo %1 snímků (%2:%3:%4.%5)</translation>
+        <source>Saved %n pictures (%1:%2:%3.%4)</source>
+        <translation>
+            <numerusform>Uložen %n snímek (%1:%2:%3.%4)</numerusform>
+            <numerusform>Uloženy %n snímky (%1:%2:%3.%4)</numerusform>
+            <numerusform>Uloženo %n snímků (%1:%2:%3.%4)</numerusform>
+        </translation>
     </message>
     <message>
         <location filename="dvbcut.cpp" line="1624"/>
@@ -882,10 +890,14 @@ vrátil nenulový návratový kód: %1</translation>
         <source>Audio channel %1: delayed %2 milliseconds</source>
         <translation>Zvukový kanál %1: zpožděn o %2 milisekund</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="mpgfile.cpp" line="741"/>
-        <source>Recoding %1 pictures</source>
-        <translation>Překódovávám %1 snímků</translation>
+        <source>Recoding %n pictures</source>
+        <translation>
+            <numerusform>Překódovávám %n snímek</numerusform>
+            <numerusform>Překódovávám %n snímky</numerusform>
+            <numerusform>Překódovávám %n snímků</numerusform>
+        </translation>
     </message>
     <message>
         <location filename="mpgfile.cpp" line="755"/>
