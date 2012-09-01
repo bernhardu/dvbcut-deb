@@ -107,3 +107,6 @@ FORMS += \
 
 RESOURCES += \
     ../icons/icons.qrc
+
+TRANSLATIONS += \
+    dvbcut_cs.ts
