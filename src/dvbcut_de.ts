@@ -208,16 +208,16 @@ Konnte Datei nicht öffnen</translation>
         <location filename="dvbcut.cpp" line="1588"/>
         <source>%1. Exporting %n pictures: %2 .. %3</source>
         <translation>
+            <numerusform>%1. Exportiere %n Bild: %2 .. %3</numerusform>
             <numerusform>%1. Exportiere %n Bilder: %2 .. %3</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="dvbcut.cpp" line="1598"/>
         <source>Saved %n pictures (%1:%2:%3.%4)</source>
         <translation>
+            <numerusform>%n Bild gespeichert (%1:%2:%3.%4)</numerusform>
             <numerusform>%n Bilder gespeichert (%1:%2:%3.%4)</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -903,8 +903,8 @@ Konnte Datei nicht öffnen</translation>
         <location filename="mpgfile.cpp" line="741"/>
         <source>Recoding %n pictures</source>
         <translation>
+            <numerusform>Neukodierung von %n Bild</numerusform>
             <numerusform>Neukodierung von %n Bildern</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
