@@ -207,7 +207,7 @@ Konnte Datei nicht öffnen</translation>
     <message numerus="yes">
         <location filename="dvbcut.cpp" line="1588"/>
         <source>%1. Exporting %n pictures: %2 .. %3</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1. Exportiere %n Bilder: %2 .. %3</numerusform>
             <numerusform></numerusform>
         </translation>
