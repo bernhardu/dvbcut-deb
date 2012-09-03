@@ -110,4 +110,5 @@ RESOURCES += \
 
 TRANSLATIONS += \
     dvbcut_cs.ts \
-    dvbcut_en.ts
+    dvbcut_en.ts \
+    dvbcut_de.ts
