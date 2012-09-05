@@ -109,6 +109,6 @@ RESOURCES += \
     ../icons/icons.qrc
 
 TRANSLATIONS += \
+    dvbcut.ts \
     dvbcut_cs.ts \
-    dvbcut_en.ts \
     dvbcut_de.ts
