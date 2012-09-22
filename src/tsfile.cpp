@@ -137,7 +137,7 @@ int tsfile::streamreader(streamhandle &s)
       int pd=buf.providedata(packetsize,packetpos);
       if (pd<0)
         return pd;
-      if (pd<packetsize)
+      if (pd < (int)packetsize)
         return returnvalue;
       }
 
