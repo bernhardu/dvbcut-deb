@@ -4,7 +4,7 @@
 <context>
     <name>dvbcut</name>
     <message numerus="yes">
-        <location filename="dvbcut.cpp" line="1601"/>
+        <location filename="dvbcut.cpp" line="1637"/>
         <source>%1. Exporting %n pictures: %2 .. %3</source>
         <extracomment>Example: 1. Exporting 600 pictures: 00:05:45.240/00 .. 00:06:09.240/00</extracomment>
         <translation>
@@ -13,7 +13,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="dvbcut.cpp" line="1612"/>
+        <location filename="dvbcut.cpp" line="1648"/>
         <source>Saved %n pictures (%1:%2:%3.%4)</source>
         <extracomment>Example: Saved 3627 pictures (00:02:25.80)</extracomment>
         <translation>
@@ -25,7 +25,7 @@
 <context>
     <name>mpgfile</name>
     <message numerus="yes">
-        <location filename="mpgfile.cpp" line="743"/>
+        <location filename="mpgfile.cpp" line="751"/>
         <source>Recoding %n pictures</source>
         <translation>
             <numerusform>Recoding %n picture</numerusform>
