@@ -313,7 +313,7 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <location filename="dvbcut.cpp" line="2136"/>
         <source>Delete all start/stops</source>
-        <translation>Alle Start/Stop löschen</translation>
+        <translation>Alle Start/Stopp löschen</translation>
     </message>
     <message>
         <location filename="dvbcut.cpp" line="2137"/>
@@ -339,7 +339,7 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <location filename="dvbcut.cpp" line="2149"/>
         <source>Convert to stop marker</source>
-        <translation>Umwandeln in STOP-Markierung</translation>
+        <translation>Umwandeln in STOPP-Markierung</translation>
     </message>
     <message>
         <location filename="dvbcut.cpp" line="2153"/>
@@ -497,7 +497,7 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <location filename="dvbcutbase.ui" line="596"/>
         <source>Set stop marker</source>
-        <translation>STOP-Markierung setzen</translation>
+        <translation>STOPP-Markierung setzen</translation>
     </message>
     <message>
         <location filename="dvbcutbase.ui" line="599"/>
@@ -737,31 +737,31 @@ Konnte Datei nicht öffnen</translation>
         <location filename="eventlistmodel.cpp" line="168"/>
         <source>START</source>
         <extracomment>Text shown on start markers in the main window marker list</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="eventlistmodel.cpp" line="170"/>
         <source>STOP</source>
         <extracomment>Text shown on stop markers in the main window marker list</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>STOPP</translation>
     </message>
     <message>
         <location filename="eventlistmodel.cpp" line="172"/>
         <source>CHAPTER</source>
         <extracomment>Text shown on chapter markers in the main window marker list</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>KAPITEL</translation>
     </message>
     <message>
         <location filename="eventlistmodel.cpp" line="174"/>
         <source>BOOKMARK</source>
         <extracomment>Text shown on bookmark markers in the main window marker list</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>LESEZEICHEN</translation>
     </message>
     <message>
         <location filename="eventlistmodel.cpp" line="176"/>
         <source>Unknown</source>
         <extracomment>Text shown on markers of unknown type in the main window marker list</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannt</translation>
     </message>
 </context>
 <context>
