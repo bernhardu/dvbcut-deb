@@ -2,6 +2,24 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de_DE">
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="settings.cpp" line="34"/>
+        <source>Recognized files (*.dvbcut *.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;dvbcut project files (*.dvbcut);;MPEG files (*.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="settings.cpp" line="39"/>
+        <source>dvbcut index files (*.idx);;All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="settings.cpp" line="41"/>
+        <source>dvbcut project files (*.dvbcut);;All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>dvbcut</name>
     <message>
         <location filename="dvbcut.cpp" line="399"/>
