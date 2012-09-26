@@ -2,24 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de_DE">
 <context>
-    <name>QObject</name>
-    <message>
-        <location filename="settings.cpp" line="34"/>
-        <source>Recognized files (*.dvbcut *.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;dvbcut project files (*.dvbcut);;MPEG files (*.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;All files (*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="settings.cpp" line="39"/>
-        <source>dvbcut index files (*.idx);;All files (*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="settings.cpp" line="41"/>
-        <source>dvbcut project files (*.dvbcut);;All files (*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>dvbcut</name>
     <message>
         <location filename="dvbcut.cpp" line="399"/>
@@ -28,7 +10,6 @@
 (assuming No)
 </source>
         <extracomment>Question during batch processing - print the prompt and tell the user that you assume the answer is No.</extracomment>
-        <translatorcomment>Kontext unbekannt (assuming = vorausgesetzt)</translatorcomment>
         <translation>%1
 %2
 (vermutlich nicht)</translation>
@@ -293,7 +274,6 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <location filename="dvbcut.cpp" line="1698"/>
         <source>Chapter list</source>
-        <translatorcomment>oder Kapitelliste</translatorcomment>
         <translation>Kapitel-Liste</translation>
     </message>
     <message>
@@ -315,7 +295,6 @@ Konnte Datei nicht öffnen</translation>
         <location filename="dvbcut.cpp" line="2129"/>
         <source>Mass delete</source>
         <extracomment>Submenu containing mass delete actions</extracomment>
-        <translatorcomment>oder : Massenweise, Auswahl</translatorcomment>
         <translation>Mengen löschen</translation>
     </message>
     <message>
@@ -431,7 +410,6 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <location filename="dvbcutbase.ui" line="476"/>
         <source>New</source>
-        <translatorcomment>Öffnet neue leere Instanz...</translatorcomment>
         <translation>Neu</translation>
     </message>
     <message>
@@ -447,7 +425,6 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <location filename="dvbcutbase.ui" line="502"/>
         <source>&amp;Save</source>
-        <translatorcomment>speichert ausschließlich Projektdateien!?!</translatorcomment>
         <translation>&amp;Speichern</translation>
     </message>
     <message>
@@ -458,7 +435,6 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <location filename="dvbcutbase.ui" line="518"/>
         <source>Save &amp;As...</source>
-        <translatorcomment>speichert ausschließlich Projektdateien!?!</translatorcomment>
         <translation>Speichern &amp;unter...</translation>
     </message>
     <message>
@@ -474,7 +450,6 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <location filename="dvbcutbase.ui" line="542"/>
         <source>Save Chapter Snapshots</source>
-        <translatorcomment>Auch: Bildschirmfoto,Schnappschuss</translatorcomment>
         <translation>Kapitel-Schnappschuss speichern</translation>
     </message>
     <message>
@@ -565,7 +540,6 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <location filename="dvbcutbase.ui" line="659"/>
         <source>Import bookmarks</source>
-        <translatorcomment>Auch: Lesezeichen, Sprungmarke</translatorcomment>
         <translation>Lesezeichen importieren</translation>
     </message>
     <message>
