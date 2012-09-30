@@ -4,7 +4,22 @@
 <context>
     <name>dvbcut</name>
     <message>
-        <location filename="dvbcut.cpp" line="399"/>
+        <location filename="dvbcut.cpp" line="47"/>
+        <source>Recognized files (*.dvbcut *.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;dvbcut project files (*.dvbcut);;MPEG files (*.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dvbcut.cpp" line="52"/>
+        <source>dvbcut index files (*.idx);;All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dvbcut.cpp" line="54"/>
+        <source>dvbcut project files (*.dvbcut);;All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dvbcut.cpp" line="409"/>
         <source>%1
 %2
 (assuming No)
@@ -15,7 +30,7 @@
 (vermutlich nicht)</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="409"/>
+        <location filename="dvbcut.cpp" line="419"/>
         <source>%1
 %2
 (aborting)
@@ -27,27 +42,27 @@
 </translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="484"/>
+        <location filename="dvbcut.cpp" line="494"/>
         <source>Choose the name of the picture file</source>
         <translation>Bilddatei speichern</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="487"/>
+        <location filename="dvbcut.cpp" line="497"/>
         <source>Images (*.%1)</source>
         <extracomment>Placeholder will be replaced with file extension</extracomment>
         <translation>Bilddateien (*.%1)</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="493"/>
-        <location filename="dvbcut.cpp" line="1382"/>
-        <location filename="dvbcut.cpp" line="1561"/>
+        <location filename="dvbcut.cpp" line="503"/>
+        <location filename="dvbcut.cpp" line="1392"/>
+        <location filename="dvbcut.cpp" line="1571"/>
         <source>File exists - dvbcut</source>
         <translation>Datei vorhanden - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="495"/>
-        <location filename="dvbcut.cpp" line="1383"/>
-        <location filename="dvbcut.cpp" line="1562"/>
+        <location filename="dvbcut.cpp" line="505"/>
+        <location filename="dvbcut.cpp" line="1393"/>
+        <location filename="dvbcut.cpp" line="1572"/>
         <source>%1
 already exists. Overwrite?</source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
@@ -55,37 +70,37 @@ already exists. Overwrite?</source>
 Vorhandene Datei überschreiben? </translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="614"/>
-        <location filename="dvbcut.cpp" line="659"/>
+        <location filename="dvbcut.cpp" line="624"/>
+        <location filename="dvbcut.cpp" line="669"/>
         <source>dvbcut</source>
         <translation>DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="615"/>
+        <location filename="dvbcut.cpp" line="625"/>
         <source>&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;span style=&quot;font-family: Helvetica,Arial,sans-serif;&quot;&gt;&lt;p&gt;dvbcut Version %1&lt;/p&gt;eMail: &lt;a href=&quot;mailto:dvbcut-user@lists.sourceforge.net?subject=Comment%20about%20dvbcut&quot;&gt;dvbcut-user@lists.sourceforge.net&lt;/a&gt;&lt;/p&gt;&lt;p&gt;This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.&lt;/p&gt;&lt;p&gt;You should have received a copy of the GNU General Public License along with this program; if not, see &lt;a href=&quot;http://www.gnu.org/licenses/&quot;&gt;http://www.gnu.org/licenses/&lt;/a&gt;.&lt;/p&gt;&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="660"/>
+        <location filename="dvbcut.cpp" line="670"/>
         <source>Help file %1 not available</source>
         <translation>Hilfedatei
 %1
 nicht vorhanden</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="779"/>
+        <location filename="dvbcut.cpp" line="789"/>
         <source>Choose one or more MPEG files to open</source>
         <translation>MPEG-Datei(en) oder Projektdatei öffnen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="894"/>
-        <location filename="dvbcut.cpp" line="952"/>
-        <location filename="dvbcut.cpp" line="961"/>
+        <location filename="dvbcut.cpp" line="904"/>
+        <location filename="dvbcut.cpp" line="962"/>
+        <location filename="dvbcut.cpp" line="971"/>
         <source>Failed to read project file - dvbcut</source>
         <translation>Konnte Projektdatei nicht lesen - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="896"/>
+        <location filename="dvbcut.cpp" line="906"/>
         <source>%1:
 Not a valid dvbcut project file</source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
@@ -93,7 +108,7 @@ Not a valid dvbcut project file</source>
 Keine gültige DVBcut-Projektdatei</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="954"/>
+        <location filename="dvbcut.cpp" line="964"/>
         <source>%1:
 No MPEG filename given in project file</source>
         <extracomment>Placeholder will be replaced with project filename</extracomment>
@@ -101,34 +116,34 @@ No MPEG filename given in project file</source>
 Projektdatei enthält keine MPEG-Dateinamen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="988"/>
-        <location filename="dvbcut.cpp" line="1042"/>
+        <location filename="dvbcut.cpp" line="998"/>
+        <location filename="dvbcut.cpp" line="1052"/>
         <source>Failed to open file - dvbcut</source>
         <translation>Konnte Datei nicht öffnen - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1010"/>
+        <location filename="dvbcut.cpp" line="1020"/>
         <source>Choose the name of the index file</source>
         <translation>Indexdatei auswählen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1049"/>
+        <location filename="dvbcut.cpp" line="1059"/>
         <source>Invalid index file - dvbcut</source>
         <translation>Ungültige Indexdatei - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1057"/>
+        <location filename="dvbcut.cpp" line="1067"/>
         <source>Index file mismatch - dvbcut</source>
         <extracomment>The index file belongs to another MPEG file</extracomment>
         <translation>Fehlerhafte Indexdatei - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1084"/>
+        <location filename="dvbcut.cpp" line="1094"/>
         <source>Error creating index - dvbcut</source>
         <translation>Fehler beim Indexieren - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1086"/>
+        <location filename="dvbcut.cpp" line="1096"/>
         <source>Cannot create index for
 %1:
 %2</source>
@@ -138,17 +153,17 @@ Projektdatei enthält keine MPEG-Dateinamen</translation>
 %2</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1090"/>
+        <location filename="dvbcut.cpp" line="1100"/>
         <source>Error saving index file - dvbcut</source>
         <translation>Fehler beim Speichern der Indexdatei - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1097"/>
+        <location filename="dvbcut.cpp" line="1107"/>
         <source>Invalid MPEG file - dvbcut</source>
         <translation>Ungültige MPEG-Datei - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1099"/>
+        <location filename="dvbcut.cpp" line="1109"/>
         <source>The chosen file
 %1
 does not contain any video</source>
@@ -158,12 +173,12 @@ does not contain any video</source>
 enthält keine Videodaten</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1302"/>
+        <location filename="dvbcut.cpp" line="1312"/>
         <source>Failed to write project file - dvbcut</source>
         <translation>Konnte Projektdatei nicht speichern - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1304"/>
+        <location filename="dvbcut.cpp" line="1314"/>
         <source>%1:
 Could not open file</source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
@@ -171,38 +186,38 @@ Could not open file</source>
 Konnte Datei nicht öffnen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1374"/>
+        <location filename="dvbcut.cpp" line="1384"/>
         <source>Choose the name of the project file</source>
         <translation>Projektdatei speichern</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1437"/>
+        <location filename="dvbcut.cpp" line="1447"/>
         <source>MPEG program stream/DVD (DVBCUT multiplexer)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1438"/>
+        <location filename="dvbcut.cpp" line="1448"/>
         <source>MPEG program stream (DVBCUT multiplexer)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1439"/>
+        <location filename="dvbcut.cpp" line="1449"/>
         <source>MPEG program stream/DVD (libavformat)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1440"/>
+        <location filename="dvbcut.cpp" line="1450"/>
         <source>MPEG transport stream (libavformat)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1532"/>
-        <location filename="dvbcut.cpp" line="1678"/>
+        <location filename="dvbcut.cpp" line="1542"/>
+        <location filename="dvbcut.cpp" line="1688"/>
         <source>Command not found - dvbcut</source>
         <translation>Befehl nicht gefunden - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1534"/>
+        <location filename="dvbcut.cpp" line="1544"/>
         <source>Problems with piped output to:
 %1</source>
         <extracomment>Placeholder will be replaced with pipe command</extracomment>
@@ -210,12 +225,12 @@ Konnte Datei nicht öffnen</translation>
 %1</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1614"/>
+        <location filename="dvbcut.cpp" line="1624"/>
         <source>Unable to set up muxer!</source>
         <translation>Kann den Muxer nicht einrichten!</translation>
     </message>
     <message numerus="yes">
-        <location filename="dvbcut.cpp" line="1637"/>
+        <location filename="dvbcut.cpp" line="1647"/>
         <source>%1. Exporting %n pictures: %2 .. %3</source>
         <extracomment>Example: 1. Exporting 600 pictures: 00:05:45.240/00 .. 00:06:09.240/00</extracomment>
         <translation>
@@ -224,7 +239,7 @@ Konnte Datei nicht öffnen</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="dvbcut.cpp" line="1648"/>
+        <location filename="dvbcut.cpp" line="1658"/>
         <source>Saved %n pictures (%1:%2:%3.%4)</source>
         <extracomment>Example: Saved 3627 pictures (00:02:25.80)</extracomment>
         <translation>
@@ -233,13 +248,13 @@ Konnte Datei nicht öffnen</translation>
         </translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1674"/>
+        <location filename="dvbcut.cpp" line="1684"/>
         <source>Performing post processing</source>
         <translatorcomment> </translatorcomment>
         <translation>Führe die Nachbearbeitung aus</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1680"/>
+        <location filename="dvbcut.cpp" line="1690"/>
         <source>Problems with post processing command:
 %1</source>
         <extracomment>Placeholder will be replaced with pipe command</extracomment>
@@ -247,17 +262,17 @@ Konnte Datei nicht öffnen</translation>
 %1</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1681"/>
+        <location filename="dvbcut.cpp" line="1691"/>
         <source>Command not found!</source>
         <translation>Befehl nicht gefunden!</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1685"/>
+        <location filename="dvbcut.cpp" line="1695"/>
         <source>Post processing error - dvbcut</source>
         <translation>Fehler bei der Nachbearbeitung - DVBcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1687"/>
+        <location filename="dvbcut.cpp" line="1697"/>
         <source>Post processing command:
 %2
  returned non-zero exit code: %1</source>
@@ -267,89 +282,89 @@ Konnte Datei nicht öffnen</translation>
  mit Rückgabewert ungleich 0: %1</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1688"/>
+        <location filename="dvbcut.cpp" line="1698"/>
         <source>Command reported some problems... please check!</source>
         <translation>Der Befehl meldete Probleme... Bitte überprüfen!</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1698"/>
+        <location filename="dvbcut.cpp" line="1708"/>
         <source>Chapter list</source>
         <translation>Kapitel-Liste</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1709"/>
+        <location filename="dvbcut.cpp" line="1719"/>
         <source>Simple XML-file for dvdauthor with chapter marks</source>
         <translation>Einfache XML-Datei für dvdauthor mit Kapitelmarkierungen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2126"/>
+        <location filename="dvbcut.cpp" line="2136"/>
         <source>Go to</source>
         <translation>Gehe zu Position</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2127"/>
+        <location filename="dvbcut.cpp" line="2137"/>
         <source>Delete</source>
         <translation>Marker löschen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2129"/>
+        <location filename="dvbcut.cpp" line="2139"/>
         <source>Mass delete</source>
         <extracomment>Submenu containing mass delete actions</extracomment>
         <translation>Mengen löschen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2130"/>
+        <location filename="dvbcut.cpp" line="2140"/>
         <source>Delete others</source>
         <translation>Alle anderen löschen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2135"/>
+        <location filename="dvbcut.cpp" line="2145"/>
         <source>Delete all</source>
         <translation>Alle löschen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2136"/>
+        <location filename="dvbcut.cpp" line="2146"/>
         <source>Delete all start/stops</source>
         <translation>Alle Start/Stopp löschen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2137"/>
+        <location filename="dvbcut.cpp" line="2147"/>
         <source>Delete all chapters</source>
         <translation>Alle Kapitel löschen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2138"/>
+        <location filename="dvbcut.cpp" line="2148"/>
         <source>Delete all bookmarks</source>
         <translation>Alle Lesezeichen löschen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2142"/>
+        <location filename="dvbcut.cpp" line="2152"/>
         <source>Convert</source>
         <extracomment>Submenu containing convert actions</extracomment>
         <translation>Umwandeln</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2145"/>
+        <location filename="dvbcut.cpp" line="2155"/>
         <source>Convert to start marker</source>
         <translation>Umwandeln in START-Markierung</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2149"/>
+        <location filename="dvbcut.cpp" line="2159"/>
         <source>Convert to stop marker</source>
         <translation>Umwandeln in STOPP-Markierung</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2153"/>
+        <location filename="dvbcut.cpp" line="2163"/>
         <source>Convert to chapter marker</source>
         <translation>Umwandeln in KAPITEL-Markierung</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2157"/>
+        <location filename="dvbcut.cpp" line="2167"/>
         <source>Convert to bookmark</source>
         <translation>Umwandeln in Lesezeichen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2160"/>
+        <location filename="dvbcut.cpp" line="2170"/>
         <source>Display difference from this picture</source>
         <translation>Zeige Abweichungen zu aktuellem Bild</translation>
     </message>
@@ -810,27 +825,27 @@ Konnte Datei nicht öffnen</translation>
 <context>
     <name>helpDialog</name>
     <message>
-        <location filename="dvbcut.cpp" line="86"/>
+        <location filename="dvbcut.cpp" line="96"/>
         <source>Prev</source>
         <translation>Vorheriges</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="87"/>
+        <location filename="dvbcut.cpp" line="97"/>
         <source>Next</source>
         <translation>Nächstes</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="88"/>
+        <location filename="dvbcut.cpp" line="98"/>
         <source>Home</source>
         <translation>Anfang</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="89"/>
+        <location filename="dvbcut.cpp" line="99"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="104"/>
+        <location filename="dvbcut.cpp" line="114"/>
         <source>dvbcut help</source>
         <translation>Hilfe zu DVBcut</translation>
     </message>

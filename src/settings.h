@@ -46,9 +46,6 @@ public:
 
   QString lastdir;
   bool lastdir_update;
-  QString idxfilter;
-  QString prjfilter;
-  QString loadfilter;
   std::vector<std::pair<std::list<std::string>,std::string> > recentfiles;
   unsigned int recentfiles_max;
   double viewscalefactor;

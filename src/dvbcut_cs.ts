@@ -4,7 +4,7 @@
 <context>
     <name>dvbcut</name>
     <message>
-        <location filename="dvbcut.cpp" line="399"/>
+        <location filename="dvbcut.cpp" line="409"/>
         <source>%1
 %2
 (assuming No)
@@ -15,7 +15,7 @@
 (volím Ne)</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="409"/>
+        <location filename="dvbcut.cpp" line="419"/>
         <source>%1
 %2
 (aborting)
@@ -26,27 +26,27 @@
 (končím)</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="484"/>
+        <location filename="dvbcut.cpp" line="494"/>
         <source>Choose the name of the picture file</source>
         <translation>Zvolte název pro soubor s obrázkem</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="487"/>
+        <location filename="dvbcut.cpp" line="497"/>
         <source>Images (*.%1)</source>
         <extracomment>Placeholder will be replaced with file extension</extracomment>
         <translation>Obrázky (*.%1)</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="493"/>
-        <location filename="dvbcut.cpp" line="1382"/>
-        <location filename="dvbcut.cpp" line="1561"/>
+        <location filename="dvbcut.cpp" line="503"/>
+        <location filename="dvbcut.cpp" line="1392"/>
+        <location filename="dvbcut.cpp" line="1571"/>
         <source>File exists - dvbcut</source>
         <translation>Soubor existuje - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="495"/>
-        <location filename="dvbcut.cpp" line="1383"/>
-        <location filename="dvbcut.cpp" line="1562"/>
+        <location filename="dvbcut.cpp" line="505"/>
+        <location filename="dvbcut.cpp" line="1393"/>
+        <location filename="dvbcut.cpp" line="1572"/>
         <source>%1
 already exists. Overwrite?</source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
@@ -54,36 +54,36 @@ already exists. Overwrite?</source>
 již existuje. Přepsat?</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="614"/>
-        <location filename="dvbcut.cpp" line="659"/>
+        <location filename="dvbcut.cpp" line="624"/>
+        <location filename="dvbcut.cpp" line="669"/>
         <source>dvbcut</source>
         <translation>dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="615"/>
+        <location filename="dvbcut.cpp" line="625"/>
         <source>&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;span style=&quot;font-family: Helvetica,Arial,sans-serif;&quot;&gt;&lt;p&gt;dvbcut Version %1&lt;/p&gt;eMail: &lt;a href=&quot;mailto:dvbcut-user@lists.sourceforge.net?subject=Comment%20about%20dvbcut&quot;&gt;dvbcut-user@lists.sourceforge.net&lt;/a&gt;&lt;/p&gt;&lt;p&gt;This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.&lt;/p&gt;&lt;p&gt;You should have received a copy of the GNU General Public License along with this program; if not, see &lt;a href=&quot;http://www.gnu.org/licenses/&quot;&gt;http://www.gnu.org/licenses/&lt;/a&gt;.&lt;/p&gt;&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;span style=&quot;font-family: Helvetica,Arial,sans-serif;&quot;&gt;&lt;p&gt;dvbcut Verze %1&lt;/p&gt;email: &lt;a href=&quot;mailto:dvbcut-user@lists.sourceforge.net?subject=Comment%20about%20dvbcut&quot;&gt;dvbcut-user@lists.sourceforge.net&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Tento program je svobodný software; můžete jej šířit a modifikovat
 podle ustanovení GNU General Public License, vydávané Free Software Foundation; a to buď verze 2 této licence anebo (podle vašeho uvážení) kterékoli pozdější verze. Tento program je rozšiřován v naději, že bude užitečný, avšak BEZ JAKÉKOLI ZÁRUKY; neposkytují se ani odvozené záruky PRODEJNOSTI anebo VHODNOSTI PRO URČITÝ ÚČEL. Další podrobnosti hledejte ve GNU General Public License.&lt;/p&gt;&lt;p&gt;Kopii GNU General Public License jste měli obdržet spolu s tímto programem; pokud se tak nestalo, navštivte &lt;a href=&quot;http://www.gnu.org/licenses/&quot;&gt;http://www.gnu.org/licenses/&lt;/a&gt;.&lt;/p&gt;&lt;/span&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="660"/>
+        <location filename="dvbcut.cpp" line="670"/>
         <source>Help file %1 not available</source>
         <translation>Soubor nápovědy %1 není dostupný</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="779"/>
+        <location filename="dvbcut.cpp" line="789"/>
         <source>Choose one or more MPEG files to open</source>
         <translation>Vyberte jeden nebo více MPEG souborů k otevření</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="894"/>
-        <location filename="dvbcut.cpp" line="952"/>
-        <location filename="dvbcut.cpp" line="961"/>
+        <location filename="dvbcut.cpp" line="904"/>
+        <location filename="dvbcut.cpp" line="962"/>
+        <location filename="dvbcut.cpp" line="971"/>
         <source>Failed to read project file - dvbcut</source>
         <translation>Selhalo čtení souboru s projektem - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="896"/>
+        <location filename="dvbcut.cpp" line="906"/>
         <source>%1:
 Not a valid dvbcut project file</source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
@@ -91,7 +91,7 @@ Not a valid dvbcut project file</source>
 Není platný soubor dvbcut projektu</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="954"/>
+        <location filename="dvbcut.cpp" line="964"/>
         <source>%1:
 No MPEG filename given in project file</source>
         <extracomment>Placeholder will be replaced with project filename</extracomment>
@@ -99,34 +99,34 @@ No MPEG filename given in project file</source>
 Soubor projektu neobsahuje žádný název MPEG souboru</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="988"/>
-        <location filename="dvbcut.cpp" line="1042"/>
+        <location filename="dvbcut.cpp" line="998"/>
+        <location filename="dvbcut.cpp" line="1052"/>
         <source>Failed to open file - dvbcut</source>
         <translation>Otevírání souboru selhalo</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1010"/>
+        <location filename="dvbcut.cpp" line="1020"/>
         <source>Choose the name of the index file</source>
         <translation>Zvolte název pro indexový soubor</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1049"/>
+        <location filename="dvbcut.cpp" line="1059"/>
         <source>Invalid index file - dvbcut</source>
         <translation>Neplatný indexový soubor - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1057"/>
+        <location filename="dvbcut.cpp" line="1067"/>
         <source>Index file mismatch - dvbcut</source>
         <extracomment>The index file belongs to another MPEG file</extracomment>
         <translation>Indexový soubor neodpovídá - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1084"/>
+        <location filename="dvbcut.cpp" line="1094"/>
         <source>Error creating index - dvbcut</source>
         <translation>Chyba při vytváření indexu - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1086"/>
+        <location filename="dvbcut.cpp" line="1096"/>
         <source>Cannot create index for
 %1:
 %2</source>
@@ -136,17 +136,17 @@ Soubor projektu neobsahuje žádný název MPEG souboru</translation>
 %2</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1090"/>
+        <location filename="dvbcut.cpp" line="1100"/>
         <source>Error saving index file - dvbcut</source>
         <translation>Chyba při ukládání indexového souboru - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1097"/>
+        <location filename="dvbcut.cpp" line="1107"/>
         <source>Invalid MPEG file - dvbcut</source>
         <translation>Neplatný MPEG soubor - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1099"/>
+        <location filename="dvbcut.cpp" line="1109"/>
         <source>The chosen file
 %1
 does not contain any video</source>
@@ -156,12 +156,12 @@ does not contain any video</source>
 neobsahuje video</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1302"/>
+        <location filename="dvbcut.cpp" line="1312"/>
         <source>Failed to write project file - dvbcut</source>
         <translation>Chyba při ukládání souboru s projektem - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1304"/>
+        <location filename="dvbcut.cpp" line="1314"/>
         <source>%1:
 Could not open file</source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
@@ -169,32 +169,32 @@ Could not open file</source>
 Nepodařilo se otevřít soubor</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1374"/>
+        <location filename="dvbcut.cpp" line="1384"/>
         <source>Choose the name of the project file</source>
         <translation>Zvolte název pro soubor s projektem</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1437"/>
+        <location filename="dvbcut.cpp" line="1447"/>
         <source>MPEG program stream/DVD (DVBCUT multiplexer)</source>
         <translation>Programový proud MPEG/DVD (DVBCUT multiplexer)</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1438"/>
+        <location filename="dvbcut.cpp" line="1448"/>
         <source>MPEG program stream (DVBCUT multiplexer)</source>
         <translation>Programový proud MPEG (DVBCUT multiplexer)</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1439"/>
+        <location filename="dvbcut.cpp" line="1449"/>
         <source>MPEG program stream/DVD (libavformat)</source>
         <translation>Programový proud MPEG/DVD (libavformat)</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1440"/>
+        <location filename="dvbcut.cpp" line="1450"/>
         <source>MPEG transport stream (libavformat)</source>
         <translation>Transportní proud MPEG (libavformat)</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1534"/>
+        <location filename="dvbcut.cpp" line="1544"/>
         <source>Problems with piped output to:
 %1</source>
         <extracomment>Placeholder will be replaced with pipe command</extracomment>
@@ -202,18 +202,33 @@ Nepodařilo se otevřít soubor</translation>
 %1</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1532"/>
-        <location filename="dvbcut.cpp" line="1678"/>
+        <location filename="dvbcut.cpp" line="1542"/>
+        <location filename="dvbcut.cpp" line="1688"/>
         <source>Command not found - dvbcut</source>
         <translation>Příkaz nenalezen - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1614"/>
+        <location filename="dvbcut.cpp" line="47"/>
+        <source>Recognized files (*.dvbcut *.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;dvbcut project files (*.dvbcut);;MPEG files (*.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;All files (*)</source>
+        <translation>Známé soubory (*.dvbcut *.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;Projektové soubory Dvbcut (*.dvbcut);;MPEG soubory (*.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;Všechny soubory (*)</translation>
+    </message>
+    <message>
+        <location filename="dvbcut.cpp" line="52"/>
+        <source>dvbcut index files (*.idx);;All files (*)</source>
+        <translation>Indexové soubory Dvbcut (*.idx);;Všechny soubory (*)</translation>
+    </message>
+    <message>
+        <location filename="dvbcut.cpp" line="54"/>
+        <source>dvbcut project files (*.dvbcut);;All files (*)</source>
+        <translation>Projektové soubory Dvbcut (*.dvbcut);;Všechny soubory (*)</translation>
+    </message>
+    <message>
+        <location filename="dvbcut.cpp" line="1624"/>
         <source>Unable to set up muxer!</source>
         <translation>Selhala inicializace muxeru!</translation>
     </message>
     <message numerus="yes">
-        <location filename="dvbcut.cpp" line="1637"/>
+        <location filename="dvbcut.cpp" line="1647"/>
         <source>%1. Exporting %n pictures: %2 .. %3</source>
         <extracomment>Example: 1. Exporting 600 pictures: 00:05:45.240/00 .. 00:06:09.240/00</extracomment>
         <translation>
@@ -223,7 +238,7 @@ Nepodařilo se otevřít soubor</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="dvbcut.cpp" line="1648"/>
+        <location filename="dvbcut.cpp" line="1658"/>
         <source>Saved %n pictures (%1:%2:%3.%4)</source>
         <extracomment>Example: Saved 3627 pictures (00:02:25.80)</extracomment>
         <translation>
@@ -233,12 +248,12 @@ Nepodařilo se otevřít soubor</translation>
         </translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1674"/>
+        <location filename="dvbcut.cpp" line="1684"/>
         <source>Performing post processing</source>
         <translation>Provádím postprocessing</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1680"/>
+        <location filename="dvbcut.cpp" line="1690"/>
         <source>Problems with post processing command:
 %1</source>
         <extracomment>Placeholder will be replaced with pipe command</extracomment>
@@ -246,17 +261,17 @@ Nepodařilo se otevřít soubor</translation>
 %1</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1681"/>
+        <location filename="dvbcut.cpp" line="1691"/>
         <source>Command not found!</source>
         <translation>Příkaz nenalezen!</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1685"/>
+        <location filename="dvbcut.cpp" line="1695"/>
         <source>Post processing error - dvbcut</source>
         <translation>Chyba při postprocessingu - dvbcut</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1687"/>
+        <location filename="dvbcut.cpp" line="1697"/>
         <source>Post processing command:
 %2
  returned non-zero exit code: %1</source>
@@ -266,89 +281,89 @@ Nepodařilo se otevřít soubor</translation>
 vrátil nenulový návratový kód: %1</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1688"/>
+        <location filename="dvbcut.cpp" line="1698"/>
         <source>Command reported some problems... please check!</source>
         <translation>Příkaz ohlásil problémy... prosím zkontrolujte!</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1698"/>
+        <location filename="dvbcut.cpp" line="1708"/>
         <source>Chapter list</source>
         <translation>Seznam kapitol</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="1709"/>
+        <location filename="dvbcut.cpp" line="1719"/>
         <source>Simple XML-file for dvdauthor with chapter marks</source>
         <translation>Jednoduchý XML soubor pro dvdauthor se značkami kapitol</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2126"/>
+        <location filename="dvbcut.cpp" line="2136"/>
         <source>Go to</source>
         <translation>Přejít na</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2127"/>
+        <location filename="dvbcut.cpp" line="2137"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2129"/>
+        <location filename="dvbcut.cpp" line="2139"/>
         <source>Mass delete</source>
         <extracomment>Submenu containing mass delete actions</extracomment>
         <translation>Hromadné mazání</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2130"/>
+        <location filename="dvbcut.cpp" line="2140"/>
         <source>Delete others</source>
         <translation>Smazat ostatní</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2135"/>
+        <location filename="dvbcut.cpp" line="2145"/>
         <source>Delete all</source>
         <translation>Smazat vše</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2136"/>
+        <location filename="dvbcut.cpp" line="2146"/>
         <source>Delete all start/stops</source>
         <translation>Smazat značky start/stop</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2137"/>
+        <location filename="dvbcut.cpp" line="2147"/>
         <source>Delete all chapters</source>
         <translation>Smazat značky kapitol</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2138"/>
+        <location filename="dvbcut.cpp" line="2148"/>
         <source>Delete all bookmarks</source>
         <translation>Smazat záložky</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2142"/>
+        <location filename="dvbcut.cpp" line="2152"/>
         <source>Convert</source>
         <extracomment>Submenu containing convert actions</extracomment>
         <translation>Konverze</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2145"/>
+        <location filename="dvbcut.cpp" line="2155"/>
         <source>Convert to start marker</source>
         <translation>Konvertovat na značku start</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2149"/>
+        <location filename="dvbcut.cpp" line="2159"/>
         <source>Convert to stop marker</source>
         <translation>Konvertovat na značku stop</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2153"/>
+        <location filename="dvbcut.cpp" line="2163"/>
         <source>Convert to chapter marker</source>
         <translation>Konvertovat na značku kapitoly</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2157"/>
+        <location filename="dvbcut.cpp" line="2167"/>
         <source>Convert to bookmark</source>
         <translation>Konvertovat na záložku</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="2160"/>
+        <location filename="dvbcut.cpp" line="2170"/>
         <source>Display difference from this picture</source>
         <translation>Zobrazit rozdíl proti tomuto snímku</translation>
     </message>
@@ -725,31 +740,31 @@ vrátil nenulový návratový kód: %1</translation>
 <context>
     <name>eventlist</name>
     <message>
-        <location filename="eventlistmodel.cpp" line="169"/>
+        <location filename="eventlistmodel.cpp" line="168"/>
         <source>START</source>
         <extracomment>Text shown on start markers in the main window marker list</extracomment>
         <translation>START</translation>
     </message>
     <message>
-        <location filename="eventlistmodel.cpp" line="171"/>
+        <location filename="eventlistmodel.cpp" line="170"/>
         <source>STOP</source>
         <extracomment>Text shown on stop markers in the main window marker list</extracomment>
         <translation>STOP</translation>
     </message>
     <message>
-        <location filename="eventlistmodel.cpp" line="173"/>
+        <location filename="eventlistmodel.cpp" line="172"/>
         <source>CHAPTER</source>
         <extracomment>Text shown on chapter markers in the main window marker list</extracomment>
         <translation>KAPITOLA</translation>
     </message>
     <message>
-        <location filename="eventlistmodel.cpp" line="175"/>
+        <location filename="eventlistmodel.cpp" line="174"/>
         <source>BOOKMARK</source>
         <extracomment>Text shown on bookmark markers in the main window marker list</extracomment>
         <translation>ZÁLOŽKA</translation>
     </message>
     <message>
-        <location filename="eventlistmodel.cpp" line="177"/>
+        <location filename="eventlistmodel.cpp" line="176"/>
         <source>Unknown</source>
         <extracomment>Text shown on markers of unknown type in the main window marker list</extracomment>
         <translation>Neznámé</translation>
@@ -809,27 +824,27 @@ vrátil nenulový návratový kód: %1</translation>
 <context>
     <name>helpDialog</name>
     <message>
-        <location filename="dvbcut.cpp" line="86"/>
+        <location filename="dvbcut.cpp" line="96"/>
         <source>Prev</source>
         <translation>Zpět</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="87"/>
+        <location filename="dvbcut.cpp" line="97"/>
         <source>Next</source>
         <translation>Vpřed</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="88"/>
+        <location filename="dvbcut.cpp" line="98"/>
         <source>Home</source>
         <translation>Domů</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="89"/>
+        <location filename="dvbcut.cpp" line="99"/>
         <source>Close</source>
         <translation>Zavřít</translation>
     </message>
     <message>
-        <location filename="dvbcut.cpp" line="104"/>
+        <location filename="dvbcut.cpp" line="114"/>
         <source>dvbcut help</source>
         <translation>Nápověda dvbcut</translation>
     </message>
