@@ -6,17 +6,17 @@
     <message>
         <location filename="dvbcut.cpp" line="47"/>
         <source>Recognized files (*.dvbcut *.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;dvbcut project files (*.dvbcut);;MPEG files (*.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekannte Formate (*.dvbcut *.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;DVBcut-Projektdateien (*.dvbcut);;MPEG-Dateien (*.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;Alle Dateien (*)</translation>
     </message>
     <message>
         <location filename="dvbcut.cpp" line="52"/>
         <source>dvbcut index files (*.idx);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>DVBcut-Indexdateien (*.idx);;Alle Dateien (*)</translation>
     </message>
     <message>
         <location filename="dvbcut.cpp" line="54"/>
         <source>dvbcut project files (*.dvbcut);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>DVBcut-Projektdateien (*.dvbcut);;Alle Dateien (*)</translation>
     </message>
     <message>
         <location filename="dvbcut.cpp" line="409"/>
