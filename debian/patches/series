@@ -1,4 +1,3 @@
-libav9.patch
 libav10.patch
 bug753347_initialize-pkt-variable-in-mpgfile__recodevideo-to-avoid-crash.patch
 715843_do-not-access-argv-beyond-last-item.patch

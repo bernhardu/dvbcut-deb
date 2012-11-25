@@ -24,7 +24,8 @@
 #include <string>
 
 extern "C" {
-#include <avcodec.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/mem.h>
 }
 
 class stream
@@ -52,8 +53,8 @@ protected:
     {
     if (avcc)
       av_free(avcc);
-    avcc=avcodec_alloc_context();
-    avcodec_get_context_defaults(avcc);
+    avcc=avcodec_alloc_context3(NULL);
+    avcodec_get_context_defaults3(avcc, NULL);
     }
   void setvideoencodingparameters(bool interlaced=false)
     {

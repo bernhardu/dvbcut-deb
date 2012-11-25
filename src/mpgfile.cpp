@@ -115,7 +115,7 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
     sd->discard(idx[streampic].getpos().packetoffset());
   }
 
-  if (int rv=avcodec_open(S->avcc, S->dec))
+  if (int rv=avcodec_open2(S->avcc, S->dec, NULL))
   {
     fprintf(stderr,"avcodec_open returned %d\n",rv);
     return;
@@ -717,7 +717,7 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
     return;
   s[VIDEOSTREAM].setvideoencodingparameters();
 
-  if (int rv=avcodec_open(avcc, s[VIDEOSTREAM].enc))
+  if (int rv=avcodec_open2(avcc, s[VIDEOSTREAM].enc, NULL))
   {
     if (log)
       log->printerror("avcodec_open(mpeg2video_encoder) returned %d",rv);
@@ -741,8 +741,11 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
       f->pts=idx[idx.indexnr(start+p)].getpts()-startpts;
       f->coded_picture_number=f->display_picture_number=p;
       f->key_frame=(p==0)?1:0;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)      
+      f->pict_type=(p==0)?AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
+#else
       f->pict_type=(p==0)?FF_I_TYPE:FF_P_TYPE;
-
+#endif
       out = avcodec_encode_video(avcc, buf,
                                  m2v.getsize(), f);
 

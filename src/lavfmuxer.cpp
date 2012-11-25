@@ -43,9 +43,16 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   if (!avfc)
     return;
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
+// todo: what here ?
+//  maybe: AVFormatContext::audio_preload but no direct access.
+//    AVOptions
+//    iformat
+#else
   avfc->preload= (int)(.5*AV_TIME_BASE);
-  avfc->max_delay= (int)(.7*AV_TIME_BASE);
   avfc->mux_rate=10080000;
+#endif
+  avfc->max_delay= (int)(.7*AV_TIME_BASE);
 
   avfc->oformat=fmt;
   strncpy(avfc->filename, filename, sizeof(avfc->filename));
@@ -53,7 +60,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   int id=0;
 
   st[VIDEOSTREAM].stream_index=id;
-  AVStream *s=st[VIDEOSTREAM].avstr=av_new_stream(avfc,id++);
+  AVStream *s=st[VIDEOSTREAM].avstr=avformat_new_stream(avfc, NULL);
   strpres[VIDEOSTREAM]=true;
   av_free(s->codec);
   mpg.setvideoencodingparameters();
@@ -67,12 +74,12 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
     if (audiostreammask & (1u<<i)) {
       int astr=audiostream(i);
       st[astr].stream_index=id;
-      s=st[astr].avstr=av_new_stream(avfc,id++);
+      s=st[astr].avstr=avformat_new_stream(avfc, NULL);
       strpres[astr]=true;
       if (s->codec)
         av_free(s->codec);
-      s->codec = avcodec_alloc_context();
-      avcodec_get_context_defaults(s->codec);
+      s->codec = avcodec_alloc_context3(NULL);
+      avcodec_get_context_defaults3(s->codec, NULL);
       s->codec->codec_type=AVMEDIA_TYPE_AUDIO;
       s->codec->codec_id = (mpg.getstreamtype(astr)==streamtype::ac3audio) ?
 	CODEC_ID_AC3 : CODEC_ID_MP2;
@@ -87,8 +94,8 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 	  break;
 
 	if (sd->getitemlistsize() > 1) {
-	  if (!avcodec_open(s->codec,
-			    avcodec_find_decoder(s->codec->codec_id))) {
+	  if (!avcodec_open2(s->codec,
+			     avcodec_find_decoder(s->codec->codec_id), NULL)) {
 	    int16_t samples[AVCODEC_MAX_AUDIO_FRAME_SIZE/sizeof(int16_t)];
 	    int frame_size=sizeof(samples);
 	    //fprintf(stderr, "** decode audio size=%d\n", sd->inbytes());
@@ -115,19 +122,36 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
       }
     }
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
+  // error: 'av_set_parameters' was not declared in this scope
+  if (!(fmt->flags & AVFMT_NOFILE)&&(avio_open(&avfc->pb, filename, AVIO_FLAG_WRITE) < 0)) {
+#else
   if ((av_set_parameters(avfc, NULL) < 0) || (!(fmt->flags & AVFMT_NOFILE)&&(url_fopen(&avfc->pb, filename, URL_WRONLY) < 0))) {
+#endif  
     av_free(avfc);
     avfc=0;
     return;
     }
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
+// todo: what here ?
+//  maybe: AVFormatContext::audio_preload but no direct access.
+//    AVOptions
+//    iformat
+#else
   avfc->preload= (int)(.5*AV_TIME_BASE);
-  avfc->max_delay= (int)(.7*AV_TIME_BASE);
   avfc->mux_rate=10080000;
+#endif
+  avfc->max_delay= (int)(.7*AV_TIME_BASE);
 
-
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
+  av_dump_format(avfc, 0, filename, 1);
+  fileopened=true;
+  avformat_write_header(avfc, NULL);
+#else
   dump_format(avfc, 0, filename, 1);
   fileopened=true;
   av_write_header(avfc);
+#endif
   }
 
 
@@ -137,7 +161,9 @@ lavfmuxer::~lavfmuxer()
     if (fileopened) {
       av_write_trailer(avfc);
       if (!(fmt->flags & AVFMT_NOFILE))
-#if LIBAVFORMAT_VERSION_INT >= ((52<<16)+(0<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
+        avio_close(avfc->pb);
+#elif LIBAVFORMAT_VERSION_INT >= ((52<<16)+(0<<8)+0)
         url_fclose(avfc->pb);
 #else
         url_fclose(&avfc->pb);
