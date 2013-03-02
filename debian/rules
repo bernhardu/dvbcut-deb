@@ -13,6 +13,8 @@ CXXFLAGS := $(shell dpkg-buildflags --get CXXFLAGS)
 	dh $@ --buildsystem=autoconf --with=autoreconf
 
 override_dh_auto_configure:
+	ln -sf debian/config.sub
+	ln -sf debian/config.guess
 	dh_auto_configure -- --with-ffmpeg=/usr
 
 override_dh_auto_clean:
@@ -20,6 +22,7 @@ override_dh_auto_clean:
 	rm -rf ffmpeg-patches
 	[ ! -f makefile ] || make -f makefile distclean
 	dh_clean bin/dvbcut dvbcut.desktop src/Makefile src/dvbcut src/qrc_icons.cpp
+	dh_clean config.sub config.guess
 	dh_auto_clean
 
 override_dh_auto_install:
