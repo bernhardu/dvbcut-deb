@@ -2,3 +2,4 @@ port-to-qt4.patch
 fix-ftbfs-libav0.7.patch
 fix_gcc_4.7.patch
 updateimagedisplayfix.patch
+libav9.patch
