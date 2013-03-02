@@ -1,8 +1,13 @@
-dvbcut (0.5.4+svn178-3) UNRELEASED; urgency=low
+dvbcut (0.5.4+svn178-3) experimental; urgency=low
 
-  * start new upload
+  [ Alessio Treglia ]
+  * compile against libav 9
 
- -- Alessio Treglia <alessio@debian.org>  Wed, 25 Apr 2012 01:10:49 +0200
+  [ Reinhard Tartler ]
+  * add patch from rpmfusion to allow compilation against libav9
+  * add missing config.sub and config.guess files
+
+ -- Reinhard Tartler <siretart@tauware.de>  Sat, 02 Mar 2013 20:12:53 +0100
 
 dvbcut (0.5.4+svn178-2) unstable; urgency=low
 
