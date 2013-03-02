@@ -10,13 +10,13 @@ Build-Depends:
  dh-autoreconf,
  liba52-0.7.4-dev,
  libao-dev,
- libavcodec-dev (>> 4:0.7~),
- libavformat-dev (>> 4:0.7~),
- libavutil-dev (>> 4:0.7~),
+ libavcodec-dev (>> 6:9~),
+ libavformat-dev (>> 6:9~),
+ libavutil-dev (>> 6:9~),
  libmad0-dev,
- libpostproc-dev (>> 4:0.7~),
+ libpostproc-dev,
  libqt4-dev,
- libswscale-dev (>> 4:0.7~),
+ libswscale-dev (>> 6:9~),
  pkg-config,
  qt4-dev-tools
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/dvbcut.git
