@@ -42,7 +42,7 @@ progressstatusbar::progressstatusbar(QStatusBar *bar)
 
   cancelbutton=new QPushButton(statusbar);
   cancelbutton->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
-  cancelbutton->setText("cancel");
+  cancelbutton->setText(tr("cancel"));
   cancelbutton->setMaximumWidth(80);
   statusbar->addWidget(cancelbutton,true);
 
@@ -104,3 +104,7 @@ void progressstatusbar::print(const char *fmt, ...)
   qApp->processEvents();
   }
 
+void progressstatusbar::print(const QString &str) {
+	label->setText(str);
+	qApp->processEvents();
+}
