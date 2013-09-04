@@ -1,3 +1,14 @@
+dvbcut (0.5.4+svn178-4) unstable; urgency=low
+
+  * Team upload.
+  * Upload to unstable.
+  * debian/control:
+    - Bump Standards-Version to 3.9.4.
+    - Build-Depends: requires debhelper >= 8.1 for build-{arch,indep} support.
+    - Vcs-*: use anonscm.debian.org.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 04 Sep 2013 16:38:27 +0200
+
 dvbcut (0.5.4+svn178-3) experimental; urgency=low
 
   [ Alessio Treglia ]
