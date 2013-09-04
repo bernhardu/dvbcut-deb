@@ -19,8 +19,8 @@ Build-Depends:
  libswscale-dev (>> 6:9~),
  pkg-config,
  qt4-dev-tools
-Vcs-Git: git://git.debian.org/git/pkg-multimedia/dvbcut.git
-Vcs-Browser: http://git.debian.org/?p=pkg-multimedia/dvbcut.git;a=summary
+Vcs-Git: git://anonscm.debian.org/pkg-multimedia/dvbcut.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-multimedia/dvbcut.git;a=summary
 Homepage: http://dvbcut.sourceforge.net/
 Standards-Version: 3.9.4
 
