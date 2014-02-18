@@ -78,7 +78,7 @@ public:
   int chapter_tolerance;
   double chapter_threshold;
   int chapter_minimum;
-
+  int search_dups_range;
 };
 
 // access function

@@ -490,6 +490,7 @@
     <addaction name="viewNormalAction"/>
     <addaction name="viewUnscaledAction"/>
     <addaction name="viewDifferenceAction"/>
+    <addaction name="searchDuplicateAction"/>
     <addaction name="separator"/>
     <addaction name="zoomInAction"/>
     <addaction name="zoomOutAction"/>
@@ -849,6 +850,17 @@
    </property>
    <property name="name" stdset="0">
     <cstring>viewDifferenceAction</cstring>
+   </property>
+  </action>
+  <action name="searchDuplicateAction">
+   <property name="name" stdset="0">
+    <cstring>searchDuplicateAction</cstring>
+   </property>
+   <property name="shortcut">
+    <string notr="true">F3</string>
+   </property>
+   <property name="text">
+    <string>Search duplicate of current picture</string>
    </property>
   </action>
   <action name="viewFullSizeAction">
@@ -1378,6 +1390,22 @@
    <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>fileSaveAs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>searchDuplicateAction</sender>
+   <signal>triggered()</signal>
+   <receiver>dvbcutbase</receiver>
+   <slot>searchDuplicate()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

@@ -140,6 +140,9 @@ protected:
   void snapshotSave(std::vector<int> piclist, int range=0, int samples=1);
   int chooseBestPicture(int startpic, int range, int smaples);
 
+  void gotoFrame(int frameno);
+  int getNextEvent(int picture);
+
 protected slots:
   virtual void helpAboutAction_activated();
   virtual void helpContentAction_activated();
@@ -183,6 +186,7 @@ public slots:
   virtual void editConvert(editconvertpop_actions options);
   virtual void abouttoshoweditconvert();
   virtual void viewDifference();
+  virtual void searchDuplicate();
   virtual void viewUnscaled();
   virtual void viewNormal();
   virtual void zoomIn();
