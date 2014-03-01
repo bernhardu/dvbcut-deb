@@ -82,7 +82,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
       avcodec_get_context_defaults3(s->codec, NULL);
       s->codec->codec_type=AVMEDIA_TYPE_AUDIO;
       s->codec->codec_id = (mpg.getstreamtype(astr)==streamtype::ac3audio) ?
-	CODEC_ID_AC3 : CODEC_ID_MP2;
+	AV_CODEC_ID_AC3 : AV_CODEC_ID_MP2;
       s->codec->rc_buffer_size = 224*1024*8;
 
       // Must read some packets to get codec parameters
@@ -96,26 +96,18 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 	if (sd->getitemlistsize() > 1) {
 	  if (!avcodec_open2(s->codec,
 			     avcodec_find_decoder(s->codec->codec_id), NULL)) {
-	    int16_t samples[AVCODEC_MAX_AUDIO_FRAME_SIZE/sizeof(int16_t)];
-	    int frame_size=sizeof(samples);
-	    //fprintf(stderr, "** decode audio size=%d\n", sd->inbytes());
-#if LIBAVCODEC_VERSION_INT > ((52<<16)+(25<<8)+0)
+            AVFrame *frame = av_frame_alloc();
 	    AVPacket pkt;
+            int got_output;
+
  	    av_init_packet( &pkt );
 	    pkt.data = (uint8_t*) sd->getdata();
 	    pkt.size = sd->inbytes();
-	    avcodec_decode_audio3
-	      (s->codec,samples,&frame_size, &pkt);
-#else
-#if LIBAVCODEC_VERSION_INT >= ((52<<16)+(0<<8)+0)
-	    avcodec_decode_audio2
-#else
-	    avcodec_decode_audio
-#endif
-	      (s->codec,samples,&frame_size,
-	       (uint8_t*) sd->getdata(),sd->inbytes());
+
+            avcodec_decode_audio4(s->codec, frame, &got_output, &pkt);
+
+            av_frame_free(&frame);
 	    avcodec_close(s->codec);
-#endif
 	  }
 	  break;
 	}
