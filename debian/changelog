@@ -1,3 +1,12 @@
+dvbcut (0.5.4+svn178-5) experimental; urgency=low
+
+  * Fix FTBFS against libav10 (Closes: #739220)
+  * compile against libav10
+  * Bump standards version (no changes needed)
+  * update Recommends on mplayer
+
+ -- Reinhard Tartler <siretart@tauware.de>  Sat, 01 Mar 2014 14:56:05 +0000
+
 dvbcut (0.5.4+svn178-4) unstable; urgency=low
 
   * Team upload.

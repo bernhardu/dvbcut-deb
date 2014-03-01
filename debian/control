@@ -10,19 +10,19 @@ Build-Depends:
  dh-autoreconf,
  liba52-0.7.4-dev,
  libao-dev,
- libavcodec-dev (>> 6:9~),
- libavformat-dev (>> 6:9~),
- libavutil-dev (>> 6:9~),
+ libavcodec-dev (>> 6:10~),
+ libavformat-dev (>> 6:10~),
+ libavutil-dev (>> 6:10~),
  libmad0-dev,
  libpostproc-dev,
  libqt4-dev,
- libswscale-dev (>> 6:9~),
+ libswscale-dev (>> 6:10~),
  pkg-config,
  qt4-dev-tools
 Vcs-Git: git://anonscm.debian.org/pkg-multimedia/dvbcut.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-multimedia/dvbcut.git;a=summary
 Homepage: http://dvbcut.sourceforge.net/
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 
 Package: dvbcut
 Architecture: any
@@ -30,7 +30,7 @@ Depends:
  ${misc:Depends},
  ${shlibs:Depends}
 Recommends:
- mplayer
+ mplayer2 | mpv | mplayer
 Description: Qt application for cutting parts out of DVB streams
  DVBcut is a Qt application that allows you to select certain parts of an
  MPEG transport stream (as received via Digital Video Broadcasting, DVB) and
