@@ -1,10 +1,7 @@
 Source: dvbcut
 Section: graphics
 Priority: optional
-Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
-Uploaders:
- Reinhard Tartler <siretart@tauware.de>,
- Fabrice Coutadeur <coutadeurf@gmail.com>
+Maintainer: Debian QA Group <packages@qa.debian.org>
 Build-Depends:
  debhelper (>= 8.1),
  dh-autoreconf,
@@ -19,8 +16,6 @@ Build-Depends:
  libswscale-dev (>> 6:10~),
  pkg-config,
  qt4-dev-tools
-Vcs-Git: git://anonscm.debian.org/pkg-multimedia/dvbcut.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-multimedia/dvbcut.git;a=summary
 Homepage: http://dvbcut.sourceforge.net/
 Standards-Version: 3.9.5
 
