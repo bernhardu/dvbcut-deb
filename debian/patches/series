@@ -1,4 +1,3 @@
-avoid-PATH_MAX-macro.patch
 772413_set-settings-params.patch
 772346_use-qt4-modifiers-function.patch
 add-mousewheel-modifiers-to-help-page.patch

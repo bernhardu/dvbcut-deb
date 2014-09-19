@@ -2227,10 +2227,10 @@ dvbcut::critical(const QString & caption, const QString & text)
 void
 dvbcut::make_canonical(std::string &filename) {
   if (filename[0] != '/') {
-    char resolved_path[PATH_MAX];
-    char *rp = realpath(filename.c_str(), resolved_path);
+    char *rp = realpath(filename.c_str(), NULL);
     if (rp)
       filename = rp;
+    free(rp);
   }
 }
 
