@@ -1,3 +1,14 @@
+dvbcut (0.5.4+svn178-8) unstable; urgency=medium
+
+  * Fix crash on export video (Closes: #753347)
+  * Fix crash when calling with malformed parameters (Closes: #715843)
+  * Fix playing audio with mplayer2 (Closes: #753369)
+  * Try to fix Hurd build by avoiding PATH_MAX
+  * Include dpkg-buildflags hinted by lintian
+  * Set maintainer to Bernhard Übelacker (Closes: #741655)
+
+ -- Bernhard Übelacker <bernhardu@vr-web.de>  Sun, 21 Sep 2014 12:16:23 +0200
+
 dvbcut (0.5.4+svn178-7) unstable; urgency=medium
 
   * QA upload.

@@ -6,8 +6,9 @@ UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed -r ' s/\+[^+]+$$//')
 SVN_VERSION := $(shell echo $(DEB_VERSION) | sed -r 's/^[0-9.:-]+\+r//; s/-[^-]+$$//' )
 SVN_URL := http://dvbcut.svn.sourceforge.net/svnroot/dvbcut/trunk
 ORIG_TAR_GZ := ../$(DEB_SOURCE)_$(UPSTREAM_VERSION)+svn$(SVN_VERSION).orig.tar.gz
-CFLAGS := $(shell dpkg-buildflags --get CFLAGS)
-CXXFLAGS := $(shell dpkg-buildflags --get CXXFLAGS)
+CFLAGS:=$(shell dpkg-buildflags --get CFLAGS)
+CPPFLAGS:=$(shell dpkg-buildflags --get CPPFLAGS)
+LDFLAGS:=$(shell dpkg-buildflags --get LDFLAGS)
 
 %:
 	dh $@ --buildsystem=autoconf --with=autoreconf
@@ -15,7 +16,7 @@ CXXFLAGS := $(shell dpkg-buildflags --get CXXFLAGS)
 override_dh_auto_configure:
 	ln -sf debian/config.sub
 	ln -sf debian/config.guess
-	dh_auto_configure -- --with-ffmpeg=/usr
+	$(shell dpkg-buildflags --export=configure) ./configure --prefix=/usr --with-ffmpeg=/usr
 
 override_dh_auto_clean:
 	rm -rf ffmpeg.src

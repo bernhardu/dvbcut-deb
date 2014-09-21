@@ -1,7 +1,7 @@
 Source: dvbcut
 Section: graphics
 Priority: optional
-Maintainer: Debian QA Group <packages@qa.debian.org>
+Maintainer: Bernhard Übelacker <bernhardu@vr-web.de>
 Build-Depends:
  debhelper (>= 8.1),
  dh-autoreconf,

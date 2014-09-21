@@ -1,0 +1,15 @@
+Description: Initialize pkt variable in mpgfile::recodevideo to avoid crash
+Author: Bernhard Übelacker <bernhardu@vr-web.de>
+Bug-Debian: https://bugs.debian.org/753347
+
+--- dvbcut-0.5.4+svn178.orig/src/mpgfile.cpp
++++ dvbcut-0.5.4+svn178/src/mpgfile.cpp
+@@ -731,7 +731,7 @@ void mpgfile::recodevideo(muxer &mux, in
+   pts_t startpts=idx[idx.indexnr(start)].getpts();
+   while (outpicture<stop)
+   {
+-    AVPacket pkt;
++    AVPacket pkt = {0};
+     u_int8_t *buf=(u_int8_t*)m2v.writeptr();
+     int ret, got_output;
+ 

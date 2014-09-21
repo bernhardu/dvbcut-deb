@@ -1,0 +1,18 @@
+Description: Avoid PATH_MAX macro to enable hurd builds
+Author: Bernhard Übelacker <bernhardu@vr-web.de>
+
+--- dvbcut-0.5.4+svn178.orig/src/dvbcut.cpp
++++ dvbcut-0.5.4+svn178/src/dvbcut.cpp
+@@ -2227,10 +2227,10 @@ dvbcut::critical(const QString & caption
+ void
+ dvbcut::make_canonical(std::string &filename) {
+   if (filename[0] != '/') {
+-    char resolved_path[PATH_MAX];
+-    char *rp = realpath(filename.c_str(), resolved_path);
++    char *rp = realpath(filename.c_str(), NULL);
+     if (rp)
+       filename = rp;
++    free(rp);
+   }
+ }
+ 

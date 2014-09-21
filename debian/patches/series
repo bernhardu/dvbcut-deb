@@ -4,3 +4,7 @@ fix_gcc_4.7.patch
 updateimagedisplayfix.patch
 libav9.patch
 libav10.patch
+bug753347_initialize-pkt-variable-in-mpgfile__recodevideo-to-avoid-crash.patch
+715843_do-not-access-argv-beyond-last-item.patch
+753369_mplayer2-uses-different-indices-for-audio-streams.patch
+avoid-PATH_MAX-macro.patch
