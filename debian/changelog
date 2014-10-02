@@ -1,3 +1,15 @@
+dvbcut (0.5.4+svn178-9) unstable; urgency=low
+
+  * Include correct fix by Aurelien Jarno for
+    lintian hardening-no-relro warning (Closes: #763812).
+    - Bump debian/compat from 7 to 9
+    - Build-Depends: debhelper >= 9, autotools-dev
+    - Remove now unneeded debian/config.{guess,sub}
+    - debian/rules
+  * Enable parallel builds (debian/rules)
+
+ -- Bernhard Übelacker <bernhardu@vr-web.de>  Fri, 03 Oct 2014 01:18:40 +0200
+
 dvbcut (0.5.4+svn178-8) unstable; urgency=medium
 
   * Fix crash on export video (Closes: #753347)

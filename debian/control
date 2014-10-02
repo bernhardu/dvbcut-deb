@@ -3,7 +3,8 @@ Section: graphics
 Priority: optional
 Maintainer: Bernhard Übelacker <bernhardu@vr-web.de>
 Build-Depends:
- debhelper (>= 8.1),
+ debhelper (>= 9),
+ autotools-dev,
  dh-autoreconf,
  liba52-0.7.4-dev,
  libao-dev,
