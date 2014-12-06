@@ -79,8 +79,7 @@ pipe/3/label=recoded DVD compliant video (ffmpeg)
 pipe/3/post=
 */
 
-dvbcut_settings::dvbcut_settings() {
-  setPath(DVBCUT_QSETTINGS_DOMAIN, DVBCUT_QSETTINGS_PRODUCT);
+dvbcut_settings::dvbcut_settings() : QSettings(DVBCUT_QSETTINGS_DOMAIN, DVBCUT_QSETTINGS_PRODUCT) {
   beginGroup("/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT);
   loaded = false;
 }
