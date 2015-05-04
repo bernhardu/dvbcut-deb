@@ -175,8 +175,11 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
         continue;
         }
 
-      if (*(uint32_t*)(data+skip)==mbo32(0x000001b3)) // sequence header
-        {
+      uint32_t n;
+      memcpy(&n, data+skip, sizeof(n));
+      /* do a memcpy here because unaligned accesses are not sure to succeed on all platforms */
+      if (n == mbo32(0x000001b3)) // sequence header
+      {
         if (last_non_b_pic >= 0) {
           p[last_non_b_pic].setsequencenumber(++maxseqnr);
           last_non_b_pic = -1;
@@ -216,7 +219,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
         inbytes=sd->inbytes();
         skip=0;
 
-        } else if ((*(uint32_t*)(data+skip)==mbo32(0x00000100))&&!waitforfirstsequenceheader) // picture header
+        } else if ((n == mbo32(0x00000100)) && !waitforfirstsequenceheader) // picture header
         {
         sd->discard(skip);
         data=(const uint8_t*) sd->getdata();

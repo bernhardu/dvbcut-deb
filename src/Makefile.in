@@ -34,7 +34,7 @@ helpdir = $(prefix)/share/help
 installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(helpdir)
 
 CXX = @CXX@
-CXXFLAGS = @CXXFLAGS@ -Wall $(DEFS) $(CPPFLAGS)
+CXXFLAGS = @CXXFLAGS@ -Wall -Wcast-align $(DEFS) $(CPPFLAGS)
 CPPFLAGS = @CPPFLAGS@ -I.
 DEFS = @DEFS@
 LDFLAGS = @LDFLAGS@
