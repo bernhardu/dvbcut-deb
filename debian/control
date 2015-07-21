@@ -18,7 +18,7 @@ Build-Depends:
  pkg-config,
  qt4-dev-tools
 Homepage: http://dvbcut.sourceforge.net/
-Standards-Version: 3.9.5
+Standards-Version: 3.9.6
 
 Package: dvbcut
 Architecture: any

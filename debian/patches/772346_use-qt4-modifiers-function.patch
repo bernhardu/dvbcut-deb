@@ -1,0 +1,57 @@
+Description: use the Qt4 QtInputEvent::modifiers() method instead of the Qt3 Q<Wheel|Key>Event::state()
+ (the later is not working anymore?)
+Author: Tim Riemenschneider <debian@tim-riemenschneider.de>
+Bug-Debian: https://bugs.debian.org/772346
+Last-Update: <2014-12-06>
+
+--- a/src/dvbcut.cpp
++++ b/src/dvbcut.cpp
+@@ -2144,17 +2144,24 @@
+   bool myEvent = true;
+   int delta = 0;
+   int incr = WHEEL_INCR_NORMAL;
++  Qt::KeyboardModifiers mods;
+ 
+   if (e->type() == QEvent::Wheel && watched != ui->jogslider) {
+     QWheelEvent *we = (QWheelEvent*)e;
+     // Note: delta is a multiple of 120 (see Qt documentation)
+     delta = we->delta();
+-      if (we->state() & Qt::Key_Alt)
++    mods = we->modifiers();
++    if(mods & Qt::AltModifier) {
+       incr = WHEEL_INCR_ALT;
+-      else if (we->state() & Qt::Key_Control)
++    } else if(mods & Qt::ControlModifier) {
+       incr = WHEEL_INCR_CTRL;
+-      else if (we->state() & Qt::Key_Shift)
++    } else if(mods & Qt::ShiftModifier) {
+       incr = WHEEL_INCR_SHIFT;
++    } else if(mods & Qt::MetaModifier) {
++      // TODO: do we want/need another step-size?
++      // incr = WHEEL_INCR_META;
++    }
++
+   }
+   else if (e->type() == QEvent::KeyPress) {
+     QKeyEvent *ke = (QKeyEvent*)e;
+@@ -2163,12 +2170,17 @@
+       delta = -delta;
+     else if (ke->key() != Qt::Key_Left)
+       myEvent = false;
+-    if (ke->state() & Qt::Key_Alt)
++    mods = ke->modifiers();
++    if(mods & Qt::AltModifier) {
+       incr = WHEEL_INCR_ALT;
+-    else if (ke->state() & Qt::Key_Control)
++    } else if(mods & Qt::ControlModifier) {
+       incr = WHEEL_INCR_CTRL;
+-    else if (ke->state() & Qt::Key_Shift)
++    } else if(mods & Qt::ShiftModifier) {
+       incr = WHEEL_INCR_SHIFT;
++    } else if(mods & Qt::MetaModifier) {
++      // TODO: do we want/need another step-size?
++      //  incr = WHEEL_INCR_META;
++    }
+   }
+   else
+     myEvent = false;

@@ -1,0 +1,46 @@
+Description: Fix index creation on arm
+ Index creation accesses the stream unaligned. Therefore
+ some accesses seem to get 0, even when there is data, but
+ the program continues.
+ This is now just for the index creation, there are probably
+ other locations affected which are pointed to by the -Wcast-align.
+ Was just tested headless.
+Author: Bernhard Übelacker <bernhardu@vr-web.de>
+Last-Update: 2015-05-05
+
+--- dvbcut-0.5.4+svn178.orig/src/Makefile.in
++++ dvbcut-0.5.4+svn178/src/Makefile.in
+@@ -34,7 +34,7 @@ helpdir = $(prefix)/share/help
+ installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(helpdir)
+ 
+ CXX = @CXX@
+-CXXFLAGS = @CXXFLAGS@ -Wall $(DEFS) $(CPPFLAGS)
++CXXFLAGS = @CXXFLAGS@ -Wall -Wcast-align $(DEFS) $(CPPFLAGS)
+ CPPFLAGS = @CPPFLAGS@ -I.
+ DEFS = @DEFS@
+ LDFLAGS = @LDFLAGS@
+--- dvbcut-0.5.4+svn178.orig/src/index.cpp
++++ dvbcut-0.5.4+svn178/src/index.cpp
+@@ -175,8 +175,11 @@ int index::generate(const char *savefile
+         continue;
+         }
+ 
+-      if (*(uint32_t*)(data+skip)==mbo32(0x000001b3)) // sequence header
+-        {
++      uint32_t n;
++      memcpy(&n, data+skip, sizeof(n));
++      /* do a memcpy here because unaligned accesses are not sure to succeed on all platforms */
++      if (n == mbo32(0x000001b3)) // sequence header
++      {
+         if (last_non_b_pic >= 0) {
+           p[last_non_b_pic].setsequencenumber(++maxseqnr);
+           last_non_b_pic = -1;
+@@ -216,7 +219,7 @@ int index::generate(const char *savefile
+         inbytes=sd->inbytes();
+         skip=0;
+ 
+-        } else if ((*(uint32_t*)(data+skip)==mbo32(0x00000100))&&!waitforfirstsequenceheader) // picture header
++        } else if ((n == mbo32(0x00000100)) && !waitforfirstsequenceheader) // picture header
+         {
+         sd->discard(skip);
+         data=(const uint8_t*) sd->getdata();

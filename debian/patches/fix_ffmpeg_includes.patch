@@ -1,0 +1,62 @@
+Description: Use full include path for FFmpeg libraries
+
+Author: Andreas Cadhalpun <Andreas.Cadhalpun@googlemail.com>
+Last-Update: <2015-07-21>
+
+--- dvbcut-0.5.4+svn178.orig/src/avframe.h
++++ dvbcut-0.5.4+svn178/src/avframe.h
+@@ -25,7 +25,7 @@ extern "C" {
+ #include <libavcodec/avcodec.h>
+ #include <libavutil/mem.h>
+ #ifdef HAVE_LIB_SWSCALE
+-#include <swscale.h>
++#include <libswscale/swscale.h>
+ #endif
+ }
+ 
+--- dvbcut-0.5.4+svn178.orig/src/lavfmuxer.cpp
++++ dvbcut-0.5.4+svn178/src/lavfmuxer.cpp
+@@ -19,8 +19,8 @@
+ /* $Id$ */
+ 
+ extern "C" {
+-#include <avformat.h>
+-#include <avcodec.h>
++#include <libavformat/avformat.h>
++#include <libavcodec/avcodec.h>
+ }
+ #include <cstring>
+ #include <utility>
+--- dvbcut-0.5.4+svn178.orig/src/lavfmuxer.h
++++ dvbcut-0.5.4+svn178/src/lavfmuxer.h
+@@ -22,7 +22,7 @@
+ #define _DVBCUT_LAVFMUXER_H
+ 
+ extern "C" {
+-#include <avformat.h>
++#include <libavformat/avformat.h>
+ }
+ 
+ #include "mpgfile.h"
+--- dvbcut-0.5.4+svn178.orig/src/main.cpp
++++ dvbcut-0.5.4+svn178/src/main.cpp
+@@ -33,7 +33,7 @@
+ 
+ #include <qapplication.h>
+ extern "C" {
+-#include <avformat.h>
++#include <libavformat/avformat.h>
+ }
+ #include <qimage.h>
+ #include <qsettings.h>
+--- dvbcut-0.5.4+svn178.orig/src/streamdata.h
++++ dvbcut-0.5.4+svn178/src/streamdata.h
+@@ -24,7 +24,7 @@
+ #include <string>
+ #include <list>
+ extern "C" {
+-#include <avformat.h>
++#include <libavformat/avformat.h>
+ }
+ 
+ #include "port.h"

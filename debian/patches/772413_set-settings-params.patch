@@ -1,0 +1,18 @@
+Description: Fix initialisation of QSettings
+ Settings are now correctly read and written.
+Author: Tim Riemenschneider <debian@tim-riemenschneider.de>
+Bug-Debian: https://bugs.debian.org/772413
+Last-Update: <2014-12-06>
+
+--- a/src/settings.cpp
++++ b/src/settings.cpp
+@@ -79,8 +79,7 @@
+ pipe/3/post=
+ */
+ 
+-dvbcut_settings::dvbcut_settings() {
+-  setPath(DVBCUT_QSETTINGS_DOMAIN, DVBCUT_QSETTINGS_PRODUCT);
++dvbcut_settings::dvbcut_settings() : QSettings(DVBCUT_QSETTINGS_DOMAIN, DVBCUT_QSETTINGS_PRODUCT) {
+   beginGroup("/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT);
+   loaded = false;
+ }

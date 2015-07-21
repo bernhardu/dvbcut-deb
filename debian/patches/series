@@ -8,3 +8,8 @@ bug753347_initialize-pkt-variable-in-mpgfile__recodevideo-to-avoid-crash.patch
 715843_do-not-access-argv-beyond-last-item.patch
 753369_mplayer2-uses-different-indices-for-audio-streams.patch
 avoid-PATH_MAX-macro.patch
+772413_set-settings-params.patch
+772346_use-qt4-modifiers-function.patch
+add-mousewheel-modifiers-to-help-page.patch
+fix-index-creation-on-arm.patch
+fix_ffmpeg_includes.patch
