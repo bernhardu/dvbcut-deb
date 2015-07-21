@@ -25,7 +25,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 #ifdef HAVE_LIB_SWSCALE
-#include <swscale.h>
+#include <libswscale/swscale.h>
 #endif
 }
 

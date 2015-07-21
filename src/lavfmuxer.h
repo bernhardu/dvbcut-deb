@@ -22,7 +22,7 @@
 #define _DVBCUT_LAVFMUXER_H
 
 extern "C" {
-#include <avformat.h>
+#include <libavformat/avformat.h>
 }
 
 #include "mpgfile.h"
