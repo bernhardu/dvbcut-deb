@@ -29,12 +29,12 @@ avframe::avframe() : tobefreed(0),w(0),h(0),dw(0),pix_fmt(),img_convert_ctx(0)
 avframe::avframe() : tobefreed(0),w(0),h(0),dw(0),pix_fmt()
 #endif
   {
-  f=avcodec_alloc_frame();
+  f=av_frame_alloc();
   }
 
 avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
   {
-  f=avcodec_alloc_frame();
+  f=av_frame_alloc();
   tobefreed=malloc(avpicture_get_size(ctx->pix_fmt, ctx->width, ctx->height));
 
   avpicture_fill((AVPicture *)f,
@@ -65,7 +65,7 @@ avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
   dw=w*ctx->sample_aspect_ratio.num/ctx->sample_aspect_ratio.den;
 #ifdef HAVE_LIB_SWSCALE
   img_convert_ctx=sws_getContext(w, h, pix_fmt, 
-                                 w, h, PIX_FMT_BGR24, SWS_BICUBIC, 
+                                 w, h, AV_PIX_FMT_BGR24, SWS_BICUBIC,
                                  NULL, NULL, NULL);
 #endif
   }
@@ -75,7 +75,7 @@ avframe::~avframe()
   if (tobefreed)
     free(tobefreed);
   if (f)
-    av_free(f);
+    av_frame_free(&f);
 #ifdef HAVE_LIB_SWSCALE
   if (img_convert_ctx)
     sws_freeContext(img_convert_ctx);
@@ -91,20 +91,20 @@ QImage avframe::getqimage(bool scaled, double viewscalefactor)
 #endif
     return QImage();
 
-  uint8_t *rgbbuffer=(uint8_t*)malloc(avpicture_get_size(PIX_FMT_RGB24, w, h)+64);
+  uint8_t *rgbbuffer=(uint8_t*)malloc(avpicture_get_size(AV_PIX_FMT_RGB24, w, h)+64);
   int headerlen=sprintf((char *) rgbbuffer, "P6\n%d %d\n255\n", w, h);
 
-  AVFrame *avframergb=avcodec_alloc_frame();
+  AVFrame *avframergb=av_frame_alloc();
 
   avpicture_fill((AVPicture*)avframergb,
                  rgbbuffer+headerlen,
-                 PIX_FMT_RGB24,w,h);
+                 AV_PIX_FMT_RGB24,w,h);
 
 #ifdef HAVE_LIB_SWSCALE
   sws_scale(img_convert_ctx, f->data, f->linesize, 0, h, 
               avframergb->data, avframergb->linesize);
 #else
-  img_convert((AVPicture *)avframergb, PIX_FMT_RGB24, (AVPicture*)f, pix_fmt, w, h);
+  img_convert((AVPicture *)avframergb, AV_PIX_FMT_RGB24, (AVPicture*)f, pix_fmt, w, h);
 #endif
 
   QImage im;
@@ -123,6 +123,6 @@ QImage avframe::getqimage(bool scaled, double viewscalefactor)
     }
 
   free(rgbbuffer);
-  av_free(avframergb);
+  av_frame_free(&avframergb);
   return (im);
   }
