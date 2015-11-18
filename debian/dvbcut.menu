@@ -1,3 +1,0 @@
-?package(dvbcut):needs="X11" section="Applications/Graphics"\
-  title="DVBcut" command="/usr/bin/dvbcut"\
-  hints="Video,DVB"

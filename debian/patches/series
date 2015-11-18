@@ -13,3 +13,4 @@ avoid-PATH_MAX-macro.patch
 add-mousewheel-modifiers-to-help-page.patch
 fix-index-creation-on-arm.patch
 fix_ffmpeg_includes.patch
+ffmpeg_2.9.patch

@@ -1,3 +1,12 @@
+dvbcut (0.5.4+svn178-12) unstable; urgency=medium
+
+  * Replace deprecated ffmpeg APIs (Closes: #803809)
+      (Thanks to Andreas Cadhalpun)
+  * Due to lintian command-in-menu-file-and-desktop-file:
+      - debian/dvbcut.menu removed.
+
+ -- Bernhard Übelacker <bernhardu@vr-web.de>  Wed, 18 Nov 2015 23:55:08 +0100
+
 dvbcut (0.5.4+svn178-11) unstable; urgency=medium
 
   * Correct changelog date format of the last version (Closes: #795616)
