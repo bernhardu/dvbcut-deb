@@ -159,14 +159,14 @@ dvbcut::dvbcut(QWidget *parent, const char *name, Qt::WFlags fl)
   connect( editconvertpopup, SIGNAL( activated(int) ), this, SLOT( editConvert(int) ) );
   connect( editconvertpopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshoweditconvert() ) );
   
-  ui->fileOpenAction->setIcon(QIcon::fromTheme("document-open"));
-  ui->fileSaveAction->setIcon(QIcon::fromTheme("document-save"));
-  ui->fileSaveAsAction->setIcon(QIcon::fromTheme("document-save-as"));
-  ui->snapshotSaveAction->setIcon(QIcon::fromTheme("camera-photo"));
-  ui->playPlayAction->setIcon(QIcon::fromTheme("media-playback-start"));
-  ui->playStopAction->setIcon(QIcon::fromTheme("media-playback-pause"));
-  ui->playAudio1Action->setIcon(QIcon::fromTheme("media-seek-backward"));
-  ui->playAudio2Action->setIcon(QIcon::fromTheme("media-seek-forward"));
+  ui->fileOpenAction->setIcon(QIcon::fromTheme("document-open", this->style()->standardIcon(QStyle::SP_DialogOpenButton)));
+  ui->fileSaveAction->setIcon(QIcon::fromTheme("document-save", this->style()->standardIcon(QStyle::SP_DialogSaveButton)));
+  ui->fileSaveAsAction->setIcon(QIcon::fromTheme("document-save-as", this->style()->standardIcon(QStyle::SP_DriveFDIcon)));
+  ui->snapshotSaveAction->setIcon(QIcon::fromTheme("camera-photo", this->style()->standardIcon(QStyle::SP_DesktopIcon)));
+  ui->playPlayAction->setIcon(QIcon::fromTheme("media-playback-start", this->style()->standardIcon(QStyle::SP_MediaPlay)));
+  ui->playStopAction->setIcon(QIcon::fromTheme("media-playback-pause", this->style()->standardIcon(QStyle::SP_MediaPause)));
+  ui->playAudio1Action->setIcon(QIcon::fromTheme("media-seek-backward", this->style()->standardIcon(QStyle::SP_MediaSeekBackward)));
+  ui->playAudio2Action->setIcon(QIcon::fromTheme("media-seek-forward", this->style()->standardIcon(QStyle::SP_MediaSeekForward)));
 
   setviewscalefactor(settings().viewscalefactor);
 
