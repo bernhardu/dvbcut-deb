@@ -1,5 +1,6 @@
 dvbcut (0.5.4+svn178-13) UNRELEASED; urgency=medium
 
+  * Changed maintainer email.
   * Push standards version to 3.9.8.
 
  -- Bernhard Übelacker <bernhardu@mailbox.org>  Thu, 09 Jun 2016 20:09:38 +0200

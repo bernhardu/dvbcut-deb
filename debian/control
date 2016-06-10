@@ -1,7 +1,7 @@
 Source: dvbcut
 Section: graphics
 Priority: optional
-Maintainer: Bernhard Übelacker <bernhardu@vr-web.de>
+Maintainer: Bernhard Übelacker <bernhardu@mailbox.org>
 Build-Depends:
  debhelper (>= 9),
  autotools-dev,
