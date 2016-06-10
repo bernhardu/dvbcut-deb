@@ -1,4 +1,4 @@
-dvbcut (0.5.4+svn178-13) UNRELEASED; urgency=medium
+dvbcut (0.5.4+svn178-13) unstable; urgency=medium
 
   * Add fallback to Qt internal icons if themes
       are not available. (Closes: #822609)
