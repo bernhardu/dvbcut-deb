@@ -14,3 +14,4 @@ add-mousewheel-modifiers-to-help-page.patch
 fix-index-creation-on-arm.patch
 fix_ffmpeg_includes.patch
 ffmpeg_2.9.patch
+822609-do-fallback-to-Qt-internal-icons-if-themes-not-avail.patch

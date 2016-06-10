@@ -1,5 +1,7 @@
 dvbcut (0.5.4+svn178-13) UNRELEASED; urgency=medium
 
+  * Add fallback to Qt internal icons if themes
+      are not available. (Closes: #822609)
   * Changed maintainer email.
   * Push standards version to 3.9.8.
 
