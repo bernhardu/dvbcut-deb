@@ -4,6 +4,7 @@ dvbcut (0.5.4+svn178-13) UNRELEASED; urgency=medium
       are not available. (Closes: #822609)
   * Changed maintainer email.
   * Push standards version to 3.9.8.
+  * Enable hardening flags (Lintian warnings).
 
  -- Bernhard Übelacker <bernhardu@mailbox.org>  Thu, 09 Jun 2016 20:09:38 +0200
 
