@@ -505,7 +505,7 @@ int dvbcut::chooseBestPicture(int startpic, int range, int samples)
         bestnr=n;
       }
   }
-  //fprintf(stderr,"choosing sample / frame: %4d / %7d\n!", bestnr, bestpic);
+  if (0) fprintf(stderr,"choosing sample / frame: %4d / %7d\n!", bestnr, bestpic);
 
   return bestpic;
 }
