@@ -349,7 +349,7 @@ tsfile::isTOPFIELD(const uint8_t *header, int len, std::string recfile) {
               && bnum<TF5XXXPVR_MAX) {
           // bookmark is stored in 128 resp. 94kbyte units
           bookmark*=unit;
-          if(verbose) fprintf(stderr,"BOOKMARK[%d] = %lld\n",bnum,bookmark);
+          if(verbose) fprintf(stderr,"BOOKMARK[%d] = %ld\n",bnum,bookmark);
           // fill bookmark vector with byte positions
           byte_bookmarks.push_back(bookmark);
           bnum++;
@@ -403,7 +403,7 @@ tsfile::isTF7700HDPVR(std::string recfile) {
       // changed byte order compared to old receivers!?!
       while ((bookmark=(buffer[boff+3]<<24)|(buffer[boff+2]<<16)|(buffer[boff+1]<<8)|buffer[boff])
               && bnum<TF7700HDPVR_MAX) {
-          if(verbose) fprintf(stderr,"BOOKMARK[%d] = %lld\n",bnum,bookmark);
+          if(verbose) fprintf(stderr,"BOOKMARK[%d] = %ld\n",bnum,bookmark);
           // bookmark is stored in seconds now, but we'll use full pts!
           bookmark*=unit;
           // fill bookmark vector with times
@@ -412,7 +412,7 @@ tsfile::isTF7700HDPVR(std::string recfile) {
           boff+=4;
       }  
   } else // receiver model identified but file to short!
-      fprintf(stderr,"ADD-File probabely corrupted (%dbytes to short), discarding bookmarks!\n",TF7700HDPVR_LEN-len);
+      fprintf(stderr,"ADD-File probabely corrupted (%ld bytes to short), discarding bookmarks!\n",TF7700HDPVR_LEN-len);
 
   // terminate
   free(buffer);

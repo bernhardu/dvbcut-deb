@@ -640,7 +640,7 @@ void mpegmuxer::packetizer(int str,pts_t maxdts)
       }
 
     if (len) {
-      fprintf(stderr,"str=%d len=%d aulist.size=%d packlist.size=%d\n",
+      fprintf(stderr,"str=%d len=%d aulist.size=%lu packlist.size=%lu\n",
 	str,len,s->aulist.size(),s->packlist.size());
       assert(len==0);
       }

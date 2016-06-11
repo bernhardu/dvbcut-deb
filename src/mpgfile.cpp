@@ -637,7 +637,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
           {
 
             for(it=sd->itemlist().begin();it!=sd->itemlist().end();++it)
-              fprintf(stderr," fileposition:%lld/%d bufferposition:%d flags:%x pts:%s\n",
+              fprintf(stderr," fileposition:%ld/%d bufferposition:%d flags:%x pts:%s\n",
                       it->fileposition.packetposition(),it->fileposition.packetoffset(),
                       it->bufferposition,it->flags,ptsstring(it->pts).c_str());
 
@@ -646,7 +646,7 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
 
             for(int i=0;i<MAXAVSTREAMS;++i)
               if (sh.stream[i])
-                fprintf(stderr,"stream %d%s, itemlist.size():%d\n",
+                fprintf(stderr,"stream %d%s, itemlist.size():%lu\n",
                         i,(sh.stream[i]==sd)?"*":"",sh.stream[i]->itemlist().size());
 
             abort();
