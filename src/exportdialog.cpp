@@ -38,11 +38,11 @@ exportdialog::~exportdialog()
 void exportdialog::fileselector()
   {
   QString newfilename(QFileDialog::getSaveFileName(
+                        this,
+                        "Export video...",
                         ui->filenameline->text(),
                         "MPEG program streams (*.mpg)"
-                        ";;All files (*)",
-                        this,0,
-                        "Export video..." ));
+                        ";;All files (*)" ));
 
   if (!newfilename.isEmpty())
     ui->filenameline->setText(newfilename);

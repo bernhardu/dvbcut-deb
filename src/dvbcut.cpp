@@ -231,11 +231,10 @@ void dvbcut::fileSaveAs()
   }
 
   QString s=QFileDialog::getSaveFileName(
-    QString::fromStdString(prjfilen),
-    settings().prjfilter,
     this,
-    "Save project as...",
-    "Choose the name of the project file" );
+    "Choose the name of the project file",
+    QString::fromStdString(prjfilen),
+    settings().prjfilter );
 
   if (s.isNull())
     return;
@@ -379,11 +378,10 @@ void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
   }  
 
   QString s = QFileDialog::getSaveFileName(
-    picfilen,
-    "Images (*."+ext+")",
     this,
-    "Save picture as...",
-    "Choose the name of the picture file" );
+    "Choose the name of the picture file",
+    picfilen,
+    "Images (*."+ext+")" );
 
   if (s.isEmpty())
     return;
@@ -1632,11 +1630,10 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 {
   if (filenames.empty()) {
     QStringList fn = QFileDialog::getOpenFileNames(
-      settings().loadfilter,
-      settings().lastdir,
       this,
-      "Open file...",
-      "Choose one or more MPEG files to open");
+      "Choose one or more MPEG files to open",
+      settings().lastdir,
+      settings().loadfilter);
     if (fn.empty()) {
 //      fprintf(stderr,"open(): QFileDialog::getOpenFileNames() returned EMPTY filelist!!!\n");    
 //      fprintf(stderr,"        If you didn't saw a FileDialog, please check your 'lastdir' settings variable...");    
@@ -1872,11 +1869,10 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	  if (chdir(u.dirPath().toAscii()) == -1) chdir("/");
 	  QString relname = u.fileName();
 	  QString s=QFileDialog::getSaveFileName(
-		  relname,
-		  settings().idxfilter,
 		  this,
-		  "Choose index file...",
-		  "Choose the name of the index file" );
+		  "Choose the name of the index file",
+		  relname,
+		  settings().idxfilter );
 	  if (s.isEmpty()) {
 		delete mpg;
 		mpg=0;
