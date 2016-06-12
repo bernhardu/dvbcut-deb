@@ -2425,8 +2425,8 @@ void dvbcut::helpAboutAction_activated()
       "</span></body></html>").arg(VERSION_STRING));
 }
 
-#include <q3hbox.h>
-#include <q3vbox.h>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <qdialog.h>
 #include <qtextbrowser.h>
 #include <qpushbutton.h>
@@ -2436,14 +2436,27 @@ public:
   helpDialog(QWidget *parent, const char *name, QString file)
   : QDialog(parent, name)
   {
-    vbox = new Q3VBox(this);
-    vbox->resize(640, 480);
-    viewer = new QTextBrowser(vbox);
-    hbox = new Q3HBox(vbox);
-    prev = new QPushButton(tr("Prev"), hbox);
-    next = new QPushButton(tr("Next"), hbox);
-    home = new QPushButton(tr("Home"), hbox);
-    close = new QPushButton(tr("Close"), hbox);
+    prev = new QPushButton(tr("Prev"));
+    next = new QPushButton(tr("Next"));
+    home = new QPushButton(tr("Home"));
+    close = new QPushButton(tr("Close"));
+    viewer = new QTextBrowser();
+
+    hbox = new QHBoxLayout();
+    hbox->addWidget(prev);
+    hbox->addWidget(next);
+    hbox->addWidget(home);
+    hbox->addWidget(close);
+
+    QWidget *hboxw = new QWidget();
+    hboxw->setLayout(hbox);
+
+    vbox = new QVBoxLayout();
+    vbox->addWidget(viewer);
+    vbox->addWidget(hboxw);
+    setLayout(vbox);
+    resize(640, 480);
+
     close->setDefault(true);
     connect(prev, SIGNAL(clicked()), viewer, SLOT(backward()));
     connect(viewer, SIGNAL(backwardAvailable(bool)), prev, SLOT(setEnabled(bool)));
@@ -2465,8 +2478,8 @@ public:
     delete vbox;
   }
 private:
-  Q3VBox *vbox;
-  Q3HBox *hbox;
+  QVBoxLayout *vbox;
+  QHBoxLayout *hbox;
   QTextBrowser *viewer;
   QPushButton *prev, *next, *home, *close;
 };
