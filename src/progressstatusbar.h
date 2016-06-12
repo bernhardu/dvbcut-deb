@@ -25,7 +25,7 @@
 #include "logoutput.h"
 
 class QStatusBar;
-class Q3ProgressBar;
+class QProgressBar;
 class QPushButton;
 class QLabel;
 
@@ -39,7 +39,7 @@ class progressstatusbar : public QObject, public logoutput
 protected:
   bool cancelwasclicked;
   QStatusBar *statusbar;
-  Q3ProgressBar *progressbar;
+  QProgressBar *progressbar;
   QPushButton *cancelbutton;
   QLabel *label;
 

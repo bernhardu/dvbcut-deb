@@ -26,7 +26,7 @@
 #include <cstdarg>
 #include <cstdlib>
 #include <qstatusbar.h>
-#include <q3progressbar.h>
+#include <qprogressbar.h>
 #include <qapplication.h>
 #include <qpushbutton.h>
 #include <qlabel.h>
@@ -46,8 +46,8 @@ progressstatusbar::progressstatusbar(QStatusBar *bar)
   cancelbutton->setMaximumWidth(80);
   statusbar->addWidget(cancelbutton,true);
 
-  progressbar=new Q3ProgressBar(statusbar);
-  progressbar->setTotalSteps(1000);
+  progressbar=new QProgressBar(statusbar);
+  progressbar->setMaximum(1000);
   progressbar->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum));
   progressbar->setMinimumWidth(160);
   progressbar->setMaximumWidth(160);
@@ -75,7 +75,7 @@ void progressstatusbar::setprogress(int permille)
   if (permille==currentprogress)
     return;
   currentprogress=permille;
-  progressbar->setProgress(permille);
+  progressbar->setValue(permille);
   qApp->processEvents();
   }
 

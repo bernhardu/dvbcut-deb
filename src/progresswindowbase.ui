@@ -24,8 +24,8 @@
    <item>
     <layout class="QHBoxLayout">
      <item>
-      <widget class="Q3ProgressBar" name="progressbar">
-       <property name="totalSteps">
+      <widget class="QProgressBar" name="progressbar">
+       <property name="maximum">
         <number>1000</number>
        </property>
       </widget>
@@ -54,11 +54,6 @@
    <class>Q3TextEdit</class>
    <extends>Q3Frame</extends>
    <header>q3textedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3ProgressBar</class>
-   <extends>QFrame</extends>
-   <header>Qt3Support/Q3ProgressBar</header>
   </customwidget>
   <customwidget>
    <class>Q3TextBrowser</class>

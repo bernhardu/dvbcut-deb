@@ -88,7 +88,7 @@ void progresswindow::setprogress(int permille)
   if (permille==currentprogress)
     return;
   currentprogress=permille;
-  ui->progressbar->setProgress(permille);
+  ui->progressbar->setValue(permille);
   qApp->processEvents();
   }
 
