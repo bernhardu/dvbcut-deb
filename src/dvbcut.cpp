@@ -122,8 +122,8 @@ void dvbcut::setbusy(bool b)
 // **************************************************************************
 // ***  dvbcut::dvbcut (private constructor)
 
-dvbcut::dvbcut(QWidget *parent, const char *name, Qt::WFlags fl)
-    :Q3MainWindow(parent),
+dvbcut::dvbcut()
+    :Q3MainWindow(),
     audiotrackpopup(0), recentfilespopup(0), editconvertpopup(0), audiotrackmenu(0),
     buf(8 << 20, 128 << 20),
     mpg(0), pictures(0),

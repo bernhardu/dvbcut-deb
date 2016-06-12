@@ -138,7 +138,7 @@ protected slots:
 	
 public:
   ~dvbcut();
-  dvbcut(QWidget *parent = 0, const char *name = 0, Qt::WFlags fl = Qt::Window);
+  dvbcut();
   void open(std::list<std::string> filenames=std::list<std::string>(), 
             std::string idxfilename=std::string(), std::string expfilename=std::string());
   void setbusy(bool b=true);
