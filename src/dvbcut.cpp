@@ -227,7 +227,7 @@ void dvbcut::fileSaveAs()
     prjfilen = prefix + ".dvbcut";
     int nr = 0;
     while (QFileInfo(QString::fromStdString(prjfilen)).exists())
-      prjfilen = prefix + "_" + ((const char*)QString::number(++nr)) + ".dvbcut";
+      prjfilen = prefix + "_" + QString::number(++nr).toStdString() + ".dvbcut";
   }
 
   QString s=QFileDialog::getSaveFileName(
@@ -246,7 +246,7 @@ void dvbcut::fileSaveAs()
       QMessageBox::Yes)
     return;
 
-  prjfilen=(const char*)s;
+  prjfilen = s.toStdString();
   if (!prjfilen.empty())
     fileSave();
 }
@@ -528,7 +528,7 @@ void dvbcut::fileExport()
       expfilen=newexpfilen+".mpg";
       int nr=0;
       while (QFileInfo(QString::fromStdString(expfilen)).exists())
-        expfilen=newexpfilen+"_"+((const char*)QString::number(++nr))+".mpg";
+        expfilen = newexpfilen + "_" + QString::number(++nr).toStdString() + ".mpg";
     }
   }
 
@@ -684,7 +684,7 @@ void dvbcut::fileExport()
       audiostreammask|=1u<<a;
 
   std::string out_file = (child_pid < 0) ? expfilen :
-    std::string("pipe:") + (const char*)QString::number(pipe_fds[1]);
+    std::string("pipe:") + QString::number(pipe_fds[1]).toStdString();
 
   switch(expfmt) {
     case 1:
@@ -1643,7 +1643,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
       return;
     }  
     for (QStringList::Iterator it = fn.begin(); it != fn.end(); ++it)
-      filenames.push_back((const char*)*it);
+      filenames.push_back(it->toStdString());
 
     // remember last directory if requested
     if (settings().lastdir_update) {
@@ -1778,17 +1778,17 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	    if (e.tagName() == "mpgfile") {
 	      QString qs = e.attribute("path");
 	      if (!qs.isEmpty())
-		filenames.push_back((const char*)qs);
+		filenames.push_back(qs.toStdString());
 	    }
 	    else if (e.tagName() == "idxfile" && idxfilename.empty()) {
 	      QString qs = e.attribute("path");
 	      if (!qs.isEmpty())
-		idxfilename = (const char*)qs;
+		idxfilename = qs.toStdString();
 	    }
 	    else if (e.tagName() == "expfile" && expfilename.empty()) {           
 	      QString qs = e.attribute("path");
 	      if (!qs.isEmpty())
-		expfilename = (const char*)qs;
+		expfilename = qs.toStdString();
 	      qs = e.attribute("format");
               bool okay=false;
 	      if (!qs.isEmpty()) {
@@ -1801,17 +1801,17 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	  if (filenames.empty()) {
 	    QString qs = docelem.attribute("mpgfile");
 	    if (!qs.isEmpty())
-	      filenames.push_back((const char*)qs);
+	      filenames.push_back(qs.toStdString());
 	  }
 	  if (idxfilename.empty()) {
 	    QString qs = docelem.attribute("idxfile");
 	    if (!qs.isEmpty())
-	      idxfilename = (const char*)qs;
+	      idxfilename = qs.toStdString();
 	  }
 	  if (expfilename.empty()) {
 	    QString qs = docelem.attribute("expfile");
 	    if (!qs.isEmpty())
-	      expfilename = (const char*)qs;
+	      expfilename = qs.toStdString();
 	  }
 	  // sanity check
 	  if (filenames.empty()) {
@@ -1869,7 +1869,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	  QUrl u;
 	  u.setProtocol(QString("file"));
 	  u.setPath(QString::fromStdString(idxfilename));
-	  if (chdir((const char*)u.dirPath()) == -1) chdir("/");
+	  if (chdir(u.dirPath().toAscii()) == -1) chdir("/");
 	  QString relname = u.fileName();
 	  QString s=QFileDialog::getSaveFileName(
 		  relname,
@@ -1883,7 +1883,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 		ui->fileOpenAction->setEnabled(true);
 		return;
 	  }
-	  idxfilename=(const char*)s;
+	  idxfilename = s.toStdString();
 	  // it's now a relative name that will be canonicalized again soon
 	}
   }
