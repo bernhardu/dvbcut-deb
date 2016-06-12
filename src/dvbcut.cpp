@@ -372,9 +372,9 @@ void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
       if (lastdot >= 0 && lastdot > lastslash)
         prefix = prefix.left(lastdot);
       int nr = first;
-      picfilen = prefix + delim + QString::number(nr).rightJustify( width, '0' ) + "." + ext;
+      picfilen = prefix + delim + QString::number(nr).rightJustified( width, '0' ) + "." + ext;
       while (QFileInfo(picfilen).exists())
-        picfilen = prefix + delim + QString::number(++nr).rightJustify( width, '0' )+ "." + ext;
+        picfilen = prefix + delim + QString::number(++nr).rightJustified( width, '0' )+ "." + ext;
     }
   }  
 
@@ -420,7 +420,7 @@ void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
     if (i>0) {
       nr = s.mid(i,width).toInt(&ok,10);
       if (ok)
-        picfilen = s.left(i) + QString::number(++nr).rightJustify(width, '0')+ "." + ext;
+        picfilen = s.left(i) + QString::number(++nr).rightJustified(width, '0')+ "." + ext;
       else
         picfilen = s;
     }
