@@ -111,7 +111,7 @@ QImage avframe::getqimage(bool scaled, double viewscalefactor)
   im.loadFromData(rgbbuffer, headerlen+w*h*3, "PPM");
 
 #ifdef HAVE_LIB_SWSCALE
-  im = im.swapRGB();
+  im = im.rgbSwapped();
 #endif
 
   if ((scaled && w!=dw)||(viewscalefactor!=1.0)) {
