@@ -348,7 +348,7 @@ void dvbcut::chapterSnapshotsSave()
   if (found) {
     snapshotSave(piclist, settings().snapshot_range, settings().snapshot_samples);
   } else
-    statusBar()->message(QString("*** No chapters to save! ***"));
+    statusBar()->showMessage(QString("*** No chapters to save! ***"));
 }
 
 void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
