@@ -38,21 +38,17 @@ progresswindow::progresswindow(QWidget *parent, const char *name)
   {
   ui = new Ui::progresswindowbase();
   ui->setupUi(this);
-  
-  Q3StyleSheetItem *item;
-  item = new Q3StyleSheetItem( ui->logbrowser->styleSheet(), "h" );
-  item->setFontWeight( QFont::Bold );
-  item->setFontUnderline( TRUE );
 
-  item = new Q3StyleSheetItem( ui->logbrowser->styleSheet(), "info" );
+  textcursor = new QTextCursor(ui->logbrowser->document());
 
-  item = new Q3StyleSheetItem( ui->logbrowser->styleSheet(), "warn" );
-  item->setColor( "red" );
+  fc_head.setFontWeight(QFont::Bold);
+  fc_head.setFontUnderline(true);
 
-  item = new Q3StyleSheetItem( ui->logbrowser->styleSheet(), "error" );
-  item->setColor( "red" );
-  item->setFontWeight( QFont::Bold );
-  item->setFontUnderline( TRUE );
+  fc_warn.setForeground(Qt::red);
+
+  fc_error.setFontWeight(QFont::Bold);
+  fc_error.setForeground(Qt::red);
+  fc_error.setFontUnderline(true);
 
   ui->cancelbutton->setPaletteBackgroundColor( QColor( 255,0,0 ) );
 
@@ -100,10 +96,13 @@ void progresswindow::print(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
+  textcursor->setBlockCharFormat(fc_normal);
   if (*text)
-    ui->logbrowser->append(quotetext(text));
+    textcursor->insertText(text);
   else
-    ui->logbrowser->append("<br>");
+    textcursor->insertText("");
+  textcursor->insertBlock();
+
   free(text);
   qApp->processEvents();
   }
@@ -116,7 +115,10 @@ void progresswindow::printheading(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
-  ui->logbrowser->append(QString("<h>")+quotetext(text)+"</h>");
+  textcursor->setBlockCharFormat(fc_head);
+  textcursor->insertText(text);
+  textcursor->insertBlock();
+
   free(text);
   qApp->processEvents();
   }
@@ -129,7 +131,10 @@ void progresswindow::printinfo(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
-  ui->logbrowser->append(QString("<info>")+quotetext(text)+"</info>");
+  textcursor->setBlockCharFormat(fc_info);
+  textcursor->insertText(text);
+  textcursor->insertBlock();
+
   free(text);
   qApp->processEvents();
   }
@@ -142,7 +147,10 @@ void progresswindow::printerror(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
-  ui->logbrowser->append(QString("<error>")+quotetext(text)+"</error>");
+  textcursor->setBlockCharFormat(fc_error);
+  textcursor->insertText(text);
+  textcursor->insertBlock();
+
   free(text);
   qApp->processEvents();
   }
@@ -155,7 +163,10 @@ void progresswindow::printwarning(const char *fmt, ...)
   if (vasprintf(&text,fmt,ap)<0 || (text==0))
     return;
 
-  ui->logbrowser->append(QString("<warn>")+quotetext(text)+"</warn>");
+  textcursor->setBlockCharFormat(fc_warn);
+  textcursor->insertText(text);
+  textcursor->insertBlock();
+
   free(text);
   qApp->processEvents();
   }
@@ -174,9 +185,4 @@ void progresswindow::clickedcancel()
     // button function is close
     close();
   }
-  }
-
-QString progresswindow::quotetext(const char *text)
-  {
-  return QString(text).replace('&',QString("&amp;")).replace('<',QString("&lt;")).replace('>',QString("&gt;"));
   }

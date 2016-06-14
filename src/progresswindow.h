@@ -32,8 +32,13 @@ class progresswindow: public QDialog, public logoutput
 protected:
   bool cancelwasclicked;
   bool waitingforclose;
+  QTextCursor *textcursor;
+  QTextCharFormat fc_normal;
+  QTextCharFormat fc_head;
+  QTextCharFormat fc_info;
+  QTextCharFormat fc_warn;
+  QTextCharFormat fc_error;
 
-  static QString quotetext(const char* text);
   void closeEvent(QCloseEvent *e);
   Ui::progresswindowbase* ui;
 public:

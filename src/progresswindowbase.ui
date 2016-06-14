@@ -15,9 +15,9 @@
   </property>
   <layout class="QVBoxLayout">
    <item>
-    <widget class="Q3TextBrowser" name="logbrowser">
-     <property name="textFormat">
-      <enum>Qt::LogText</enum>
+    <widget class="QTextBrowser" name="logbrowser">
+     <property name="lineWrapMode">
+      <enum>QTextEdit::NoWrap</enum>
      </property>
     </widget>
    </item>
@@ -43,24 +43,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>Q3Frame</class>
-   <extends>QFrame</extends>
-   <header>Qt3Support/Q3Frame</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextEdit</class>
-   <extends>Q3Frame</extends>
-   <header>q3textedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextBrowser</class>
-   <extends>Q3TextEdit</extends>
-   <header>Qt3Support/Q3TextBrowser</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>
