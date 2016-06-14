@@ -554,9 +554,9 @@ void dvbcut::fileExport()
   expd->ui->muxercombo->setCurrentItem(settings().export_format);
 
   for(int a=0;a<mpg->getaudiostreams();++a) {
-    expd->ui->audiolist->insertItem(mpg->getstreaminfo(audiostream(a)).c_str());
-    expd->ui->audiolist->setSelected(a,true);
+    expd->ui->audiolist->addItem(mpg->getstreaminfo(audiostream(a)).c_str());
   }
+  expd->ui->audiolist->selectAll();
 
   int expfmt = 0;
   if (!nogui) {
@@ -684,7 +684,7 @@ void dvbcut::fileExport()
   uint32_t audiostreammask(0);
 
   for(int a=0;a<mpg->getaudiostreams();++a)
-    if (expd->ui->audiolist->isSelected(a))
+    if (expd->ui->audiolist->item(a)->isSelected())
       audiostreammask|=1u<<a;
 
   std::string out_file = (child_pid < 0) ? expfilen :

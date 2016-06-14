@@ -61,9 +61,9 @@
      </property>
      <layout class="QVBoxLayout">
       <item>
-       <widget class="Q3ListBox" name="audiolist">
+       <widget class="QListWidget" name="audiolist">
         <property name="selectionMode">
-         <enum>Q3ListBox::Multi</enum>
+         <enum>QAbstractItemView::MultiSelection</enum>
         </property>
        </widget>
       </item>
@@ -145,17 +145,6 @@
    <extends>QGroupBox</extends>
    <header>Qt3Support/Q3GroupBox</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3Frame</class>
-   <extends>QFrame</extends>
-   <header>Qt3Support/Q3Frame</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3ListBox</class>
-   <extends>Q3Frame</extends>
-   <header>q3listbox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
