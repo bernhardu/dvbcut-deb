@@ -289,10 +289,12 @@ void dvbcut::fileSave()
     root.appendChild(elem);
   }
 
-  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
-    if (item->rtti()==EventListItem::RTTI()) {
+  int index;
+  for (index = 0; index < ui->eventlist->count(); index++)
+  {
+    EventListItem *eli = dynamic_cast<EventListItem *>(ui->eventlist->item(index));
+    if (eli) {
       QString elemname;
-      EventListItem *eli=(EventListItem*)item;
       EventListItem::eventtype evt=eli->geteventtype();
 
       if (evt==EventListItem::start)
@@ -310,6 +312,7 @@ void dvbcut::fileSave()
       elem.setAttribute("picture",eli->getpicture());
       root.appendChild(elem);
     }
+  }
 
   QTextStream stream(&outfile);
   stream.setEncoding(QTextStream::Latin1);
@@ -330,14 +333,17 @@ void dvbcut::chapterSnapshotsSave()
 {
   int found=0;
   std::vector<int> piclist;
-  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
-    if (item->rtti()==EventListItem::RTTI()) {
-      EventListItem *eli=(EventListItem*)item;
+  int index;
+  for (index = 0; index < ui->eventlist->count(); index++)
+  {
+    EventListItem *eli = dynamic_cast<EventListItem *>(ui->eventlist->item(index));
+    if (eli) {
       if (eli->geteventtype()==EventListItem::chapter) {
          piclist.push_back(eli->getpicture());
          found++;
       }
     }
+  }
 
   if (found) {
     snapshotSave(piclist, settings().snapshot_range, settings().snapshot_samples);
@@ -829,12 +835,15 @@ void dvbcut::fileClose()
 void dvbcut::addEventListItem(int pic, EventListItem::eventtype type)
 {
   //check if requested EventListItem is already in list to avoid doubles!
-  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
-    if (item->rtti()==EventListItem::RTTI()) {
-      EventListItem *eli=(EventListItem*)item;
+  int index;
+  for (index = 0; index < ui->eventlist->count(); index++)
+  {
+    EventListItem *eli = dynamic_cast<EventListItem *>(ui->eventlist->item(index));
+    if (eli) {
       if (pic==eli->getpicture() && type==eli->geteventtype()) 
         return;
     }
+  }
 
   QPixmap p;
   if (imgp && imgp->rtti() == IMAGEPROVIDER_STANDARD)
@@ -988,15 +997,18 @@ void dvbcut::editConvert(int option)
   
   int found=0;
   std::vector<int> cutlist;
-  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
-    if (item->rtti()==EventListItem::RTTI()) {
-      EventListItem *eli=(EventListItem*)item;
+  int index;
+  for (index = 0; index < ui->eventlist->count(); index++)
+  {
+    EventListItem *eli = dynamic_cast<EventListItem *>(ui->eventlist->item(index));
+    if (eli) {
       if (eli->geteventtype()==EventListItem::bookmark) {
          cutlist.push_back(eli->getpicture());
-         delete item;       
+         delete eli;
          found++;
       } 
     } 
+  }
   if (found) {
     addStartStopItems(cutlist, option);
 
@@ -1021,12 +1033,15 @@ void dvbcut::addStartStopItems(std::vector<int> cutlist, int option)
   std::sort(cutlist.begin(),cutlist.end());
 
   // ...AND there are no old START/STOP pairs!!!
-  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
-    if (item->rtti()==EventListItem::RTTI()) {
-      EventListItem *eli=(EventListItem*)item;
+  int index;
+  for (index = 0; index < ui->eventlist->count(); index++)
+  {
+    EventListItem *eli = dynamic_cast<EventListItem *>(ui->eventlist->item(index));
+    if (eli) {
       if (eli->geteventtype()==EventListItem::start || eli->geteventtype()==EventListItem::stop) 
-         delete item;       
+         delete eli;
     } 
+  }
   
   for (std::vector<int>::iterator it = cutlist.begin(); it != cutlist.end(); ++it) {   
     if(!alternate) {
@@ -1313,24 +1328,22 @@ void dvbcut::jogslidervalue(int v)
     fine=false;
 }
 
-void dvbcut::doubleclickedeventlist(Q3ListBoxItem *lbi)
+void dvbcut::doubleclickedeventlist(QListWidgetItem *lbi)
 {
-  if (lbi->rtti()!=EventListItem::RTTI())
+  EventListItem *item = dynamic_cast<EventListItem *>(lbi);
+  if (!item)
     return;
 
   fine=true;
-  ui->linslider->setValue(((EventListItem*)lbi)->getpicture());
+  ui->linslider->setValue(item->getpicture());
   fine=false;
 }
 
-void dvbcut::eventlistcontextmenu(Q3ListBoxItem *lbi, const QPoint &point)
+void dvbcut::eventlistcontextmenu(const QPoint &point)
 {
-  if (!lbi)
+  EventListItem *eli = dynamic_cast<EventListItem *>(ui->eventlist->itemAt(point));
+  if (!eli)
     return;
-  if (lbi->rtti()!=EventListItem::RTTI())
-    return;
-  // is it a problem to have no "const EventListItem &eli=..."? Needed for seteventtype()...! 
-  EventListItem &eli=*static_cast<EventListItem*>(lbi);
 
   Q3PopupMenu popup(ui->eventlist);
   popup.insertItem("Go to",1);
@@ -1346,32 +1359,31 @@ void dvbcut::eventlistcontextmenu(Q3ListBoxItem *lbi, const QPoint &point)
   popup.insertItem("Convert to bookmark",11);
   popup.insertItem("Display difference from this picture",12);
 
-  Q3ListBox *lb=lbi->listBox();
-  Q3ListBoxItem *first=lb->firstItem(),*current,*next;
+  QListWidget *lb = ui->eventlist;
   EventListItem::eventtype cmptype=EventListItem::none, cmptype2=EventListItem::none;
+  int index;
 
-  switch (popup.exec(point)) {
+  switch (popup.exec(ui->eventlist->mapToGlobal(point))) {
     case 1:
       fine=true;
-      ui->linslider->setValue(eli.getpicture());
+      ui->linslider->setValue(eli->getpicture());
       fine=false;
       break;
 
     case 2:
       {
-      EventListItem::eventtype type=eli.geteventtype();
-      delete lbi;
+      EventListItem::eventtype type=eli->geteventtype();
+      delete eli;
       if (type!=EventListItem::bookmark) update_quick_picture_lookup_table();
       }
       break;
 
     case 3:
-      current=first;
-      while(current) {
-         next=current->next();
-         if (current!=lbi) delete current;
-         current=next;
-      }   
+      for (index = lb->count(); index > 0; index--) {
+          EventListItem *t = dynamic_cast<EventListItem *>(lb->item(index-1));
+          if (t != eli)
+              delete t;
+      }
       update_quick_picture_lookup_table();
       break;
 
@@ -1387,41 +1399,38 @@ void dvbcut::eventlistcontextmenu(Q3ListBoxItem *lbi, const QPoint &point)
       if (cmptype==EventListItem::none) cmptype=EventListItem::chapter;
     case 7:
       if (cmptype==EventListItem::none) cmptype=EventListItem::bookmark;
-      current=first;
-      while(current) {
-        next=current->next();
-        const EventListItem &eli_current=*static_cast<const EventListItem*>(current);
-        if (eli_current.geteventtype()==cmptype || eli_current.geteventtype()==cmptype2) 
-          delete current;
-        current=next;
-      }       
+      for (index = lb->count(); index > 0; index--) {
+          EventListItem *t = dynamic_cast<EventListItem *>(lb->item(index-1));
+          if (t->geteventtype() == cmptype || t->geteventtype() == cmptype2)
+              delete t;
+      }
       if (cmptype!=EventListItem::bookmark) update_quick_picture_lookup_table();
       break;
 
     case 8:
-      eli.seteventtype(EventListItem::start);
+      eli->seteventtype(EventListItem::start);
       update_quick_picture_lookup_table();
       break;
 
     case 9: 
-      eli.seteventtype(EventListItem::stop);
+      eli->seteventtype(EventListItem::stop);
       update_quick_picture_lookup_table();
       break; 
 
     case 10:
-      eli.seteventtype(EventListItem::chapter);
+      eli->seteventtype(EventListItem::chapter);
       update_quick_picture_lookup_table();
       break;
 
     case 11: 
-      eli.seteventtype(EventListItem::bookmark);
+      eli->seteventtype(EventListItem::bookmark);
       update_quick_picture_lookup_table();
       break; 
 
     case 12:
       if (imgp)
         delete imgp;
-      imgp=new differenceimageprovider(*mpg,eli.getpicture(),new dvbcutbusy(this),false,viewscalefactor);
+      imgp=new differenceimageprovider(*mpg,eli->getpicture(),new dvbcutbusy(this),false,viewscalefactor);
       updateimagedisplay();
       ui->viewNormalAction->setChecked(false);
       ui->viewUnscaledAction->setChecked(false);
@@ -2002,11 +2011,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   ui->linslider->setValue(0);
   ui->jogslider->setValue(0);
 
-  {
-    EventListItem *eli=new EventListItem(0,QPixmap::fromImage(imgp->getimage(0)),EventListItem::start,9999999,2,0);
-    ui->eventlist->setMinimumWidth(eli->width(ui->eventlist)+24);
-    delete eli;
-  }
+  ui->eventlist->setMinimumWidth(200);
 
   if (!domdoc.isNull()) {
     QDomElement e;
@@ -2353,8 +2358,11 @@ void dvbcut::update_quick_picture_lookup_table() {
     startpts=0; 
   }
   
-  for (Q3ListBoxItem *item=ui->eventlist->firstItem();item;item=item->next())
-    if (item->rtti()==EventListItem::RTTI()) {
+  int index;
+  for (index = 0; index < ui->eventlist->count(); index++)
+  {
+    EventListItem *item = dynamic_cast<EventListItem *>(ui->eventlist->item(index));
+    if (item) {
     const EventListItem &eli=*static_cast<const EventListItem*>(item);
     switch (eli.geteventtype()) {
       case EventListItem::start:
@@ -2389,6 +2397,7 @@ void dvbcut::update_quick_picture_lookup_table() {
         break;
       }
     }
+  }
 
   // last item in list was a (real or virtual) START
   if (stop_eof && startpic>=0) {

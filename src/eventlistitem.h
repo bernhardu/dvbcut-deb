@@ -21,23 +21,21 @@
 #ifndef _DVBCUT_EVENTLISTIEM_H_
 #define _DVBCUT_EVENTLISTIEM_H_
 
-#include <qpixmap.h>
-#include <q3listbox.h>
+#include <qlistwidget.h>
 #include "pts.h"
 
-class EventListItem : public Q3ListBoxItem
+class QLabel;
+class QPixmap;
+
+class EventListItem : public QListWidgetItem
   {
 public:
   enum eventtype { none, start, stop, chapter, bookmark };
 
 public:
-  EventListItem( Q3ListBox *listbox, const QPixmap &pixmap, eventtype type, int picture, int picturetype, pts_t _pts );
+  EventListItem( QListWidget *listbox, const QPixmap &pixmap, eventtype type, int picture, int picturetype, pts_t _pts );
   ~EventListItem();
 
-  const QPixmap *pixmap() const
-    {
-    return &pm;
-    }
   int getpicture() const
     {
     return pic;
@@ -53,31 +51,21 @@ public:
   void seteventtype(enum eventtype type)
     {
     evtype=type;
+    label_text->setText(getstring());
     return;
     }
 
-  int	 height( const Q3ListBox *lb ) const;
-  int	 width( const Q3ListBox *lb )  const;
-
-  int rtti() const;
-  static int RTTI()
-    {
-    return 294268923;
-    }
-
-protected:
-  void paint( QPainter * );
+  virtual bool operator<(const QListWidgetItem &other) const;
 
 private:
-  QPixmap pm;
   enum eventtype evtype;
   int pic;
   int pictype;
   pts_t pts;
 
   QString getstring() const;
+  QLabel *label_text;
 
-  static Q3ListBoxItem *afterwhich(Q3ListBox *lb, int picture);
   };
 
 #endif // ifndef _EVENTLISTIEM_H_
