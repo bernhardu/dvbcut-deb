@@ -145,7 +145,7 @@ dvbcut::dvbcut()
 #endif // ! HAVE_LIB_AO
 
   audiotrackpopup=new QMenu(QString("Audio track"), this);
-  ui->playMenu->insertSeparator();
+  ui->playMenu->addSeparator();
   audiotrackmenu=ui->playMenu->addMenu(audiotrackpopup);
   connect( audiotrackpopup, SIGNAL( triggered(QAction*) ), this, SLOT( audiotrackchosen(QAction*) ) );
 
