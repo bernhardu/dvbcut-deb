@@ -174,7 +174,7 @@ dvbcut::dvbcut()
   ui->linslider->installEventFilter(this);
 
   // set caption
-  setCaption(QString(VERSION_STRING));
+  setWindowTitle(QString(VERSION_STRING));
 }
 
 // **************************************************************************
@@ -674,7 +674,7 @@ void dvbcut::fileExport()
   }
   else {
     prgwin = new progresswindow(this);
-    prgwin->setCaption(QString("export - " + QString::fromStdString(expfilen)));
+    prgwin->setWindowTitle(QString("export - " + QString::fromStdString(expfilen)));
     log = prgwin;
   }
 
@@ -1697,7 +1697,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   std::string filename = filenames.front();
 
   // a valid file name has been entered
-  setCaption(QString(VERSION_STRING " - " + QString::fromStdString(filename)));
+  setWindowTitle(QString(VERSION_STRING " - " + QString::fromStdString(filename)));
 
   // reset inbuffer
   buf.reset();
@@ -2506,7 +2506,7 @@ public:
     connect(home, SIGNAL(clicked()), viewer, SLOT(home()));
     connect(close, SIGNAL(clicked()), this, SLOT(accept()));
     viewer->setSource(file);
-    setCaption(tr("dvbcut help"));
+    setWindowTitle(tr("dvbcut help"));
     show();
   }
   virtual ~helpDialog() {
