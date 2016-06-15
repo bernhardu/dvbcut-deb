@@ -25,10 +25,7 @@
     </widget>
    </item>
    <item>
-    <widget class="Q3TextBrowser" name="textbrowser">
-     <property name="autoFormatting">
-      <set>Q3TextEdit::AutoAll</set>
-     </property>
+    <widget class="QTextBrowser" name="textbrowser">
     </widget>
    </item>
    <item>
@@ -62,24 +59,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>Q3Frame</class>
-   <extends>QFrame</extends>
-   <header>Qt3Support/Q3Frame</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextEdit</class>
-   <extends>Q3Frame</extends>
-   <header>q3textedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextBrowser</class>
-   <extends>Q3TextEdit</extends>
-   <header>Qt3Support/Q3TextBrowser</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>
