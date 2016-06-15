@@ -147,7 +147,7 @@ dvbcut::dvbcut()
   audiotrackpopup=new QMenu(QString("Audio track"), this);
   ui->playMenu->insertSeparator();
   audiotrackmenu=ui->playMenu->addMenu(audiotrackpopup);
-  connect( audiotrackpopup, SIGNAL( activated(int) ), this, SLOT( audiotrackchosen(int) ) );
+  connect( audiotrackpopup, SIGNAL( triggered(QAction*) ), this, SLOT( audiotrackchosen(QAction*) ) );
 
   recentfilespopup=new QMenu(QString("Open recent..."), this);
   ui->fileMenu->insertMenu(ui->fileSaveAction, recentfilespopup);
@@ -1630,13 +1630,12 @@ void dvbcut::updateimagedisplay()
   }
 }
 
-void dvbcut::audiotrackchosen(int id)
+void dvbcut::audiotrackchosen(QAction* a)
 {
+  int id = a->data().toInt();
   if (id<0 || id>mpg->getaudiostreams())
     return;
   currentaudiotrack=id;
-  for(int a=0;a<mpg->getaudiostreams();++a)
-    audiotrackpopup->setItemChecked(a,a==id);
 }
 
 void dvbcut::abouttoshowrecentfiles()
@@ -2115,10 +2114,12 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   ui->linslider->setEnabled(true);
   ui->jogslider->setEnabled(true);
 
-  //   audiotrackmenuids.clear();
+  QActionGroup *audiotrackmenugroup = new QActionGroup(this);
   for(int a=0;a<mpg->getaudiostreams();++a) {
-    //     audiotrackmenuids.push_back(audiotrackpopup->insertItem(QString(mpg->getstreaminfo(audiostream(a)))));
-    audiotrackpopup->insertItem(QString::fromStdString(mpg->getstreaminfo(audiostream(a))),a);
+    QAction* action = audiotrackpopup->addAction(QString::fromStdString(mpg->getstreaminfo(audiostream(a))));
+    action->setData(a);
+    action->setCheckable(true);
+    audiotrackmenugroup->addAction(action);
   }
   if (mpg->getaudiostreams()>0) {
     audiotrackpopup->actions().at(0)->setChecked(true);
