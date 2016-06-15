@@ -1785,7 +1785,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
         line = QString::fromAscii(buff, readBytes);
       if (line.startsWith(QString("<!DOCTYPE"))
        || line.startsWith(QString("<?xml"))) {
-        infile.at(0);
+        infile.seek(0);
         QString errormsg;
         if (domdoc.setContent(&infile,false,&errormsg)) {
           QDomElement docelem = domdoc.documentElement();
@@ -1899,10 +1899,11 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	   * contain ":" will not be handled correctly. --mr
 	   */
 	  QUrl u;
-	  u.setProtocol(QString("file"));
+	  u.setScheme("file");
 	  u.setPath(QString::fromStdString(idxfilename));
-	  if (chdir(u.dirPath().toAscii()) == -1) chdir("/");
-	  QString relname = u.fileName();
+	  if (chdir(QFileInfo(u.path()).absolutePath().toAscii()) == -1)
+	      chdir("/");
+	  QString relname = QFileInfo(u.path()).fileName();
 	  QString s=QFileDialog::getSaveFileName(
 		  this,
 		  "Choose the name of the index file",
@@ -2530,11 +2531,11 @@ void dvbcut::helpContentAction_activated()
 {
   QFileInfo appDir(qApp->applicationDirPath());
   // first search in the directory containing dvbcut
-  QString helpFile = appDir.absFilePath() + "/dvbcut_en.html";
+  QString helpFile = appDir.absoluteFilePath() + "/dvbcut_en.html";
 #ifndef __WIN32__
   // Unix/Linux: search in the associated share subdirectory
   if (!QFile::exists(helpFile)) {
-    helpFile = appDir.dirPath(true) + "/share/help/dvbcut_en.html";
+    helpFile = appDir.absolutePath() + "/share/help/dvbcut_en.html";
   }
 #endif
   if (QFile::exists(helpFile)) {
