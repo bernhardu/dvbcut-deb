@@ -172,10 +172,6 @@ AC_CHECK_LIB(QtCore, main,
   [HAVE_QT4="yes"],
   [AC_MSG_ERROR([QtCore library not found])])
 
-AC_CHECK_LIB(Qt3Support, main,
-  [HAVE_QT4="yes"],
-  [AC_MSG_ERROR([Qt3Support library not found])])
-
 AC_CHECK_LIB(QtGui, main,
   [HAVE_QT4="yes"],
   [AC_MSG_ERROR([QtGui library not found])])
@@ -185,8 +181,8 @@ AC_CHECK_LIB(QtXml, main,
   [AC_MSG_ERROR([QtXml library not found])])
 
 if test "x$HAVE_QT4" = "xyes"; then 
-   QT_CXXFLAGS=`$PKG_CONFIG --cflags Qt3Support QtCore QtGui QtXml`
-   QT_LIBS=`$PKG_CONFIG --libs Qt3Support QtCore QtGui QtXml`
+   QT_CXXFLAGS=`$PKG_CONFIG --cflags QtCore QtGui QtXml`
+   QT_LIBS=`$PKG_CONFIG --libs QtCore QtGui QtXml`
    CPPFLAGS="$CPPFLAGS $QT_CXXFLAGS"
    LIBS="$LIBS $QT_LIBS"
 else
