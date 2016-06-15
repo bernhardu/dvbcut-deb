@@ -52,6 +52,7 @@
 #include <qstatusbar.h>
 #include <QTextCodec>
 #include <QTextStream>
+#include <QWheelEvent>
 
 #include "port.h"
 #include "dvbcut.h"

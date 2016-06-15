@@ -30,6 +30,7 @@
 #include <qtextbrowser.h>
 #include <qpushbutton.h>
 #include <qapplication.h>
+#include <QCloseEvent>
 #include "progresswindow.h"
 
 progresswindow::progresswindow(QWidget *parent)
