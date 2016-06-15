@@ -50,6 +50,7 @@
 #include <qsettings.h>
 #include <qregexp.h>
 #include <qstatusbar.h>
+#include <QTextCodec>
 #include <QTextStream>
 
 #include "port.h"
@@ -315,7 +316,7 @@ void dvbcut::fileSave()
   }
 
   QTextStream stream(&outfile);
-  stream.setEncoding(QTextStream::Latin1);
+  stream.setCodec(QTextCodec::codecForName("ISO-8859-1"));
   stream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
   stream << doc.toString().toStdString().c_str();
   outfile.close();
