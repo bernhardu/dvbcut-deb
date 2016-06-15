@@ -50,7 +50,6 @@ SOURCES += \
     eventlistitem.cpp \
     exception.cpp \
     exportdialog.cpp \
-    gettext.cpp \
     imageprovider.cpp \
     index.cpp \
     lavfmuxer.cpp \
@@ -78,7 +77,6 @@ HEADERS += \
     eventlistitem.h \
     exception.h \
     exportdialog.h \
-    gettext.h \
     imageprovider.h \
     index.h \
     lavfmuxer.h \

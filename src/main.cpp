@@ -43,8 +43,6 @@ extern "C" {
 #include "mpgfile.h"
 #include "index.h"
 
-#include "gettext.h"
-
 #include "version.h"
 
 #define VERSION_STRING	"dvbcut " VERSION "/" REVISION
@@ -90,8 +88,6 @@ main(int argc, char *argv[]) {
   std::list<std::string> filenames;
   int i;
 
-  setlocale(LC_ALL, "");
-  textdomain("dvbcut");
   /*
    * process arguments
    */

@@ -261,8 +261,6 @@ src/exportdialog.cpp
 src/exportdialog.h
 src/exportdialogbase.h
 src/exportdialogbase.ui
-src/gettext.cpp
-src/gettext.h
 src/imageprovider.cpp
 src/imageprovider.h
 src/index.cpp
