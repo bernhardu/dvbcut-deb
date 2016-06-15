@@ -1018,7 +1018,7 @@
  <connections>
   <connection>
    <sender>fileCloseAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>fileClose()</slot>
    <hints>
@@ -1034,7 +1034,7 @@
   </connection>
   <connection>
    <sender>fileOpenAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>fileOpen()</slot>
    <hints>
@@ -1098,7 +1098,7 @@
   </connection>
   <connection>
    <sender>editStartAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>editStart()</slot>
    <hints>
@@ -1114,7 +1114,7 @@
   </connection>
   <connection>
    <sender>editStopAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>editStop()</slot>
    <hints>
@@ -1130,7 +1130,7 @@
   </connection>
   <connection>
    <sender>editChapterAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>editChapter()</slot>
    <hints>
@@ -1146,7 +1146,7 @@
   </connection>
   <connection>
    <sender>editBookmarkAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>editBookmark()</slot>
    <hints>
@@ -1162,7 +1162,7 @@
   </connection>
   <connection>
    <sender>editAutoChaptersAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>editAutoChapters()</slot>
    <hints>
@@ -1178,7 +1178,7 @@
   </connection>
   <connection>
    <sender>editSuggestAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>editSuggest()</slot>
    <hints>
@@ -1194,7 +1194,7 @@
   </connection>
   <connection>
    <sender>editImportAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>editImport()</slot>
    <hints>
@@ -1306,7 +1306,7 @@
   </connection>
   <connection>
    <sender>playPlayAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>playPlay()</slot>
    <hints>
@@ -1322,7 +1322,7 @@
   </connection>
   <connection>
    <sender>playStopAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>playStop()</slot>
    <hints>
@@ -1338,7 +1338,7 @@
   </connection>
   <connection>
    <sender>playAudio1Action</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>playAudio1()</slot>
    <hints>
@@ -1354,7 +1354,7 @@
   </connection>
   <connection>
    <sender>playAudio2Action</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>playAudio2()</slot>
    <hints>
@@ -1370,7 +1370,7 @@
   </connection>
   <connection>
    <sender>fileNewAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>fileNew()</slot>
    <hints>
@@ -1386,7 +1386,7 @@
   </connection>
   <connection>
    <sender>fileSaveAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>fileSave()</slot>
    <hints>
@@ -1402,7 +1402,7 @@
   </connection>
   <connection>
    <sender>fileSaveAsAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>fileSaveAs()</slot>
    <hints>
@@ -1418,7 +1418,7 @@
   </connection>
   <connection>
    <sender>viewDifferenceAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>viewDifference()</slot>
    <hints>
@@ -1434,7 +1434,7 @@
   </connection>
   <connection>
    <sender>viewNormalAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>viewNormal()</slot>
    <hints>
@@ -1450,7 +1450,7 @@
   </connection>
   <connection>
    <sender>viewUnscaledAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>viewUnscaled()</slot>
    <hints>
@@ -1466,7 +1466,7 @@
   </connection>
   <connection>
    <sender>fileExportAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>fileExport()</slot>
    <hints>
@@ -1482,7 +1482,7 @@
   </connection>
   <connection>
    <sender>zoomInAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>zoomIn()</slot>
    <hints>
@@ -1498,7 +1498,7 @@
   </connection>
   <connection>
    <sender>zoomOutAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>zoomOut()</slot>
    <hints>
@@ -1514,7 +1514,7 @@
   </connection>
   <connection>
    <sender>viewHalfSizeAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>viewHalfSize()</slot>
    <hints>
@@ -1530,7 +1530,7 @@
   </connection>
   <connection>
    <sender>viewFullSizeAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>viewFullSize()</slot>
    <hints>
@@ -1546,7 +1546,7 @@
   </connection>
   <connection>
    <sender>viewQuarterSizeAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>viewQuarterSize()</slot>
    <hints>
@@ -1562,7 +1562,7 @@
   </connection>
   <connection>
    <sender>viewCustomSizeAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>viewCustomSize()</slot>
    <hints>
@@ -1578,7 +1578,7 @@
   </connection>
   <connection>
    <sender>snapshotSaveAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>snapshotSave()</slot>
    <hints>
@@ -1594,7 +1594,7 @@
   </connection>
   <connection>
    <sender>chapterSnapshotsSaveAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>chapterSnapshotsSave()</slot>
    <hints>
@@ -1610,7 +1610,7 @@
   </connection>
   <connection>
    <sender>helpAboutAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>helpAboutAction_activated()</slot>
    <hints>
@@ -1626,7 +1626,7 @@
   </connection>
   <connection>
    <sender>helpContentAction</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>dvbcutbase</receiver>
    <slot>helpContentAction_activated()</slot>
    <hints>

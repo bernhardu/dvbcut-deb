@@ -198,7 +198,7 @@ public slots:
   virtual void clickedgo2();
   virtual void updateimagedisplay();
   virtual void audiotrackchosen(QAction* a);
-  virtual void loadrecentfile(int id);
+  virtual void loadrecentfile(QAction* a);
   virtual void abouttoshowrecentfiles();
   virtual void wheelEvent(QWheelEvent* event);
   };

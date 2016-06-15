@@ -153,7 +153,7 @@ dvbcut::dvbcut()
 
   recentfilespopup=new QMenu(QString("Open recent..."), this);
   ui->fileMenu->insertMenu(ui->fileSaveAction, recentfilespopup);
-  connect( recentfilespopup, SIGNAL( activated(int) ), this, SLOT( loadrecentfile(int) ) );
+  connect( recentfilespopup, SIGNAL( triggered(QAction*) ), this, SLOT( loadrecentfile(QAction*) ) );
   connect( recentfilespopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshowrecentfiles() ) );
 
   editconvertpopup=new QMenu(QString("Convert bookmarks"), this);
@@ -1648,12 +1648,13 @@ void dvbcut::abouttoshowrecentfiles()
     menuitem=QString(QString::fromStdString(settings().recentfiles[id].first.front()));
     if(settings().recentfiles[id].first.size()>1)
       menuitem += " ... (+" + QString::number(settings().recentfiles[id].first.size()-1) + ")";
-    recentfilespopup->addAction(menuitem);    
+    recentfilespopup->addAction(menuitem)->setData(id);
   }   
 }
 
-void dvbcut::loadrecentfile(int id)
+void dvbcut::loadrecentfile(QAction* a)
 {
+  int id = a->data().toInt();
   if (id<0 || id>=(signed)settings().recentfiles.size())
     return;
   open(settings().recentfiles[(unsigned)id].first, settings().recentfiles[(unsigned)id].second);
