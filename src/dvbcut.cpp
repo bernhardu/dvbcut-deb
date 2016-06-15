@@ -538,21 +538,21 @@ void dvbcut::fileExport()
   }
 
   std::auto_ptr<exportdialog> expd(new exportdialog(QString::fromStdString(expfilen),this));
-  expd->ui->muxercombo->insertItem("MPEG program stream/DVD (DVBCUT multiplexer)");
-  expd->ui->muxercombo->insertItem("MPEG program stream (DVBCUT multiplexer)");
-  expd->ui->muxercombo->insertItem("MPEG program stream/DVD (libavformat)");
-  expd->ui->muxercombo->insertItem("MPEG transport stream (libavformat)");
+  expd->ui->muxercombo->addItem("MPEG program stream/DVD (DVBCUT multiplexer)");
+  expd->ui->muxercombo->addItem("MPEG program stream (DVBCUT multiplexer)");
+  expd->ui->muxercombo->addItem("MPEG program stream/DVD (libavformat)");
+  expd->ui->muxercombo->addItem("MPEG transport stream (libavformat)");
 #ifndef __WIN32__
   // add possible user configured pipe commands 
   int pipe_items_start=expd->ui->muxercombo->count();
   for (unsigned int i = 0; i < settings().pipe_command.size(); ++i)
-    expd->ui->muxercombo->insertItem(settings().pipe_label[i]);
+    expd->ui->muxercombo->addItem(settings().pipe_label[i]);
 #endif
 
   if (settings().export_format < 0
       || settings().export_format >= expd->ui->muxercombo->count())
     settings().export_format = 0;
-  expd->ui->muxercombo->setCurrentItem(settings().export_format);
+  expd->ui->muxercombo->setCurrentIndex(settings().export_format);
 
   for(int a=0;a<mpg->getaudiostreams();++a) {
     expd->ui->audiolist->addItem(mpg->getstreaminfo(audiostream(a)).c_str());
@@ -565,8 +565,8 @@ void dvbcut::fileExport()
     if (!expd->exec())
       return;
 
-    settings().export_format = expd->ui->muxercombo->currentItem();
-    expfmt = expd->ui->muxercombo->currentItem();
+    settings().export_format = expd->ui->muxercombo->currentIndex();
+    expfmt = expd->ui->muxercombo->currentIndex();
 
     expfilen=(const char *)(expd->ui->filenameline->text());
     if (expfilen.empty())
