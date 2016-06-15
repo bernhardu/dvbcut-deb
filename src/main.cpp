@@ -200,7 +200,6 @@ main(int argc, char *argv[]) {
    * GUI and batch mode
    */
   QApplication a(argc, argv);
-  QTextCodec::setCodecForCStrings(QTextCodec::codecForLocale());
 
 #ifdef HAVE_LIB_AO
   ao_initialize();
