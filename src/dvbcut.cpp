@@ -39,7 +39,6 @@
 #include <qstring.h>
 #include <qlineedit.h>
 #include <qprocess.h>
-#include <q3popupmenu.h>
 #include <qpushbutton.h>
 #include <qaction.h>
 #include <qtextbrowser.h>
@@ -1345,32 +1344,53 @@ void dvbcut::eventlistcontextmenu(const QPoint &point)
   if (!eli)
     return;
 
-  Q3PopupMenu popup(ui->eventlist);
-  popup.insertItem("Go to",1);
-  popup.insertItem("Delete",2);
-  popup.insertItem("Delete others",3);
-  popup.insertItem("Delete all",4);
-  popup.insertItem("Delete all start/stops",5);
-  popup.insertItem("Delete all chapters",6);
-  popup.insertItem("Delete all bookmarks",7);
-  popup.insertItem("Convert to start marker",8);
-  popup.insertItem("Convert to stop marker",9);
-  popup.insertItem("Convert to chapter marker",10);
-  popup.insertItem("Convert to bookmark",11);
-  popup.insertItem("Display difference from this picture",12);
+  enum popup_actions {
+      act_go_to = 1,
+      act_delete,
+      act_delete_others,
+      act_delete_all,
+      act_delete_all_startstops,
+      act_delete_all_chapters,
+      act_delete_all_bookmarks,
+      act_convert_to_start,
+      act_convert_to_stop,
+      act_convert_to_chapter,
+      act_convert_to_bookmark,
+      act_display_difference
+  };
+
+  QMenu popup(ui->eventlist);
+  popup.addAction(tr("Go to"))->setData(act_go_to);
+  popup.addSeparator();
+  popup.addAction(tr("Delete"))->setData(act_delete);
+  popup.addAction(tr("Delete others"))->setData(act_delete_others);
+  popup.addAction(tr("Delete all"))->setData(act_delete_all);
+  popup.addAction(tr("Delete all start/stops"))->setData(act_delete_all_startstops);
+  popup.addAction(tr("Delete all chapters"))->setData(act_delete_all_chapters);
+  popup.addAction(tr("Delete all bookmarks"))->setData(act_delete_all_bookmarks);
+  popup.addSeparator();
+  popup.addAction(tr("Convert to start marker"))->setData(act_convert_to_start);
+  popup.addAction(tr("Convert to stop marker"))->setData(act_convert_to_stop);
+  popup.addAction(tr("Convert to chapter marker"))->setData(act_convert_to_chapter);
+  popup.addAction(tr("Convert to bookmark"))->setData(act_convert_to_bookmark);
+  popup.addSeparator();
+  popup.addAction(tr("Display difference from this picture"))->setData(act_display_difference);
 
   QListWidget *lb = ui->eventlist;
   EventListItem::eventtype cmptype=EventListItem::none, cmptype2=EventListItem::none;
   int index;
 
-  switch (popup.exec(ui->eventlist->mapToGlobal(point))) {
-    case 1:
+  QAction *a = popup.exec(ui->eventlist->mapToGlobal(point));
+  if (!a)
+      return;
+  switch (a->data().toInt()) {
+    case act_go_to:
       fine=true;
       ui->linslider->setValue(eli->getpicture());
       fine=false;
       break;
 
-    case 2:
+    case act_delete:
       {
       EventListItem::eventtype type=eli->geteventtype();
       delete eli;
@@ -1378,7 +1398,7 @@ void dvbcut::eventlistcontextmenu(const QPoint &point)
       }
       break;
 
-    case 3:
+    case act_delete_others:
       for (index = lb->count(); index > 0; index--) {
           EventListItem *t = dynamic_cast<EventListItem *>(lb->item(index-1));
           if (t != eli)
@@ -1387,17 +1407,17 @@ void dvbcut::eventlistcontextmenu(const QPoint &point)
       update_quick_picture_lookup_table();
       break;
 
-    case 4:
+    case act_delete_all:
       lb->clear();
       update_quick_picture_lookup_table();
       break;
 
-    case 5:
+    case act_delete_all_startstops:
       cmptype=EventListItem::start;
       cmptype2=EventListItem::stop;
-    case 6:
+    case act_delete_all_chapters:
       if (cmptype==EventListItem::none) cmptype=EventListItem::chapter;
-    case 7:
+    case act_delete_all_bookmarks:
       if (cmptype==EventListItem::none) cmptype=EventListItem::bookmark;
       for (index = lb->count(); index > 0; index--) {
           EventListItem *t = dynamic_cast<EventListItem *>(lb->item(index-1));
@@ -1407,27 +1427,27 @@ void dvbcut::eventlistcontextmenu(const QPoint &point)
       if (cmptype!=EventListItem::bookmark) update_quick_picture_lookup_table();
       break;
 
-    case 8:
+    case act_convert_to_start:
       eli->seteventtype(EventListItem::start);
       update_quick_picture_lookup_table();
       break;
 
-    case 9: 
+    case act_convert_to_stop:
       eli->seteventtype(EventListItem::stop);
       update_quick_picture_lookup_table();
       break; 
 
-    case 10:
+    case act_convert_to_chapter:
       eli->seteventtype(EventListItem::chapter);
       update_quick_picture_lookup_table();
       break;
 
-    case 11: 
+    case act_convert_to_bookmark:
       eli->seteventtype(EventListItem::bookmark);
       update_quick_picture_lookup_table();
       break; 
 
-    case 12:
+    case act_display_difference:
       if (imgp)
         delete imgp;
       imgp=new differenceimageprovider(*mpg,eli->getpicture(),new dvbcutbusy(this),false,viewscalefactor);
