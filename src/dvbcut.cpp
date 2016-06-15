@@ -414,7 +414,7 @@ void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
       p = imgp->getimage(pic,fine);
     else
       p = imageprovider(*mpg, new dvbcutbusy(this), false, viewscalefactor).getimage(pic,fine);
-    if(p.save(s,type,quality))
+    if(p.save(s,type.toAscii(),quality))
       statusBar()->showMessage("Saved snapshot: " + s);
     else
       statusBar()->showMessage("*** Unable to save snapshot: " + s + "! ***");
@@ -568,7 +568,7 @@ void dvbcut::fileExport()
     settings().export_format = expd->ui->muxercombo->currentIndex();
     expfmt = expd->ui->muxercombo->currentIndex();
 
-    expfilen=(const char *)(expd->ui->filenameline->text());
+    expfilen = expd->ui->filenameline->text().toStdString();
     if (expfilen.empty())
       return;
     expd->hide();
@@ -612,10 +612,10 @@ void dvbcut::fileExport()
   int ip=expfmt-pipe_items_start; 
   if(ip>=0) {
     expfmt=settings().pipe_format[ip];
-    if (settings().pipe_command[ip].find('|')==-1) 
-      expcmd = "|"+std::string(settings().pipe_command[ip].ascii());
+    if (settings().pipe_command[ip].indexOf('|') == -1)
+      expcmd = "|" + settings().pipe_command[ip].toStdString();
     else 
-      expcmd = std::string(settings().pipe_command[ip].ascii());
+      expcmd = settings().pipe_command[ip].toStdString();
        
     if ((pos=expcmd.find("%OUTPUT%"))!=std::string::npos)
       expcmd.replace(pos,8,expfilen);  
@@ -762,7 +762,7 @@ void dvbcut::fileExport()
 
   // do some post processing if requested
   if (ip>=0 && !settings().pipe_post[ip].isEmpty()) {
-    expcmd = std::string(settings().pipe_post[ip].ascii());
+    expcmd = settings().pipe_post[ip].toStdString();
        
     if ((pos=expcmd.find("%OUTPUT%"))!=std::string::npos)
       expcmd.replace(pos,8,expfilen);  
@@ -2247,7 +2247,7 @@ int
 dvbcut::question(const QString & caption, const QString & text)
 {
   if (nogui) {
-    fprintf(stderr, "%s\n%s\n(assuming No)\n", caption.ascii(), text.ascii());
+    fprintf(stderr, "%s\n%s\n(assuming No)\n", caption.toAscii().data(), text.toAscii().data());
     return QMessageBox::No;
   }
   return QMessageBox::question(this, caption, text, QMessageBox::Yes,
@@ -2263,7 +2263,7 @@ int
 dvbcut::critical(const QString & caption, const QString & text)
 {
   if (nogui) {
-    fprintf(stderr, "%s\n%s\n(aborting)\n", caption.ascii(), text.ascii());
+    fprintf(stderr, "%s\n%s\n(aborting)\n", caption.toAscii().data(), text.toAscii().data());
     return QMessageBox::Abort;
   }
   return QMessageBox::critical(this, caption, text,
