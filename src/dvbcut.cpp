@@ -415,7 +415,7 @@ void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
       p = imgp->getimage(pic,fine);
     else
       p = imageprovider(*mpg, new dvbcutbusy(this), false, viewscalefactor).getimage(pic,fine);
-    if(p.save(s,type.toAscii(),quality))
+    if(p.save(s,type.toLatin1(),quality))
       statusBar()->showMessage("Saved snapshot: " + s);
     else
       statusBar()->showMessage("*** Unable to save snapshot: " + s + "! ***");
@@ -1783,7 +1783,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
       QString line;
       qint64 readBytes = infile.readLine(buff,512);
       if(readBytes>0)
-        line = QString::fromAscii(buff, readBytes);
+        line = QString::fromLatin1(buff, readBytes);
       if (line.startsWith(QString("<!DOCTYPE"))
        || line.startsWith(QString("<?xml"))) {
         infile.seek(0);
@@ -1902,7 +1902,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	  QUrl u;
 	  u.setScheme("file");
 	  u.setPath(QString::fromStdString(idxfilename));
-	  if (chdir(QFileInfo(u.path()).absolutePath().toAscii()) == -1)
+	  if (chdir(QFileInfo(u.path()).absolutePath().toLatin1()) == -1)
 	      chdir("/");
 	  QString relname = QFileInfo(u.path()).fileName();
 	  QString s=QFileDialog::getSaveFileName(
@@ -2248,7 +2248,7 @@ int
 dvbcut::question(const QString & caption, const QString & text)
 {
   if (nogui) {
-    fprintf(stderr, "%s\n%s\n(assuming No)\n", caption.toAscii().data(), text.toAscii().data());
+    fprintf(stderr, "%s\n%s\n(assuming No)\n", caption.toLatin1().data(), text.toLatin1().data());
     return QMessageBox::No;
   }
   return QMessageBox::question(this, caption, text, QMessageBox::Yes,
@@ -2264,7 +2264,7 @@ int
 dvbcut::critical(const QString & caption, const QString & text)
 {
   if (nogui) {
-    fprintf(stderr, "%s\n%s\n(aborting)\n", caption.toAscii().data(), text.toAscii().data());
+    fprintf(stderr, "%s\n%s\n(aborting)\n", caption.toLatin1().data(), text.toLatin1().data());
     return QMessageBox::Abort;
   }
   return QMessageBox::critical(this, caption, text,
