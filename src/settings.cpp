@@ -191,17 +191,18 @@ dvbcut_settings::load_settings() {
     recentfiles_max = value("/max", 5).toInt();
     recentfiles.clear();
     std::list<std::string> filenames;
-    QStringList keys = entryList("/");
+    beginGroup("/");
+    QStringList keys = childKeys();
     for (unsigned int i = 0; i < recentfiles_max; ++i) {
       QString key = "/" + QString::number(i);
       if (version < 1 && keys.size()>1) {
 		// OLD format (2 keys per input file, NO subkeys!)
-        QString filename = readEntry(key);
+	QString filename = value(key).toString();
         if (filename.isEmpty())
 		  continue;
         filenames.clear();
         filenames.push_back(filename.toStdString());
-        QString idxfilename = readEntry(key + "-idx", "");
+        QString idxfilename = value(key + "-idx", "").toString();
         recentfiles.push_back(
         std::pair<std::list<std::string>,std::string>(filenames, idxfilename.toStdString()));
       }
@@ -217,13 +218,14 @@ dvbcut_settings::load_settings() {
 		  filenames.push_back(filename.toStdString());
 		  filename = value("/" + QString::number(++j), "").toString();
 		}  
-		QString idxfilename = readEntry("/idx", "");
+		QString idxfilename = value("/idx", "").toString();
 		recentfiles.push_back(
 		  std::pair<std::list<std::string>,std::string>(filenames, idxfilename.toStdString()));
 	  }
 	endGroup();	// key
       }
     }
+    endGroup(); // "/"
   endGroup();	// recentfiles
   beginGroup("/labels");
     start_label = value("/start", DVBCUT_DEFAULT_START_LABEL).toString();
@@ -264,10 +266,10 @@ dvbcut_settings::load_settings() {
       pipe_format.push_back(format);
       QString key = "/" + QString::number(++i);
       beginGroup(key);
-	command = readEntry("/command","");
-	post = readEntry("/post","");
-	label = readEntry("/label","");
-	format = readNumEntry("/format", 0);
+        command = value("/command","").toString();
+        post = value("/post","").toString();
+        label = value("/label","").toString();
+        format = value("/format", "0").toInt();
       endGroup();	// key
     }
   endGroup();	// pipe
@@ -319,17 +321,21 @@ dvbcut_settings::save_settings() {
   setValue("/export_format", export_format);
   beginGroup("/recentfiles");
     // first remove any OLD recentfiles entries to clean the settings file (<revision 108)!!!
-    QStringList keys = entryList("/");
-    for ( QStringList::Iterator it = keys.begin(); it != keys.end(); ++it ) 
+    beginGroup("/");
+    QStringList keys = childKeys();
+    for ( QStringList::Iterator it = keys.begin(); it != keys.end(); ++it )
       remove("/" + *it);
     // then remove ALL new recentfiles entries!!!
     // (otherwise it would be a mess with erased&inserted muliple file entries of different size)
-    QStringList subkeys = subkeyList("/");
+    QStringList subkeys = childGroups();
     for ( QStringList::Iterator its = subkeys.begin(); its != subkeys.end(); ++its ) {
-      QStringList keys = entryList("/" + *its);
+      beginGroup("/" + *its);
+      QStringList keys = childKeys();
       for ( QStringList::Iterator itk = keys.begin(); itk != keys.end(); ++itk ) 
         remove("/"  + *its + "/" + *itk);
+      endGroup(); // "/" + *its
     }    
+    endGroup(); // "/"
     setValue("/max", int(recentfiles_max));
     // and NOW write the updated list from scratch!!!
     for (unsigned int i = 0; i < recentfiles.size(); ++i) {
