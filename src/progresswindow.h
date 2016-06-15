@@ -42,7 +42,7 @@ protected:
   void closeEvent(QCloseEvent *e);
   Ui::progresswindowbase* ui;
 public:
-  progresswindow(QWidget *parent = 0, const char *name = 0);
+  progresswindow(QWidget *parent = 0);
   ~progresswindow();
   virtual bool cancelled()
     {

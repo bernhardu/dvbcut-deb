@@ -28,7 +28,7 @@ class exportdialog: public QDialog
   {
   Q_OBJECT
 public:
-  exportdialog(const QString &filename, QWidget *parent = 0, const char *name = 0);
+  exportdialog(const QString &filename, QWidget *parent = 0);
   ~exportdialog();
   Ui::exportdialogbase* ui;
   

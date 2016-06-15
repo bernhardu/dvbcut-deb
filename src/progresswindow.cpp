@@ -32,12 +32,13 @@
 #include <qapplication.h>
 #include "progresswindow.h"
 
-progresswindow::progresswindow(QWidget *parent, const char *name)
-    :QDialog(parent, name, true), logoutput(),
+progresswindow::progresswindow(QWidget *parent)
+    :QDialog(parent), logoutput(),
     cancelwasclicked(false), waitingforclose(false)
   {
   ui = new Ui::progresswindowbase();
   ui->setupUi(this);
+  setModal(true);
 
   textcursor = new QTextCursor(ui->logbrowser->document());
 

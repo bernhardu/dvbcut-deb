@@ -2475,8 +2475,8 @@ void dvbcut::helpAboutAction_activated()
 
 class helpDialog : public QDialog {
 public:
-  helpDialog(QWidget *parent, const char *name, QString file)
-  : QDialog(parent, name)
+  helpDialog(QWidget *parent, QString file)
+  : QDialog(parent)
   {
     prev = new QPushButton(tr("Prev"));
     next = new QPushButton(tr("Next"));
@@ -2538,7 +2538,7 @@ void dvbcut::helpContentAction_activated()
   }
 #endif
   if (QFile::exists(helpFile)) {
-    helpDialog dlg(this, "helpDialog", helpFile);
+    helpDialog dlg(this, helpFile);
     dlg.exec();
   }
   else {

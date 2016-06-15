@@ -22,11 +22,12 @@
 #include <qfiledialog.h>
 #include "exportdialog.h"
 
-exportdialog::exportdialog(const QString &filename, QWidget *parent, const char *name)
-    :QDialog(parent, name, true)
+exportdialog::exportdialog(const QString &filename, QWidget *parent)
+    :QDialog(parent)
   {
     ui = new Ui::exportdialogbase();
     ui->setupUi(this);
+    setModal(true);
     ui->filenameline->setText(filename);
   }
   
