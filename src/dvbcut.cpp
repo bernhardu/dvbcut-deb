@@ -848,9 +848,9 @@ void dvbcut::addEventListItem(int pic, EventListItem::eventtype type)
 
   QPixmap p;
   if (imgp && imgp->rtti() == IMAGEPROVIDER_STANDARD)
-    p = imgp->getimage(pic);
+    p = QPixmap::fromImage(imgp->getimage(pic));
   else
-    p = imageprovider(*mpg, new dvbcutbusy(this), false, 4).getimage(pic);
+    p = QPixmap::fromImage(imageprovider(*mpg, new dvbcutbusy(this), false, 4).getimage(pic));
   
   new EventListItem(ui->eventlist, p, type, pic, (*mpg)[pic].getpicturetype(),
                     (*mpg)[pic].getpts() - firstpts);
