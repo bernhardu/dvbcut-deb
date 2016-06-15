@@ -1715,7 +1715,6 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
     imgp=0;
   }
   ui->eventlist->clear();
-  ui->imagedisplay->setBackgroundMode(Qt::PaletteBackground);
   ui->imagedisplay->setMinimumSize(QSize(0,0));
   ui->imagedisplay->setPixmap(QPixmap());
   ui->pictimelabel->clear();
@@ -2026,7 +2025,6 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   if (settings().jog_interval > 0 && settings().jog_interval <= 100000) 
     ui->jogslider->setTickInterval(int(100000/settings().jog_interval));
 
-  ui->imagedisplay->setBackgroundMode(Qt::NoBackground);
   curpic=~0;
   showimage=true;
   fine=false;

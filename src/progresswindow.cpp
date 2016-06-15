@@ -51,7 +51,9 @@ progresswindow::progresswindow(QWidget *parent)
   fc_error.setForeground(Qt::red);
   fc_error.setFontUnderline(true);
 
-  ui->cancelbutton->setPaletteBackgroundColor( QColor( 255,0,0 ) );
+  QPalette palette;
+  palette.setColor(ui->cancelbutton->backgroundRole(), QColor( 255,0,0 ));
+  ui->cancelbutton->setPalette(palette);
 
   show();
   qApp->processEvents();
@@ -75,7 +77,11 @@ void progresswindow::finish()
   ui->cancelbutton->setEnabled(false);
   waitingforclose=true;
   ui->cancelbutton->setText( tr( "Close" ) );
-  ui->cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
+
+  QPalette palette;
+  palette.setColor(ui->cancelbutton->backgroundRole(), QColor( 0,255,0 ));
+  ui->cancelbutton->setPalette(palette);
+
   ui->cancelbutton->setEnabled(true);
   exec();
   }
@@ -180,7 +186,11 @@ void progresswindow::clickedcancel()
     ui->cancelbutton->setEnabled(false);
     qApp->processEvents();
     ui->cancelbutton->setText( tr( "Close" ) );
-    ui->cancelbutton->setPaletteBackgroundColor( QColor( 0,255,0 ) );
+
+    QPalette palette;
+    palette.setColor(ui->cancelbutton->backgroundRole(), QColor( 0,255,0 ));
+    ui->cancelbutton->setPalette(palette);
+
     ui->cancelbutton->setEnabled(true);
   } else {
     // button function is close
