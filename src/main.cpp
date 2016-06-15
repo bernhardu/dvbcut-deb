@@ -220,19 +220,19 @@ main(int argc, char *argv[]) {
     if(!cutlist.empty()) {
       if(cutlist.front()=="AR") {  // obsolete (use 4:3 resp. 16:9 instead)! Or just in case of another AR... 
           main->editSuggest();
-          main->editConvert(0);             
+          main->editConvert(dvbcut::act_start_stop);
       } else if(cutlist.front()=="4:3") {
           main->editSuggest();     
-          main->editConvert(2);             
+          main->editConvert(dvbcut::act_4_3);
       } else if(cutlist.front()=="16:9") {
           main->editSuggest();     
-          main->editConvert(3);             
+          main->editConvert(dvbcut::act_16_9);
       } else if(cutlist.front()=="TS" || cutlist.front()=="TS1") {  // first bookmark is a START
           main->editImport();     
-          main->editConvert(0);             
+          main->editConvert(dvbcut::act_start_stop);
       } else if(cutlist.front()=="TS2") { // 2nd bookmark is a START
           main->editImport();     
-          main->editConvert(1);             
+          main->editConvert(dvbcut::act_stop_start);
       } else { 
           std::vector<int> piclist, prob_item, prob_pos;
           unsigned int j;

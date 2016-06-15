@@ -156,7 +156,7 @@ dvbcut::dvbcut()
 
   editconvertpopup=new QMenu(QString("Convert bookmarks"), this);
   ui->editMenu->insertMenu(ui->editBookmarkAction, editconvertpopup);
-  connect( editconvertpopup, SIGNAL( activated(int) ), this, SLOT( editConvert(int) ) );
+  connect( editconvertpopup, SIGNAL( triggered(QAction*) ), this, SLOT( editConvert(QAction*) ) );
   connect( editconvertpopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshoweditconvert() ) );
   
   ui->fileOpenAction->setIcon(QIcon::fromTheme("document-open", this->style()->standardIcon(QStyle::SP_DialogOpenButton)));
@@ -980,21 +980,26 @@ void dvbcut::editImport()
     statusBar()->showMessage(QString("*** No valid bookmarks available/found! ***"));
 }
 
-
 void dvbcut::abouttoshoweditconvert()
 {
   editconvertpopup->clear();
-  editconvertpopup->insertItem(QString("START / STOP"), 0);    
-  editconvertpopup->insertItem(QString("STOP / START"), 1);    
-  editconvertpopup->insertItem(QString("4 : 3"), 2);    
-  editconvertpopup->insertItem(QString("16 : 9"), 3);    
+  editconvertpopup->addAction(tr("START / STOP"))->setData(act_start_stop);
+  editconvertpopup->addAction(tr("STOP / START"))->setData(act_stop_start);
+  editconvertpopup->addAction(tr("4 : 3"))->setData(act_4_3);
+  editconvertpopup->addAction(tr("16 : 9"))->setData(act_16_9);
 }
 
-void dvbcut::editConvert(int option)
+void dvbcut::editConvert(QAction *a)
+{
+  int option = a->data().toInt();
+  if (option < act_start_stop || option > act_16_9)
+      return;
+  editConvert((editconvertpop_actions)option);
+}
+
+void dvbcut::editConvert(editconvertpop_actions option)
 {
   // convert Bookmarks to START/STOP markers
-  if(option<0 || option>3) return;
-  
   int found=0;
   std::vector<int> cutlist;
   int index;
@@ -1024,9 +1029,9 @@ void dvbcut::addStartStopItems(std::vector<int> cutlist, int option)
   // take list of frame numbers and set alternating START/STOP markers
   bool alternate=true;
   EventListItem::eventtype type=EventListItem::start;
-  if(option==1)
+  if (option == act_stop_start)
     type=EventListItem::stop;
-  else if(option==2 || option==3)
+  else if (option == act_4_3 || option == act_16_9)
     alternate=false;   
  
   // make sure list is sorted... 

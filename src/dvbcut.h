@@ -148,6 +148,13 @@ public:
   void addStartStopItems(std::vector<int>, int option=0);
   int getTimePerFrame() { return timeperframe>0 && timeperframe<5000 ? timeperframe : 3003; };
 
+  enum editconvertpop_actions {
+      act_start_stop = 0,
+      act_stop_start,
+      act_4_3,
+      act_16_9
+  };
+
 public slots:
   virtual void fileNew();
   virtual void fileOpen();
@@ -164,7 +171,8 @@ public slots:
   virtual void editAutoChapters();
   virtual void editSuggest();
   virtual void editImport();
-  virtual void editConvert(int);
+  virtual void editConvert(QAction* a);
+  virtual void editConvert(editconvertpop_actions options);
   virtual void abouttoshoweditconvert();
   virtual void viewDifference();
   virtual void viewUnscaled();
