@@ -50,6 +50,7 @@
 #include <qsettings.h>
 #include <qregexp.h>
 #include <qstatusbar.h>
+#include <QTextStream>
 
 #include "port.h"
 #include "dvbcut.h"
@@ -122,7 +123,7 @@ void dvbcut::setbusy(bool b)
 // ***  dvbcut::dvbcut (private constructor)
 
 dvbcut::dvbcut()
-    :Q3MainWindow(),
+    :QMainWindow(),
     audiotrackpopup(0), recentfilespopup(0), editconvertpopup(0), audiotrackmenu(0),
     buf(8 << 20, 128 << 20),
     mpg(0), pictures(0),
@@ -2226,8 +2227,13 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
     }
 
   // propagate to base class
-  //return ui->eventFilter(watched, e);
-  return Q3MainWindow::eventFilter(watched, e);
+  return QMainWindow::eventFilter(watched, e);
+}
+
+/*virtual*/
+void dvbcut::wheelEvent(QWheelEvent* event)
+{
+    eventFilter(NULL, event);
 }
 
 int

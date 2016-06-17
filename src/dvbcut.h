@@ -32,7 +32,7 @@
 class QProcess;
 class imageprovider;
 
-class dvbcut: public Q3MainWindow
+class dvbcut: public QMainWindow
   {
   Q_OBJECT
 
@@ -192,6 +192,7 @@ public slots:
   virtual void audiotrackchosen(int id);
   virtual void loadrecentfile(int id);
   virtual void abouttoshowrecentfiles();
+  virtual void wheelEvent(QWheelEvent* event);
   };
 
 #endif
