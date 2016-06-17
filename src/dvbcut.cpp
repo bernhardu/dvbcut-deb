@@ -2066,7 +2066,6 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
         picnum=str.toInt(&okay,0);
       if (okay && picnum>=0 && picnum<pictures) {
         new EventListItem(ui->eventlist,QPixmap::fromImage(imgp->getimage(picnum)),evt,picnum,(*mpg)[picnum].getpicturetype(),(*mpg)[picnum].getpts()-firstpts);
-        qApp->processEvents();
       }
     }
   }
