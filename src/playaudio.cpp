@@ -202,7 +202,7 @@ protected:
   }
     
   static enum mad_flow output(void *data,
-                              struct mad_header const *header,
+                              struct mad_header const */*header*/,
                               struct mad_pcm *pcm)
   {
     mp2dec *This=reinterpret_cast<mp2dec*>(data);
@@ -241,7 +241,7 @@ protected:
   
   static enum mad_flow error(void *data,
                                   struct mad_stream *stream,
-                                  struct mad_frame *frame)
+                                  struct mad_frame */*frame*/)
   {
     mp2dec *This=reinterpret_cast<mp2dec*>(data);
     
