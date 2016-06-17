@@ -139,7 +139,7 @@ public:
     } else if(bmtype==time) {
       // convert pts positions to frame numbers if not already done/stored
       int picnr;
-      for (std::vector<dvbcut_off_t>::iterator b = time_bookmarks.begin(); b != time_bookmarks.end(); ++b) 
+      for (std::vector<pts_t>::iterator b = time_bookmarks.begin(); b != time_bookmarks.end(); ++b)
         if((picnr = getpictureattime(*b)) >= 0) 
           pic_bookmarks.push_back(picnr);
       bmtype = pic;
