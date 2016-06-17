@@ -731,10 +731,11 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
   pts_t startpts=idx[idx.indexnr(start)].getpts();
   while (outpicture<stop)
   {
-    AVPacket pkt = {0};
+    AVPacket pkt;
     u_int8_t *buf=(u_int8_t*)m2v.writeptr();
     int ret, got_output;
 
+    av_init_packet(&pkt);
     pkt.data = buf;
     pkt.size = m2v.getsize();
 
