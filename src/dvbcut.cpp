@@ -50,6 +50,7 @@
 #include <qsettings.h>
 #include <qregexp.h>
 #include <qstatusbar.h>
+#include <QProxyStyle>
 #include <QTextCodec>
 #include <QTextStream>
 #include <QWheelEvent>
@@ -121,6 +122,17 @@ void dvbcut::setbusy(bool b)
   }
 }
 
+class SliderStyleAbsolute : public QProxyStyle {
+public:
+    virtual int styleHint ( StyleHint hint, const QStyleOption * option = 0, const QWidget * widget = 0, QStyleHintReturn * returnData = 0 ) const{
+        if (hint == QStyle::SH_Slider_AbsoluteSetButtons){
+            return Qt::LeftButton;
+        }else{
+            return QProxyStyle::styleHint(hint, option, widget, returnData);
+        }
+    }
+};
+
 // **************************************************************************
 // ***  dvbcut::dvbcut (private constructor)
 
@@ -174,6 +186,7 @@ dvbcut::dvbcut()
 
   // install event handler
   ui->linslider->installEventFilter(this);
+  ui->linslider->setStyle(new SliderStyleAbsolute);
 
   // set caption
   setWindowTitle(QString(VERSION_STRING));
