@@ -39,6 +39,10 @@ extern "C" {
 #include <qimage.h>
 #include <qsettings.h>
 #include <qtextcodec.h>
+#include <QFileInfo>
+#include <QLibraryInfo>
+#include <QTranslator>
+
 #include "dvbcut.h"
 #include "mpgfile.h"
 #include "index.h"
@@ -196,6 +200,18 @@ main(int argc, char *argv[]) {
    * GUI and batch mode
    */
   QApplication a(argc, argv);
+
+  QString locale = QLocale::system().name();
+  QTranslator qt_translator;
+  qt_translator.load("qt_" + locale, QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+  a.installTranslator(&qt_translator);
+
+  QString appDirPath = a.applicationDirPath();
+  QTranslator app_translator;
+  // Search in development directory or system wide.
+  if (!app_translator.load("dvbcut_" + locale, appDirPath))
+      app_translator.load("dvbcut_" + locale, QFileInfo(appDirPath).absolutePath() + "/share/dvbcut");
+  a.installTranslator(&app_translator);
 
 #ifdef HAVE_LIB_AO
   ao_initialize();
