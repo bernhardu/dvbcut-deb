@@ -323,6 +323,10 @@ Konnte Datei nicht öffnen</translation>
         <source>Audio track</source>
         <translation>Audiospur</translation>
     </message>
+    <message>
+        <source>With this libav version the lavfmuxer is broken. Probably you want to use the DVBcut muxer instead.</source>
+        <translation>Mit dieser libav-Version funktioniert der lavfmuxer nicht. Eventuell verwenden Sie stattdessen den DVBcut muxer.</translation>
+    </message>
 </context>
 <context>
     <name>dvbcutbase</name>
