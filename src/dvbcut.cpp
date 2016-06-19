@@ -843,12 +843,12 @@ void dvbcut::fileExport()
   destname=filename.substr(0,filename.rfind("."));
   log->print("");
   log->printheading(tr("Simple XML-file for dvdauthor with chapter marks"));
-  log->print("<dvdauthor dest=\"%s\">",destname.c_str());
+  log->print("<dvdauthor dest=\"" + QString::fromStdString(destname) + "\">");
   log->print("  <vmgm />");
   log->print("  <titleset>");
   log->print("    <titles>");
   log->print("      <pgc>");
-  log->print("        <vob file=\"%s\" chapters=\"%s\" />",filename.c_str(),chapterstring.c_str());
+  log->print("        <vob file=\"" + QString::fromStdString(filename) + "\" chapters=\"" + QString::fromStdString(chapterstring) + "\" />");
   log->print("      </pgc>");
   log->print("    </titles>");
   log->print("  </titleset>");

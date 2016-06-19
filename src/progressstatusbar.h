@@ -52,8 +52,7 @@ public:
     return cancelwasclicked;
     }
   virtual void finish();
-  virtual void print(const char *fmt, ...);
-	virtual void print(const QString &str);
+  virtual void print(const QString &str);
 
 public slots:
   virtual void setprogress(int permille);

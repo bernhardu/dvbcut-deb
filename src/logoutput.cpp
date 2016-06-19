@@ -36,83 +36,42 @@ logoutput::setprogress(int permille) {
   fprintf(stderr,"[%3d.%d]\r",currentprogress/10,currentprogress%10);
 }
 
-static void
-vprintmsg(const char *fmt, va_list ap, const char *head, const char *tail) {
-//  fprintf(stderr, "[%3d.%d] ", currentprogress / 10, currentprogress % 10);
-  if (head)
-    fputs(head, stderr);
-  vfprintf(stderr, fmt, ap);
-  if (tail)
-    fputs(tail, stderr);
-  fprintf(stderr, "\n");
-}
-
-void
-logoutput::print(const char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  vprintmsg(fmt, ap, 0, 0);
-  va_end(ap);
-}
-
-void
-logoutput::printheading(const char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  vprintmsg(fmt, ap, "=== ", " ===");
-  va_end(ap);
-}
-
-void
-logoutput::printinfo(const char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  vprintmsg(fmt, ap, "INFO: ", 0);
-  va_end(ap);
-}
-
-void
-logoutput::printerror(const char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  vprintmsg(fmt, ap, "ERROR: ", 0);
-  va_end(ap);
-}
-
-void
-logoutput::printwarning(const char *fmt, ...) {
-  va_list ap;
-  va_start(ap,fmt);
-  vprintmsg(fmt, ap, "WARNING: ", 0);
-  va_end(ap);
+void logoutput::printmsg(const QString &str, const QString head, const QString tail)
+{
+    if (!head.isEmpty())
+        fprintf(stderr, "%s", head.toLatin1().data());
+    fprintf(stderr, "%s", str.toLatin1().data());
+    if (!tail.isEmpty())
+        fprintf(stderr, "%s", tail.toLatin1().data());
+    fprintf(stderr, "\n");
 }
 
 /*virtual*/
 void logoutput::print(const QString &str)
 {
-    print("%s", str.toLatin1().data());
+    printmsg(str, "", "");
 }
 
 /*virtual*/
 void logoutput::printheading(const QString &str)
 {
-    printheading("%s", str.toLatin1().data());
+    printmsg(str, "=== ", " ===");
 }
 
 /*virtual*/
 void logoutput::printinfo(const QString &str)
 {
-    printinfo("%s", str.toLatin1().data());
+    printmsg(str, "INFO: ", 0);
 }
 
 /*virtual*/
 void logoutput::printerror(const QString &str)
 {
-    printerror("%s", str.toLatin1().data());
+    printmsg(str, "ERROR: ", 0);
 }
 
 /*virtual*/
 void logoutput::printwarning(const QString &str)
 {
-    printwarning("%s", str.toLatin1().data());
+    printmsg(str, "WARNING: ", 0);
 }

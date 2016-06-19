@@ -41,8 +41,6 @@ progresswindow::progresswindow(QWidget *parent)
   ui->setupUi(this);
   setModal(true);
 
-  textcursor = new QTextCursor(ui->logbrowser->document());
-
   fc_head.setFontWeight(QFont::Bold);
   fc_head.setFontUnderline(true);
 
@@ -96,88 +94,37 @@ void progresswindow::setprogress(int permille)
   qApp->processEvents();
   }
 
-void progresswindow::print(const char *fmt, ...)
-  {
-  va_list ap;
-  va_start(ap,fmt);
-  char *text=0;
-  if (vasprintf(&text,fmt,ap)<0 || (text==0))
-    return;
+void progresswindow::printmsg(const QString &str, const QTextCharFormat &format)
+{
+    ui->logbrowser->setCurrentCharFormat(format);
+    ui->logbrowser->append(str);
+    qApp->processEvents();
+}
 
-  textcursor->setBlockCharFormat(fc_normal);
-  if (*text)
-    textcursor->insertText(text);
-  else
-    textcursor->insertText("");
-  textcursor->insertBlock();
+void progresswindow::print(const QString &str)
+{
+    printmsg(str, fc_normal);
+}
 
-  free(text);
-  qApp->processEvents();
-  }
+void progresswindow::printheading(const QString &str)
+{
+    printmsg(str, fc_head);
+}
 
-void progresswindow::printheading(const char *fmt, ...)
-  {
-  va_list ap;
-  va_start(ap,fmt);
-  char *text=0;
-  if (vasprintf(&text,fmt,ap)<0 || (text==0))
-    return;
+void progresswindow::printinfo(const QString &str)
+{
+    printmsg(str, fc_info);
+}
 
-  textcursor->setBlockCharFormat(fc_head);
-  textcursor->insertText(text);
-  textcursor->insertBlock();
+void progresswindow::printerror(const QString &str)
+{
+    printmsg(str, fc_error);
+}
 
-  free(text);
-  qApp->processEvents();
-  }
-
-void progresswindow::printinfo(const char *fmt, ...)
-  {
-  va_list ap;
-  va_start(ap,fmt);
-  char *text=0;
-  if (vasprintf(&text,fmt,ap)<0 || (text==0))
-    return;
-
-  textcursor->setBlockCharFormat(fc_info);
-  textcursor->insertText(text);
-  textcursor->insertBlock();
-
-  free(text);
-  qApp->processEvents();
-  }
-
-void progresswindow::printerror(const char *fmt, ...)
-  {
-  va_list ap;
-  va_start(ap,fmt);
-  char *text=0;
-  if (vasprintf(&text,fmt,ap)<0 || (text==0))
-    return;
-
-  textcursor->setBlockCharFormat(fc_error);
-  textcursor->insertText(text);
-  textcursor->insertBlock();
-
-  free(text);
-  qApp->processEvents();
-  }
-
-void progresswindow::printwarning(const char *fmt, ...)
-  {
-  va_list ap;
-  va_start(ap,fmt);
-  char *text=0;
-  if (vasprintf(&text,fmt,ap)<0 || (text==0))
-    return;
-
-  textcursor->setBlockCharFormat(fc_warn);
-  textcursor->insertText(text);
-  textcursor->insertBlock();
-
-  free(text);
-  qApp->processEvents();
-  }
+void progresswindow::printwarning(const QString &str)
+{
+    printmsg(str, fc_warn);
+}
 
 void progresswindow::clickedcancel()
   {

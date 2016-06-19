@@ -91,19 +91,6 @@ void progressstatusbar::clickedcancel()
   qApp->processEvents();
   }
 
-void progressstatusbar::print(const char *fmt, ...)
-  {
-  va_list ap;
-  va_start(ap,fmt);
-  char *text=0;
-  if (vasprintf(&text,fmt,ap)<0 || (text==0))
-    return;
-
-  label->setText(text);
-  free(text);
-  qApp->processEvents();
-  }
-
 void progressstatusbar::print(const QString &str) {
 	label->setText(str);
 	qApp->processEvents();

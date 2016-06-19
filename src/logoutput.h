@@ -30,6 +30,7 @@ class logoutput
   {
 protected:
   int currentprogress;
+  void printmsg(const QString &str, const QString head, const QString tail);
 
 public:
   logoutput() : currentprogress(0)
@@ -42,12 +43,6 @@ public:
     return currentprogress;
     }
   virtual void setprogress(int permille);
-
-  virtual void print(const char *fmt, ...);
-  virtual void printheading(const char *fmt, ...);
-  virtual void printinfo(const char *fmt, ...);
-  virtual void printerror(const char *fmt, ...);
-  virtual void printwarning(const char *fmt, ...);
 
   virtual void print(const QString &str);
   virtual void printheading(const QString &str);

@@ -32,12 +32,12 @@ class progresswindow: public QDialog, public logoutput
 protected:
   bool cancelwasclicked;
   bool waitingforclose;
-  QTextCursor *textcursor;
   QTextCharFormat fc_normal;
   QTextCharFormat fc_head;
   QTextCharFormat fc_info;
   QTextCharFormat fc_warn;
   QTextCharFormat fc_error;
+  void printmsg(const QString&str, const QTextCharFormat &format);
 
   void closeEvent(QCloseEvent *e);
   Ui::progresswindowbase* ui;
@@ -49,11 +49,11 @@ public:
     return cancelwasclicked;
     }
   virtual void finish();
-  virtual void print(const char *fmt, ...);
-  virtual void printheading(const char *fmt, ...);
-  virtual void printinfo(const char *fmt, ...);
-  virtual void printerror(const char *fmt, ...);
-  virtual void printwarning(const char *fmt, ...);
+  virtual void print(const QString &str);
+  virtual void printheading(const QString &str);
+  virtual void printinfo(const QString &str);
+  virtual void printerror(const QString &str);
+  virtual void printwarning(const QString &str);
 
 public slots:
   virtual void setprogress(int permille);
