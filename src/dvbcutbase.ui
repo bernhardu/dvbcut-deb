@@ -530,9 +530,6 @@
    <property name="text">
     <string>&amp;Open...</string>
    </property>
-   <property name="iconText">
-    <string>Open</string>
-   </property>
    <property name="shortcut">
     <string notr="true">O</string>
    </property>
@@ -554,9 +551,6 @@
    <property name="text">
     <string>&amp;Save</string>
    </property>
-   <property name="iconText">
-    <string>Save</string>
-   </property>
    <property name="shortcut">
     <string notr="true">S</string>
    </property>
@@ -575,12 +569,6 @@
    <property name="text">
     <string>Save &amp;As...</string>
    </property>
-   <property name="iconText">
-    <string>Save As</string>
-   </property>
-   <property name="shortcut">
-    <string/>
-   </property>
    <property name="name" stdset="0">
     <cstring>fileSaveAsAction</cstring>
    </property>
@@ -590,7 +578,7 @@
     <iconset>
      <normaloff>image3</normaloff>image3</iconset>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Close</string>
    </property>
    <property name="shortcut">
@@ -650,7 +638,7 @@
     <iconset>
      <normaloff>image6</normaloff>image6</iconset>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Play</string>
    </property>
    <property name="shortcut">
@@ -668,7 +656,7 @@
     <iconset>
      <normaloff>image7</normaloff>image7</iconset>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Stop</string>
    </property>
    <property name="shortcut">
@@ -686,7 +674,7 @@
     <iconset resource="../icons/icons.qrc">
      <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Set start marker</string>
    </property>
    <property name="shortcut">
@@ -704,7 +692,7 @@
     <iconset resource="../icons/icons.qrc">
      <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Set stop marker</string>
    </property>
    <property name="shortcut">
@@ -722,7 +710,7 @@
     <iconset resource="../icons/icons.qrc">
      <normaloff>:/icons/chapter.png</normaloff>:/icons/chapter.png</iconset>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Set chapter marker</string>
    </property>
    <property name="shortcut">
@@ -740,7 +728,7 @@
     <iconset resource="../icons/icons.qrc">
      <normaloff>:/icons/bookmark.png</normaloff>:/icons/bookmark.png</iconset>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Set bookmark</string>
    </property>
    <property name="shortcut">
@@ -754,7 +742,7 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Auto chapters</string>
    </property>
    <property name="shortcut">
@@ -768,7 +756,7 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Suggest bookmarks</string>
    </property>
    <property name="shortcut">
@@ -782,7 +770,7 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Import bookmarks</string>
    </property>
    <property name="shortcut">
@@ -797,7 +785,7 @@
     <iconset>
      <normaloff>image12</normaloff>image12</iconset>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>New</string>
    </property>
    <property name="name" stdset="0">
@@ -808,7 +796,7 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Export video...</string>
    </property>
    <property name="shortcut">
@@ -825,7 +813,7 @@
    <property name="checked">
     <bool>true</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Normal</string>
    </property>
    <property name="shortcut">
@@ -839,7 +827,7 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Unscaled</string>
    </property>
    <property name="shortcut">
@@ -853,7 +841,7 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Show difference to current picture</string>
    </property>
    <property name="shortcut">
@@ -870,7 +858,7 @@
    <property name="checked">
     <bool>true</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Full size</string>
    </property>
    <property name="shortcut">
@@ -884,7 +872,7 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Quarter size</string>
    </property>
    <property name="shortcut">
@@ -898,7 +886,7 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Custom size</string>
    </property>
    <property name="shortcut">
@@ -909,7 +897,7 @@
    </property>
   </action>
   <action name="zoomInAction">
-   <property name="iconText">
+   <property name="text">
     <string>Zoom in</string>
    </property>
    <property name="shortcut">
@@ -920,7 +908,7 @@
    </property>
   </action>
   <action name="zoomOutAction">
-   <property name="iconText">
+   <property name="text">
     <string>Zoom out</string>
    </property>
    <property name="shortcut">
@@ -934,7 +922,7 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="iconText">
+   <property name="text">
     <string>Half size</string>
    </property>
    <property name="shortcut">
@@ -952,8 +940,8 @@
     <iconset>
      <normaloff>image13</normaloff>image13</iconset>
    </property>
-   <property name="iconText">
-    <string>Save Snapshot</string>
+   <property name="text">
+    <string>Save Snapshot...</string>
    </property>
    <property name="shortcut">
     <string notr="true">G</string>
@@ -966,8 +954,8 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="iconText">
-    <string>Save Chapter Snapshots</string>
+   <property name="text">
+    <string>Save Chapter Snapshots...</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+G</string>
@@ -980,15 +968,6 @@
    <property name="text">
     <string>&amp;About</string>
    </property>
-   <property name="iconText">
-    <string>&amp;About</string>
-   </property>
-   <property name="toolTip">
-    <string>About </string>
-   </property>
-   <property name="statusTip">
-    <string>About </string>
-   </property>
    <property name="name" stdset="0">
     <cstring>helpAboutAction</cstring>
    </property>
@@ -996,12 +975,6 @@
   <action name="helpContentAction">
    <property name="text">
     <string>&amp;Contents</string>
-   </property>
-   <property name="iconText">
-    <string>&amp;Contents</string>
-   </property>
-   <property name="toolTip">
-    <string>Contents</string>
    </property>
    <property name="shortcut">
     <string notr="true">F1</string>

@@ -112,7 +112,7 @@ Projektdatei enthält keine MPEG-Dateinamen</translation>
     <message>
         <source>Indexing &apos;%1&apos;...</source>
         <extracomment>Text shown in the main window status bar when generating index. For example: &quot;Indexing &apos;path/to/file.mpg&apos;...&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Indiziere &apos;%1&apos;...</translation>
     </message>
     <message>
         <source>Error creating index - dvbcut</source>
@@ -256,11 +256,6 @@ Konnte Datei nicht öffnen</translation>
         <translation>Marker löschen</translation>
     </message>
     <message>
-        <source>Mass delete</source>
-        <extracomment>Submenu containing mass delete actions</extracomment>
-        <translation>Mengen löschen</translation>
-    </message>
-    <message>
         <source>Delete others</source>
         <translation>Alle anderen löschen</translation>
     </message>
@@ -279,11 +274,6 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <source>Delete all bookmarks</source>
         <translation>Alle Lesezeichen löschen</translation>
-    </message>
-    <message>
-        <source>Convert</source>
-        <extracomment>Submenu containing convert actions</extracomment>
-        <translation>Umwandeln</translation>
     </message>
     <message>
         <source>Convert to start marker</source>
@@ -305,6 +295,34 @@ Konnte Datei nicht öffnen</translation>
         <source>Display difference from this picture</source>
         <translation>Zeige Abweichungen zu aktuellem Bild</translation>
     </message>
+    <message>
+        <source>Open &amp;recent...</source>
+        <translation>Zu&amp;letzt bearbeitete Dateien...</translation>
+    </message>
+    <message>
+        <source>Convert bookmarks</source>
+        <translation>Lesezeichen konvertieren</translation>
+    </message>
+    <message>
+        <source>START / STOP</source>
+        <translation>START / STOPP</translation>
+    </message>
+    <message>
+        <source>STOP / START</source>
+        <translation>STOPP / START</translation>
+    </message>
+    <message>
+        <source>4 : 3</source>
+        <translation>4 : 3</translation>
+    </message>
+    <message>
+        <source>16 : 9</source>
+        <translation>16 : 9</translation>
+    </message>
+    <message>
+        <source>Audio track</source>
+        <translation>Audiospur</translation>
+    </message>
 </context>
 <context>
     <name>dvbcutbase</name>
@@ -321,16 +339,8 @@ Konnte Datei nicht öffnen</translation>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <source>Open recent...</source>
-        <translation>Zu&amp;letzt bearbeitete Dateien</translation>
-    </message>
-    <message>
         <source>&amp;Edit</source>
         <translation>&amp;Bearbeiten</translation>
-    </message>
-    <message>
-        <source>Convert bookmarks</source>
-        <translation>Lesezeichen konvertieren</translation>
     </message>
     <message>
         <source>&amp;View</source>
@@ -341,10 +351,6 @@ Konnte Datei nicht öffnen</translation>
         <translation>Wieder&amp;gabe</translation>
     </message>
     <message>
-        <source>Audio track</source>
-        <translation>Audiospur</translation>
-    </message>
-    <message>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
@@ -353,7 +359,7 @@ Konnte Datei nicht öffnen</translation>
         <translation>Neu</translation>
     </message>
     <message>
-        <source>&amp;Open</source>
+        <source>&amp;Open...</source>
         <translation>Ö&amp;ffnen...</translation>
     </message>
     <message>
@@ -365,12 +371,12 @@ Konnte Datei nicht öffnen</translation>
         <translation>Speichern &amp;unter...</translation>
     </message>
     <message>
-        <source>Save Snapshot</source>
-        <translation>Video-Schnappschuss speichern</translation>
+        <source>Save Snapshot...</source>
+        <translation>Video-Schnappschuss speichern...</translation>
     </message>
     <message>
-        <source>Save Chapter Snapshots</source>
-        <translation>Kapitel-Schnappschuss speichern</translation>
+        <source>Save Chapter Snapshots...</source>
+        <translation>Kapitel-Schnappschuss speichern...</translation>
     </message>
     <message>
         <source>Export video...</source>
@@ -379,6 +385,18 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <source>Close</source>
         <translation>Beenden</translation>
+    </message>
+    <message>
+        <source>File toolbar</source>
+        <translation>Datei Toolbar</translation>
+    </message>
+    <message>
+        <source>Edit toolbar</source>
+        <translation>Bearbeiten Toolbar</translation>
+    </message>
+    <message>
+        <source>Play toolbar</source>
+        <translation>Wiedergabe Toolbar</translation>
     </message>
     <message>
         <source>Set start marker</source>
@@ -475,22 +493,6 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <source>&amp;Contents</source>
         <translation>&amp;Inhalt</translation>
-    </message>
-    <message>
-        <source>START / STOP</source>
-        <translation>START / STOPP</translation>
-    </message>
-    <message>
-        <source>STOP / START</source>
-        <translation>STOPP / START</translation>
-    </message>
-    <message>
-        <source>4 : 3</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>16 : 9</source>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -697,8 +699,8 @@ Konnte Datei nicht öffnen</translation>
         <translation>DVBcut: MPlayer-Fehler</translation>
     </message>
     <message>
-        <source>MPlayer finished unsuccessfully</source>
-        <translation>MPlayer wurde unerwartet beendet</translation>
+        <source>MPlayer finished unsuccessfully.</source>
+        <translation>MPlayer wurde unerwartet beendet.</translation>
     </message>
     <message>
         <source>Okay</source>
@@ -709,7 +711,7 @@ Konnte Datei nicht öffnen</translation>
     <name>progressstatusbar</name>
     <message>
         <source>cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbruch</translation>
     </message>
 </context>
 <context>

@@ -30,6 +30,7 @@
 #include <set>
 #include <vector>
 #include <string>
+#include <QCoreApplication>
 
 #include "port.h"
 #include "index.h"
@@ -85,8 +86,10 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
       usestdout=true;
       } else
       if ((fd=::open(savefilename,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY,0666))<0) {
-        if (errorstring)
-          *errorstring+=std::string("Open (")+savefilename+"): "+strerror(errno)+"\n";
+        if (errorstring) {
+          //: 1% will be replaced with filename, %2 with error description
+          *errorstring += QCoreApplication::translate("index", "Open (%1): %2\n").arg(savefilename, strerror(errno)).toStdString();
+        }
         return fd;
         }
     }
@@ -153,8 +156,10 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
     if (fd>=0 && pictureswritten<seqheaderpic) {
       int len=(seqheaderpic-pictureswritten)*sizeof(picture);
       if (::writer(fd,(void*)&p[pictureswritten],len)<0) {
-        if (errorstring)
-          *errorstring+=std::string("Write (")+savefilename+"): "+strerror(errno)+"\n";
+        if (errorstring) {
+          //: 1% will be replaced with filename, %2 with error description
+          *errorstring += QCoreApplication::translate("index", "Write (%1): %2\n").arg(savefilename, strerror(errno)).toStdString();
+        }
         if (!usestdout)
           ::close(fd);
         fd=-1;
@@ -407,7 +412,7 @@ int index::generate(const char *savefilename, std::string *errorstring, logoutpu
     int len=(pictures-pictureswritten)*sizeof(picture);
     if (::writer(fd,(void*)&p[pictureswritten],len)<0) {
       if (errorstring)
-        *errorstring+=std::string("Write (")+savefilename+"): "+strerror(errno)+"\n";
+        *errorstring += QCoreApplication::translate("index", "Write (%1): %2\n").arg(savefilename, strerror(errno)).toStdString();
       if (!usestdout)
         ::close(fd);
       fd=-1;
@@ -439,15 +444,17 @@ index::save(int fd, std::string *errorstring, bool closeme) {
 
   if (isatty(fd)) {
     if (errorstring)
-      *errorstring += std::string("refusing to write index to a tty\n");
+      *errorstring += QCoreApplication::translate("index", "refusing to write index to a tty\n").toStdString();
     errno = EINVAL;
     // Note: do NOT close it even if the caller said so
     return -1;
   }
   if (::writer(fd, (void*)p, len) < 0) {
     save = errno;
-    if (errorstring)
-      *errorstring += std::string("write: ") + strerror(errno) + "\n";
+    if (errorstring) {
+      //: Placeholder will be replaced with error description
+      *errorstring += QCoreApplication::translate("index", "write: %1\n").arg(strerror(errno)).toStdString();
+    }
     res = -1;
   }
   if (closeme)
@@ -462,8 +469,10 @@ index::save(const char *filename, std::string *errorstring) {
 
   fd = ::open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
   if (fd == -1) {
-    if (errorstring)
-      *errorstring += std::string(filename) + ": open: " + strerror(errno) + "\n";
+    if (errorstring) {
+      //: %1 will be replaced with filename, %2 with error description
+      *errorstring += QCoreApplication::translate("index", "%1: open: %2\n").arg(filename, strerror(errno)).toStdString();
+    }
     return -1;
   }
   std::string tmp;
@@ -481,7 +490,7 @@ int index::load(const char *filename, std::string *errorstring)
   if (fd<0) {
     if (errorstring) {
       int serrno=errno;
-      *errorstring+=std::string("Open (")+filename+"): "+strerror(errno)+"\n";
+      *errorstring += QCoreApplication::translate("index", "Open (%1): %2\n").arg(filename, strerror(errno)).toStdString();
       errno=serrno;
       }
     return fd;
@@ -501,8 +510,10 @@ int index::load(const char *filename, std::string *errorstring)
 
     if (rd<0) {
       int save_errno=errno;
-      if (errorstring)
-        *errorstring+=std::string("Read (")+filename+"): "+strerror(errno)+"\n";
+      if (errorstring) {
+        //: %1 will be replaced with filename, %2 with error description
+        *errorstring += QCoreApplication::translate("index", "Read (%1): %2\n").arg(filename, strerror(errno)).toStdString();
+      }
       if (data)
         free(data);
       ::close(fd);
@@ -530,8 +541,10 @@ int index::load(const char *filename, std::string *errorstring)
     p=0;
     pictures=0;
     realpictures=0;
-    if (errorstring)
-      *errorstring+=std::string("Invalid index file '")+filename+"'\n";
+    if (errorstring) {
+      //: Placeholder will be replaced with filename
+      *errorstring += QCoreApplication::translate("index", "Invalid index file '%1'\n").arg(filename).toStdString();
+    }
     fprintf(stderr,"Invalid index file: first frame no sequence header\n");
     return -2;
     }
@@ -561,8 +574,10 @@ int index::load(const char *filename, std::string *errorstring)
       for(int j=0;j<seqpics;++j) {
         if (seqnr[j]!=1) // this sequence-number did not appear exactly once
           {
-          if (errorstring)
-            *errorstring+=std::string("Invalid index file (")+filename+")\n";
+          if (errorstring) {
+            //: Placeholder will be replaced with filename
+            *errorstring += QCoreApplication::translate("index", "Invalid index file (%1)\n").arg(filename).toStdString();
+          }
           fprintf(stderr,"Invalid index file: sequence number %u appears %u times\n",
 			  j, seqnr[j]);
           fprintf(stderr, "Picture %u/%u, %u seqpics\n", i, pictures, seqpics);
@@ -599,8 +614,10 @@ int index::load(const char *filename, std::string *errorstring)
       p=0;
       pictures=0;
       realpictures=0;
-      if (errorstring)
-        *errorstring+=std::string("Index file (")+filename+") does not correspond to MPEG file\n";
+      if (errorstring) {
+        //: Placeholder will be replaced with filename
+        *errorstring += QCoreApplication::translate("index", "Index file (%1) does not correspond to MPEG file\n").arg(filename).toStdString();
+      }
       return -3;
       }
     }

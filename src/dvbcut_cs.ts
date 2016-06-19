@@ -255,11 +255,6 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>Smazat</translation>
     </message>
     <message>
-        <source>Mass delete</source>
-        <extracomment>Submenu containing mass delete actions</extracomment>
-        <translation>Hromadné mazání</translation>
-    </message>
-    <message>
         <source>Delete others</source>
         <translation>Smazat ostatní</translation>
     </message>
@@ -278,11 +273,6 @@ vrátil nenulový návratový kód: %1</translation>
     <message>
         <source>Delete all bookmarks</source>
         <translation>Smazat záložky</translation>
-    </message>
-    <message>
-        <source>Convert</source>
-        <extracomment>Submenu containing convert actions</extracomment>
-        <translation>Konverze</translation>
     </message>
     <message>
         <source>Convert to start marker</source>
@@ -304,6 +294,34 @@ vrátil nenulový návratový kód: %1</translation>
         <source>Display difference from this picture</source>
         <translation>Zobrazit rozdíl proti tomuto snímku</translation>
     </message>
+    <message>
+        <source>Open &amp;recent...</source>
+        <translation>Otevřít nedávné...</translation>
+    </message>
+    <message>
+        <source>Convert bookmarks</source>
+        <translation>Konvertovat záložky</translation>
+    </message>
+    <message>
+        <source>START / STOP</source>
+        <translation>START / STOP</translation>
+    </message>
+    <message>
+        <source>STOP / START</source>
+        <translation>STOP / START</translation>
+    </message>
+    <message>
+        <source>4 : 3</source>
+        <translation>4 : 3</translation>
+    </message>
+    <message>
+        <source>16 : 9</source>
+        <translation>16 : 9</translation>
+    </message>
+    <message>
+        <source>Audio track</source>
+        <translation>Zvuková stopa</translation>
+    </message>
 </context>
 <context>
     <name>dvbcutbase</name>
@@ -320,16 +338,8 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>&amp;Soubor</translation>
     </message>
     <message>
-        <source>Open recent...</source>
-        <translation>Otevřít nedávné...</translation>
-    </message>
-    <message>
         <source>&amp;Edit</source>
         <translation>Úpr&amp;avy</translation>
-    </message>
-    <message>
-        <source>Convert bookmarks</source>
-        <translation>Konvertovat záložky</translation>
     </message>
     <message>
         <source>&amp;View</source>
@@ -340,10 +350,6 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>&amp;Přehrát</translation>
     </message>
     <message>
-        <source>Audio track</source>
-        <translation>Zvuková stopa</translation>
-    </message>
-    <message>
         <source>&amp;Help</source>
         <translation>&amp;Nápověda</translation>
     </message>
@@ -352,7 +358,7 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>Nový</translation>
     </message>
     <message>
-        <source>&amp;Open</source>
+        <source>&amp;Open...</source>
         <translation>&amp;Otevřít</translation>
     </message>
     <message>
@@ -364,12 +370,12 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>Uložit &amp;jako...</translation>
     </message>
     <message>
-        <source>Save Snapshot</source>
-        <translation>Uložit snímek</translation>
+        <source>Save Snapshot...</source>
+        <translation>Uložit snímek...</translation>
     </message>
     <message>
-        <source>Save Chapter Snapshots</source>
-        <translation>Uložit snímky kapitol</translation>
+        <source>Save Chapter Snapshots...</source>
+        <translation>Uložit snímky kapitol...</translation>
     </message>
     <message>
         <source>Export video...</source>
@@ -378,6 +384,18 @@ vrátil nenulový návratový kód: %1</translation>
     <message>
         <source>Close</source>
         <translation>Zavřít</translation>
+    </message>
+    <message>
+        <source>File toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play toolbar</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Set start marker</source>
@@ -474,22 +492,6 @@ vrátil nenulový návratový kód: %1</translation>
     <message>
         <source>&amp;Contents</source>
         <translation>&amp;Obsah</translation>
-    </message>
-    <message>
-        <source>START / STOP</source>
-        <translation>START / STOP</translation>
-    </message>
-    <message>
-        <source>STOP / START</source>
-        <translation>STOP / START</translation>
-    </message>
-    <message>
-        <source>4 : 3</source>
-        <translation>4 : 3</translation>
-    </message>
-    <message>
-        <source>16 : 9</source>
-        <translation>16 : 9</translation>
     </message>
 </context>
 <context>
@@ -697,8 +699,8 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>dvbcut: chyba MPlayeru</translation>
     </message>
     <message>
-        <source>MPlayer finished unsuccessfully</source>
-        <translation>MPlayer neúspěšně skončil</translation>
+        <source>MPlayer finished unsuccessfully.</source>
+        <translation>MPlayer neúspěšně skončil.</translation>
     </message>
     <message>
         <source>Okay</source>

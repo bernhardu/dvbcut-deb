@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="textLabel1">
      <property name="text">
-      <string>MPlayer finished unsuccesfully.</string>
+      <string>MPlayer finished unsuccessfully.</string>
      </property>
      <property name="wordWrap">
       <bool>false</bool>
@@ -49,7 +49,7 @@
      <item>
       <widget class="QPushButton" name="okaybutton">
        <property name="text">
-        <string>okay</string>
+        <string>Okay</string>
        </property>
       </widget>
      </item>

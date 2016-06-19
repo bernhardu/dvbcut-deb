@@ -168,17 +168,17 @@ dvbcut::dvbcut()
   ui->playMenu->removeAction(ui->playAudio2Action);
 #endif // ! HAVE_LIB_AO
 
-  audiotrackpopup=new QMenu(QString("Audio track"), this);
+  audiotrackpopup=new QMenu(tr("Audio track"), this);
   ui->playMenu->addSeparator();
   audiotrackmenu=ui->playMenu->addMenu(audiotrackpopup);
   connect( audiotrackpopup, SIGNAL( triggered(QAction*) ), this, SLOT( audiotrackchosen(QAction*) ) );
 
-  recentfilespopup=new QMenu(QString("Open recent..."), this);
+  recentfilespopup=new QMenu(tr("Open &recent..."), this);
   ui->fileMenu->insertMenu(ui->fileSaveAction, recentfilespopup);
   connect( recentfilespopup, SIGNAL( triggered(QAction*) ), this, SLOT( loadrecentfile(QAction*) ) );
   connect( recentfilespopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshowrecentfiles() ) );
 
-  editconvertpopup=new QMenu(QString("Convert bookmarks"), this);
+  editconvertpopup=new QMenu(tr("Convert bookmarks"), this);
   ui->editMenu->insertMenu(ui->editBookmarkAction, editconvertpopup);
   connect( editconvertpopup, SIGNAL( triggered(QAction*) ), this, SLOT( editConvert(QAction*) ) );
   connect( editconvertpopup, SIGNAL( aboutToShow() ), this, SLOT( abouttoshoweditconvert() ) );
@@ -257,7 +257,7 @@ void dvbcut::fileSaveAs()
 
   QString s=QFileDialog::getSaveFileName(
     this,
-    "Choose the name of the project file",
+    tr("Choose the name of the project file"),
     QString::fromStdString(prjfilen),
     tr(DVBCUT_PRJFILTER) );
 
@@ -265,8 +265,8 @@ void dvbcut::fileSaveAs()
     return;
 
   if (QFileInfo(s).exists() && question(
-      "File exists - dvbcut",
-      s + "\nalready exists. Overwrite?") !=
+      tr("File exists - dvbcut"),
+      tr("%1\nalready exists. Overwrite?").arg(s)) !=
       QMessageBox::Yes)
     return;
 
@@ -284,10 +284,9 @@ void dvbcut::fileSave()
 
   QFile outfile(QString::fromStdString(prjfilen));
   if (!outfile.open(QIODevice::WriteOnly)) {
-    QMessageBox::critical(this,"Failed to write project file - dvbcut",QString::fromStdString(prjfilen)+
-                          ":\nCould not open file",
-                          QMessageBox::Abort,
-                          QMessageBox::NoButton);
+    critical(tr("Failed to write project file - dvbcut"),
+      //: Placeholder will be replaced with filename
+      tr("%1:\nCould not open file").arg(QString::fromStdString(prjfilen)));
     return;
   }
 
@@ -410,16 +409,18 @@ void dvbcut::snapshotSave(std::vector<int> piclist, int range, int samples)
 
   QString s = QFileDialog::getSaveFileName(
     this,
-    "Choose the name of the picture file",
+    tr("Choose the name of the picture file"),
     picfilen,
-    "Images (*."+ext+")" );
+    //: Placeholder will be replaced with file extension
+    tr("Images (*.%1)").arg(ext) );
 
   if (s.isEmpty())
     return;
 
   if (QFileInfo(s).exists() && question(
-    "File exists - dvbcut",
-    s + "\nalready exists. Overwrite?") !=
+    tr("File exists - dvbcut"),
+    //: Placeholder will be replaced with filename
+    tr("%1\nalready exists. Overwrite?").arg(s)) !=
     QMessageBox::Yes)
     return;
 
@@ -562,10 +563,10 @@ void dvbcut::fileExport()
   }
 
   std::auto_ptr<exportdialog> expd(new exportdialog(QString::fromStdString(expfilen),this));
-  expd->ui->muxercombo->addItem("MPEG program stream/DVD (DVBCUT multiplexer)");
-  expd->ui->muxercombo->addItem("MPEG program stream (DVBCUT multiplexer)");
-  expd->ui->muxercombo->addItem("MPEG program stream/DVD (libavformat)");
-  expd->ui->muxercombo->addItem("MPEG transport stream (libavformat)");
+  expd->ui->muxercombo->addItem(tr("MPEG program stream/DVD (DVBCUT multiplexer)"));
+  expd->ui->muxercombo->addItem(tr("MPEG program stream (DVBCUT multiplexer)"));
+  expd->ui->muxercombo->addItem(tr("MPEG program stream/DVD (libavformat)"));
+  expd->ui->muxercombo->addItem(tr("MPEG transport stream (libavformat)"));
 #ifndef __WIN32__
   // add possible user configured pipe commands 
   int pipe_items_start=expd->ui->muxercombo->count();
@@ -659,8 +660,10 @@ void dvbcut::fileExport()
     std::string which="which "+expcmd.substr(pos,end-pos)+" >/dev/null";
     int irc = system(which.c_str());
     if(irc!=0) { 
-      critical("Command not found - dvbcut","Problems with piped output to:\n"+expcmd.substr(pos,end-pos));
-      return; 
+      critical(tr("Command not found - dvbcut"),
+        //: Placeholder will be replaced with pipe command
+        tr("Problems with piped output to:\n%1").arg(QString::fromStdString(expcmd.substr(pos,end-pos))));
+      return;
     }       
 
     if (::pipe(pipe_fds) < 0)
@@ -686,9 +689,8 @@ void dvbcut::fileExport()
   } else
 #endif
   if (QFileInfo(QString::fromStdString(expfilen)).exists() && question(
-      "File exists - dvbcut",
-      QString::fromStdString(expfilen)+"\nalready exists. "
-          "Overwrite?") !=
+      tr("File exists - dvbcut"),
+      tr("%1\nalready exists. Overwrite?").arg(QString::fromStdString(expfilen))) !=
       QMessageBox::Yes)
     return;
 
@@ -739,7 +741,7 @@ void dvbcut::fileExport()
       while (waitpid(child_pid, &wstatus, 0)==-1 && errno==EINTR);
     }
 #endif
-    log->printerror("Unable to set up muxer!");
+    log->printerror(tr("Unable to set up muxer!"));
     if (nogui)
       delete log;
     else {
@@ -761,8 +763,9 @@ void dvbcut::fileExport()
       stoppic=quick_picture_lookup[num].stoppicture;
       stoppts=quick_picture_lookup[num].stoppts;
       
-      log->printheading("%d. Exporting %d pictures: %s .. %s",
-			num+1,stoppic-startpic,ptsstring(startpts).c_str(),ptsstring(stoppts).c_str());
+      //: Example: 1. Exporting 600 pictures: 00:05:45.240/00 .. 00:06:09.240/00
+      log->printheading(tr("%1. Exporting %n pictures: %2 .. %3", "", stoppic-startpic)
+                        .arg(num+1).arg(ptsstring(startpts).c_str(),ptsstring(stoppts).c_str()));
       mpg->savempg(*mux,startpic,stoppic,savedpic,quick_picture_lookup.back().outpicture,log);
 
       savedpic=quick_picture_lookup[num].outpicture;
@@ -771,11 +774,12 @@ void dvbcut::fileExport()
 
   mux.reset();
 
-  log->printheading("Saved %d pictures (%02d:%02d:%02d.%03d)",savedpic,
-		    int(savedtime/(3600*90000)),
-		    int(savedtime/(60*90000))%60,
-		    int(savedtime/90000)%60,
-		    int(savedtime/90)%1000	);
+  //: Example: Saved 3627 pictures (00:02:25.80)
+  log->printheading(tr("Saved %n pictures (%1:%2:%3.%4)", "", savedpic)
+                    .arg(int(savedtime/(3600*90000)), 2, 10, QChar('0'))
+                    .arg(int(savedtime/(60*90000))%60, 2, 10, QChar('0'))
+                    .arg(int(savedtime/90000)%60, 2, 10, QChar('0'))
+                    .arg(int(savedtime/90)%1000, 2, 10, QChar('0')));
 
 #ifndef __WIN32__
   if (child_pid > 0) {
@@ -797,18 +801,21 @@ void dvbcut::fileExport()
     std::string which="which "+expcmd.substr(0,pos)+" >/dev/null";
 
     log->print("");
-    log->printheading("Performing post processing");
+    log->printheading(tr("Performing post processing"));
     int irc = system(which.c_str());
 
     if(irc!=0) { 
-      critical("Command not found - dvbcut","Problems with post processing command:\n"+expcmd.substr(0,pos));
-      log->print("Command not found!");
+      critical(tr("Command not found - dvbcut"),
+        //: Placeholder will be replaced with pipe command
+        tr("Problems with post processing command:\n%1").arg(QString::fromStdString(expcmd.substr(0,pos))));
+      log->print(tr("Command not found!"));
     } else {      
       int irc = system(expcmd.c_str());
       if(irc!=0) { 
-        critical("Post processing error - dvbcut","Post processing command:\n"+
-                 QString::fromStdString(expcmd)+"\n returned non-zero exit code: " +QString::number(irc));
-        log->print("Command reported some problems... please check!");
+        critical(tr("Post processing error - dvbcut"),
+                //: %1 will be replaced with exit code, %2 with pipe command
+                tr("Post processing command:\n%2\n returned non-zero exit code: %1").arg(irc).arg(QString::fromStdString(expcmd)));
+        log->print(tr("Command reported some problems... please check!"));
       } 
       //else      
       //  log->print("Everything seems to be OK...");
@@ -818,7 +825,7 @@ void dvbcut::fileExport()
 
   // print plain list of chapter marks
   log->print("");
-  log->printheading("Chapter list");
+  log->printheading(tr("Chapter list"));
   log->print(chaptercolumn.c_str());
 
   // simple dvdauthor xml file with chapter marks
@@ -829,7 +836,7 @@ void dvbcut::fileExport()
     filename=expfilen;
   destname=filename.substr(0,filename.rfind("."));
   log->print("");
-  log->printheading("Simple XML-file for dvdauthor with chapter marks");
+  log->printheading(tr("Simple XML-file for dvdauthor with chapter marks"));
   log->print("<dvdauthor dest=\"%s\">",destname.c_str());
   log->print("  <vmgm />");
   log->print("  <titleset>");
@@ -1691,7 +1698,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   if (filenames.empty()) {
     QStringList fn = QFileDialog::getOpenFileNames(
       this,
-      "Choose one or more MPEG files to open",
+      tr("Choose one or more MPEG files to open"),
       settings().lastdir,
       tr(DVBCUT_LOADFILTER));
     if (fn.empty()) {
@@ -1814,8 +1821,9 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
         if (domdoc.setContent(&infile,false,&errormsg)) {
           QDomElement docelem = domdoc.documentElement();
           if (docelem.tagName() != "dvbcut") {
-            critical("Failed to read project file - dvbcut",
-	      QString::fromStdString(filename) + ":\nNot a valid dvbcut project file");
+            critical(tr("Failed to read project file - dvbcut"),
+                     //: Placeholder will be replaced with filename
+                     tr("%1:\nNot a valid dvbcut project file").arg(QString::fromStdString(filename)));
             ui->fileOpenAction->setEnabled(true);
             return;
           }
@@ -1871,15 +1879,16 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	  }
 	  // sanity check
 	  if (filenames.empty()) {
-	    critical("Failed to read project file - dvbcut",
-	      QString::fromStdString(filename) + ":\nNo MPEG filename given in project file");
+	    critical(tr("Failed to read project file - dvbcut"),
+		     //: Placeholder will be replaced with project filename
+		     tr("%1:\nNo MPEG filename given in project file").arg(QString::fromStdString(filename)));
 	    ui->fileOpenAction->setEnabled(true);
 	    return;
 	  }
           prjfilename = filename;
         }
         else {
-          critical("Failed to read project file - dvbcut",
+          critical(tr("Failed to read project file - dvbcut"),
 	    QString::fromStdString(filename) + ":\n" + errormsg);
           ui->fileOpenAction->setEnabled(true);
           return;
@@ -1906,7 +1915,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   busy.setbusy(false);
 
   if (!mpg) {
-    critical("Failed to open file - dvbcut", errormessage);
+    critical(tr("Failed to open file - dvbcut"), errormessage);
     ui->fileOpenAction->setEnabled(true);
     return;
   }
@@ -1930,7 +1939,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	  QString relname = QFileInfo(u.path()).fileName();
 	  QString s=QFileDialog::getSaveFileName(
 		  this,
-		  "Choose the name of the index file",
+		  tr("Choose the name of the index file"),
 		  relname,
 		  tr(DVBCUT_IDXFILTER) );
 	  if (s.isEmpty()) {
@@ -1959,21 +1968,22 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
     if (pictures==-1 && serrno!=ENOENT) {
       delete mpg;
       mpg=0;
-      critical("Failed to open file - dvbcut",errorstring);
+      critical(tr("Failed to open file - dvbcut"),errorstring);
       ui->fileOpenAction->setEnabled(true);
       return;
     }
     if (pictures==-2) {
       delete mpg;
       mpg=0;
-      critical("Invalid index file - dvbcut", errorstring);
+      critical(tr("Invalid index file - dvbcut"), errorstring);
       ui->fileOpenAction->setEnabled(true);
       return;
     }
     if (pictures<=-3) {
       delete mpg;
       mpg=0;
-      critical("Index file mismatch - dvbcut", errorstring);
+      //: The index file belongs to another MPEG file
+      critical(tr("Index file mismatch - dvbcut"), errorstring);
       ui->fileOpenAction->setEnabled(true);
       return;
     }
@@ -1982,7 +1992,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   if (pictures<0) {
     progressstatusbar psb(statusBar());
     psb.setprogress(500);
-    psb.print("Indexing '%s'...",filename.c_str());
+    //: Text shown in the main window status bar when generating index. For example: "Indexing 'path/to/file.mpg'..."
+    psb.print(tr("Indexing '%1'...").arg(QString::fromStdString(filename)));
     std::string errorstring;
     busy.setbusy(true);
     pictures=mpg->generateindex(idxfilename.empty()?0:idxfilename.c_str(),&errorstring,&psb);
@@ -2000,20 +2011,22 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
     if (pictures<0) {
       delete mpg;
       mpg=0;
-      critical("Error creating index - dvbcut",
-	       QString("Cannot create index for\n")+QString::fromStdString(filename)+":\n"+QString::fromStdString(errorstring));
+      critical(tr("Error creating index - dvbcut"),
+               //: %1 will be replaced with filename, %2 with error description
+               tr("Cannot create index for\n%1:\n%2").arg(QString::fromStdString(filename), QString::fromStdString(errorstring)));
       ui->fileOpenAction->setEnabled(true);
       return;
     } else if (!errorstring.empty()) {
-      critical("Error saving index file - dvbcut", QString::fromStdString(errorstring));
+      critical(tr("Error saving index file - dvbcut"), QString::fromStdString(errorstring));
     }
   }
 
   if (pictures<1) {
     delete mpg;
     mpg=0;
-    critical("Invalid MPEG file - dvbcut",
-	     QString("The chosen file\n")+QString::fromStdString(filename)+"\ndoes not contain any video");
+    critical(tr("Invalid MPEG file - dvbcut"),
+             //: Placeholder will be replaced with filename
+             tr("The chosen file\n%1\ndoes not contain any video").arg(QString::fromStdString(filename)));
     ui->fileOpenAction->setEnabled(true);
     return;
   }
@@ -2270,7 +2283,8 @@ int
 dvbcut::question(const QString & caption, const QString & text)
 {
   if (nogui) {
-    fprintf(stderr, "%s\n%s\n(assuming No)\n", caption.toLatin1().data(), text.toLatin1().data());
+    //: Question during batch processing - print the prompt and tell the user that you assume the answer is No.
+    fprintf(stderr, "%s", tr("%1\n%2\n(assuming No)\n").arg(caption, text).toLatin1().data());
     return QMessageBox::No;
   }
   return QMessageBox::question(this, caption, text, QMessageBox::Yes,
@@ -2286,7 +2300,8 @@ int
 dvbcut::critical(const QString & caption, const QString & text)
 {
   if (nogui) {
-    fprintf(stderr, "%s\n%s\n(aborting)\n", caption.toLatin1().data(), text.toLatin1().data());
+    //: Error during batch processing - print text and tell the user you're aborting the batch
+    fprintf(stderr, "%s", tr("%1\n%2\n(aborting)\n").arg(caption, text).toLatin1().data());
     return QMessageBox::Abort;
   }
   return QMessageBox::critical(this, caption, text,
