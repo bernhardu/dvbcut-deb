@@ -19,6 +19,7 @@
 /* $Id$ */
 
 #include <qlabel.h>
+#include <QCoreApplication>
 #include <QHBoxLayout>
 #include "eventlistitem.h"
 #include "settings.h"
@@ -51,13 +52,21 @@ QString EventListItem::getstring() const
   {
   QString label;
   if (evtype==start)
-    label = settings().start_label;
+    label = QString("<font size=\"+1\" color=\"darkgreen\"><b>%1</b></font>")
+            //: Text shown on start markers in the main window marker list
+            .arg(QCoreApplication::translate("eventlist", "START"));
   else if (evtype==stop)
-    label = settings().stop_label;
+    label = QString("<font size=\"+1\" color=\"darkred\"><b>%1</b></font>")
+            //: Text shown on stop markers in the main window marker list
+            .arg(QCoreApplication::translate("eventlist", "STOP"));
   else if (evtype==chapter)
-    label = settings().chapter_label;
+    label = QString("<font color=\"darkgoldenrod\">%1</font>")
+            //: Text shown on chapter markers in the main window marker list
+            .arg(QCoreApplication::translate("eventlist", "CHAPTER"));
   else if (evtype==bookmark)
-    label = settings().bookmark_label;
+    label = QString("<font color=\"darkblue\">%1</font>")
+            //: Text shown on bookmark markers in the main window marker list
+            .arg(QCoreApplication::translate("eventlist", "BOOKMARK"));
 
   return label + QString().sprintf("<br>%02d:%02d:%02d.%03d<br>%d (%c)",
                            int(pts/(3600*90000)),

@@ -623,11 +623,6 @@ Konnte Datei nicht öffnen</translation>
         <extracomment>Text shown on bookmark markers in the main window marker list</extracomment>
         <translation>LESEZEICHEN</translation>
     </message>
-    <message>
-        <source>Unknown</source>
-        <extracomment>Text shown on markers of unknown type in the main window marker list</extracomment>
-        <translation>Unbekannt</translation>
-    </message>
 </context>
 <context>
     <name>exportdialog</name>

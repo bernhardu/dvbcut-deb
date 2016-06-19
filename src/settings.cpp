@@ -32,15 +32,6 @@
 #define DVBCUT_QSETTINGS_PRODUCT "dvbcut"
 #define DVBCUT_QSETTINGS_PATH "/" DVBCUT_QSETTINGS_DOMAIN "/" DVBCUT_QSETTINGS_PRODUCT "/"
 
-#define DVBCUT_DEFAULT_START_LABEL \
-	"<font size=\"+1\" color=\"darkgreen\"><b>START</b></font>"
-#define DVBCUT_DEFAULT_STOP_LABEL \
-	"<font size=\"+1\" color=\"darkred\"><b>STOP</b></font>"
-#define DVBCUT_DEFAULT_CHAPTER_LABEL \
-	"<font color=\"darkgoldenrod\">CHAPTER</font>"
-#define DVBCUT_DEFAULT_BOOKMARK_LABEL \
-	"<font color=\"darkblue\">BOOKMARK</font>"
-
 #define DVBCUT_DEFAULT_PIPE_COMMAND \
         "|dvdauthor -t -c '%CHAPTERS%' -v mpeg2 -o '%OUTPUT%' -"
 #define DVBCUT_DEFAULT_PIPE_POST \
@@ -209,12 +200,6 @@ dvbcut_settings::load_settings() {
     }
     endGroup(); // "/"
   endGroup();	// recentfiles
-  beginGroup("/labels");
-    start_label = value("/start", DVBCUT_DEFAULT_START_LABEL).toString();
-    stop_label = value("/stop", DVBCUT_DEFAULT_STOP_LABEL).toString();
-    chapter_label = value("/chapter", DVBCUT_DEFAULT_CHAPTER_LABEL).toString();
-    bookmark_label = value("/bookmark", DVBCUT_DEFAULT_BOOKMARK_LABEL).toString();
-  endGroup();	// labels
   start_bof = value("/start_bof", true).toBool();
   stop_eof = value("/stop_eof", true).toBool();
   beginGroup("/snapshots");
@@ -326,12 +311,6 @@ dvbcut_settings::save_settings() {
       endGroup();	// key
     }
   endGroup();	// recentfiles
-  beginGroup("/labels");
-    setValue("/start", start_label);
-    setValue("/stop", stop_label);
-    setValue("/chapter", chapter_label);
-    setValue("/bookmark", bookmark_label);
-  endGroup();	// labels
   setValue("/start_bof", start_bof);
   setValue("/stop_eof", stop_eof);
   beginGroup("/snapshots");

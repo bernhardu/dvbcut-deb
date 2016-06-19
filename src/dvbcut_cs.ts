@@ -622,11 +622,6 @@ vrátil nenulový návratový kód: %1</translation>
         <extracomment>Text shown on bookmark markers in the main window marker list</extracomment>
         <translation>ZÁLOŽKA</translation>
     </message>
-    <message>
-        <source>Unknown</source>
-        <extracomment>Text shown on markers of unknown type in the main window marker list</extracomment>
-        <translation>Neznámé</translation>
-    </message>
 </context>
 <context>
     <name>exportdialog</name>
