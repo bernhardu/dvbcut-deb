@@ -2564,17 +2564,37 @@ private:
   QPushButton *prev, *next, *home, *close;
 };
 
-void dvbcut::helpContentAction_activated()
+QString get_help_file(QString locale)
 {
+  QString file = QString("/dvbcut_%1.html").arg(locale);
+
   QFileInfo appDir(qApp->applicationDirPath());
+
   // first search in the directory containing dvbcut
-  QString helpFile = appDir.absoluteFilePath() + "/dvbcut_en.html";
+  QString helpFile = appDir.absoluteFilePath() + file;
+
 #ifndef __WIN32__
   // Unix/Linux: search in the associated share subdirectory
   if (!QFile::exists(helpFile)) {
-    helpFile = appDir.absolutePath() + "/share/dvbcut/dvbcut_en.html";
+    helpFile = appDir.absolutePath() + "/share/dvbcut" + file;
   }
 #endif
+
+  return helpFile;
+}
+
+void dvbcut::helpContentAction_activated()
+{
+  QString locale = QLocale::system().name();
+
+  QString helpFile = get_help_file(locale);
+
+  if (!QFile::exists(helpFile))
+      helpFile = get_help_file(locale.left(2));
+
+  if (!QFile::exists(helpFile))
+      helpFile = get_help_file("en");
+
   if (QFile::exists(helpFile)) {
     helpDialog dlg(this, helpFile);
     dlg.exec();
