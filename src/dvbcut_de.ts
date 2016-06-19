@@ -357,16 +357,8 @@ Konnte Datei nicht öffnen</translation>
         <translation>Ö&amp;ffnen...</translation>
     </message>
     <message>
-        <source>O</source>
-        <translation>O</translation>
-    </message>
-    <message>
         <source>&amp;Save</source>
         <translation>&amp;Speichern</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Save &amp;As...</source>
@@ -377,95 +369,47 @@ Konnte Datei nicht öffnen</translation>
         <translation>Video-Schnappschuss speichern</translation>
     </message>
     <message>
-        <source>G</source>
-        <translation>G</translation>
-    </message>
-    <message>
         <source>Save Chapter Snapshots</source>
         <translation>Kapitel-Schnappschuss speichern</translation>
-    </message>
-    <message>
-        <source>Ctrl+G</source>
-        <translation></translation>
     </message>
     <message>
         <source>Export video...</source>
         <translation>Video exportieren...</translation>
     </message>
     <message>
-        <source>E</source>
-        <translation>E</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Beenden</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <translation></translation>
     </message>
     <message>
         <source>Set start marker</source>
         <translation>START-Markierung setzen</translation>
     </message>
     <message>
-        <source>A</source>
-        <translation>A</translation>
-    </message>
-    <message>
         <source>Set stop marker</source>
         <translation>STOPP-Markierung setzen</translation>
-    </message>
-    <message>
-        <source>N</source>
-        <translation>N</translation>
     </message>
     <message>
         <source>Set chapter marker</source>
         <translation>Kapitel-Markierung setzen</translation>
     </message>
     <message>
-        <source>C</source>
-        <translation>C</translation>
-    </message>
-    <message>
         <source>Set bookmark</source>
         <translation>Lesezeichen setzen</translation>
-    </message>
-    <message>
-        <source>B</source>
-        <translation>B</translation>
     </message>
     <message>
         <source>Auto chapters</source>
         <translation>Kapitel vorschlagen lassen</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Suggest bookmarks</source>
         <translation>Lesezeichen vorschlagen lassen</translation>
-    </message>
-    <message>
-        <source>M</source>
-        <translation>M</translation>
     </message>
     <message>
         <source>Import bookmarks</source>
         <translation>Lesezeichen importieren</translation>
     </message>
     <message>
-        <source>I</source>
-        <translation>I</translation>
-    </message>
-    <message>
         <source>Normal</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
@@ -473,80 +417,40 @@ Konnte Datei nicht öffnen</translation>
         <translation>nicht skaliert</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Show difference to current picture</source>
         <translation>Zeige Abweichungen zu aktuellem Bild</translation>
-    </message>
-    <message>
-        <source>Ctrl+D</source>
-        <translation></translation>
     </message>
     <message>
         <source>Zoom in</source>
         <translation>vergrößern</translation>
     </message>
     <message>
-        <source>Ctrl++</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Zoom out</source>
         <translation>verkleinern</translation>
-    </message>
-    <message>
-        <source>Ctrl+-</source>
-        <translation></translation>
     </message>
     <message>
         <source>Full size</source>
         <translation>1:1 Original</translation>
     </message>
     <message>
-        <source>Ctrl+1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Half size</source>
         <translation>1:2 Hälfte</translation>
-    </message>
-    <message>
-        <source>Ctrl+2</source>
-        <translation></translation>
     </message>
     <message>
         <source>Quarter size</source>
         <translation>1:4 Viertel</translation>
     </message>
     <message>
-        <source>Ctrl+4</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Custom size</source>
         <translation>benutzerdefiniert</translation>
-    </message>
-    <message>
-        <source>Ctrl+3</source>
-        <translation></translation>
     </message>
     <message>
         <source>Play</source>
         <translation>Start</translation>
     </message>
     <message>
-        <source>P</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Stop</source>
         <translation>Stopp</translation>
-    </message>
-    <message>
-        <source>Q</source>
-        <translation></translation>
     </message>
     <message>
         <source>Play audio: last 2 seconds</source>
@@ -554,10 +458,6 @@ Konnte Datei nicht öffnen</translation>
     </message>
     <message>
         <source>Audio -&gt;|</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&gt;</source>
         <translation></translation>
     </message>
     <message>
@@ -569,20 +469,12 @@ Konnte Datei nicht öffnen</translation>
         <translation></translation>
     </message>
     <message>
-        <source>&lt;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>&amp;About</source>
         <translation>Ü&amp;ber</translation>
     </message>
     <message>
         <source>&amp;Contents</source>
         <translation>&amp;Inhalt</translation>
-    </message>
-    <message>
-        <source>F1</source>
-        <translation>F1</translation>
     </message>
     <message>
         <source>START / STOP</source>

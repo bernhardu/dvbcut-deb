@@ -534,7 +534,7 @@
     <string>Open</string>
    </property>
    <property name="shortcut">
-    <string>O</string>
+    <string notr="true">O</string>
    </property>
    <property name="name" stdset="0">
     <cstring>fileOpenAction</cstring>
@@ -558,7 +558,7 @@
     <string>Save</string>
    </property>
    <property name="shortcut">
-    <string>S</string>
+    <string notr="true">S</string>
    </property>
    <property name="name" stdset="0">
     <cstring>fileSaveAction</cstring>
@@ -594,7 +594,7 @@
     <string>Close</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Q</string>
+    <string notr="true">Ctrl+Q</string>
    </property>
    <property name="name" stdset="0">
     <cstring>fileCloseAction</cstring>
@@ -615,7 +615,7 @@
     <string>Audio -&gt;|</string>
    </property>
    <property name="shortcut">
-    <string>Shift+&gt;</string>
+    <string notr="true">Shift+&gt;</string>
    </property>
    <property name="name" stdset="0">
     <cstring>playAudio1Action</cstring>
@@ -636,7 +636,7 @@
     <string>Audio |-&gt;</string>
    </property>
    <property name="shortcut">
-    <string>&lt;</string>
+    <string notr="true">&lt;</string>
    </property>
    <property name="name" stdset="0">
     <cstring>playAudio2Action</cstring>
@@ -654,7 +654,7 @@
     <string>Play</string>
    </property>
    <property name="shortcut">
-    <string>P</string>
+    <string notr="true">P</string>
    </property>
    <property name="name" stdset="0">
     <cstring>playPlayAction</cstring>
@@ -672,7 +672,7 @@
     <string>Stop</string>
    </property>
    <property name="shortcut">
-    <string>Q</string>
+    <string notr="true">Q</string>
    </property>
    <property name="name" stdset="0">
     <cstring>playStopAction</cstring>
@@ -690,7 +690,7 @@
     <string>Set start marker</string>
    </property>
    <property name="shortcut">
-    <string>A</string>
+    <string notr="true">A</string>
    </property>
    <property name="name" stdset="0">
     <cstring>editStartAction</cstring>
@@ -708,7 +708,7 @@
     <string>Set stop marker</string>
    </property>
    <property name="shortcut">
-    <string>N</string>
+    <string notr="true">N</string>
    </property>
    <property name="name" stdset="0">
     <cstring>editStopAction</cstring>
@@ -726,7 +726,7 @@
     <string>Set chapter marker</string>
    </property>
    <property name="shortcut">
-    <string>C</string>
+    <string notr="true">C</string>
    </property>
    <property name="name" stdset="0">
     <cstring>editChapterAction</cstring>
@@ -744,7 +744,7 @@
     <string>Set bookmark</string>
    </property>
    <property name="shortcut">
-    <string>B</string>
+    <string notr="true">B</string>
    </property>
    <property name="name" stdset="0">
     <cstring>editBookmarkAction</cstring>
@@ -758,7 +758,7 @@
     <string>Auto chapters</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+C</string>
+    <string notr="true">Ctrl+C</string>
    </property>
    <property name="name" stdset="0">
     <cstring>editAutoChaptersAction</cstring>
@@ -772,7 +772,7 @@
     <string>Suggest bookmarks</string>
    </property>
    <property name="shortcut">
-    <string>M</string>
+    <string notr="true">M</string>
    </property>
    <property name="name" stdset="0">
     <cstring>editSuggestAction</cstring>
@@ -786,7 +786,7 @@
     <string>Import bookmarks</string>
    </property>
    <property name="shortcut">
-    <string>I</string>
+    <string notr="true">I</string>
    </property>
    <property name="name" stdset="0">
     <cstring>editImportAction</cstring>
@@ -812,7 +812,7 @@
     <string>Export video...</string>
    </property>
    <property name="shortcut">
-    <string>E</string>
+    <string notr="true">E</string>
    </property>
    <property name="name" stdset="0">
     <cstring>fileExportAction</cstring>
@@ -829,7 +829,7 @@
     <string>Normal</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+N</string>
+    <string notr="true">Ctrl+N</string>
    </property>
    <property name="name" stdset="0">
     <cstring>viewNormalAction</cstring>
@@ -843,7 +843,7 @@
     <string>Unscaled</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+U</string>
+    <string notr="true">Ctrl+U</string>
    </property>
    <property name="name" stdset="0">
     <cstring>viewUnscaledAction</cstring>
@@ -857,7 +857,7 @@
     <string>Show difference to current picture</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+D</string>
+    <string notr="true">Ctrl+D</string>
    </property>
    <property name="name" stdset="0">
     <cstring>viewDifferenceAction</cstring>
@@ -874,7 +874,7 @@
     <string>Full size</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+1</string>
+    <string notr="true">Ctrl+1</string>
    </property>
    <property name="name" stdset="0">
     <cstring>viewFullSizeAction</cstring>
@@ -888,7 +888,7 @@
     <string>Quarter size</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+4</string>
+    <string notr="true">Ctrl+4</string>
    </property>
    <property name="name" stdset="0">
     <cstring>viewQuarterSizeAction</cstring>
@@ -902,7 +902,7 @@
     <string>Custom size</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+3</string>
+    <string notr="true">Ctrl+3</string>
    </property>
    <property name="name" stdset="0">
     <cstring>viewCustomSizeAction</cstring>
@@ -913,7 +913,7 @@
     <string>Zoom in</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl++</string>
+    <string notr="true">Ctrl++</string>
    </property>
    <property name="name" stdset="0">
     <cstring>zoomInAction</cstring>
@@ -924,7 +924,7 @@
     <string>Zoom out</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+-</string>
+    <string notr="true">Ctrl+-</string>
    </property>
    <property name="name" stdset="0">
     <cstring>zoomOutAction</cstring>
@@ -938,7 +938,7 @@
     <string>Half size</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+2</string>
+    <string notr="true">Ctrl+2</string>
    </property>
    <property name="name" stdset="0">
     <cstring>viewHalfSizeAction</cstring>
@@ -956,7 +956,7 @@
     <string>Save Snapshot</string>
    </property>
    <property name="shortcut">
-    <string>G</string>
+    <string notr="true">G</string>
    </property>
    <property name="name" stdset="0">
     <cstring>snapshotSaveAction</cstring>
@@ -970,7 +970,7 @@
     <string>Save Chapter Snapshots</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+G</string>
+    <string notr="true">Ctrl+G</string>
    </property>
    <property name="name" stdset="0">
     <cstring>chapterSnapshotsSaveAction</cstring>
@@ -1004,7 +1004,7 @@
     <string>Contents</string>
    </property>
    <property name="shortcut">
-    <string>F1</string>
+    <string notr="true">F1</string>
    </property>
    <property name="name" stdset="0">
     <cstring>helpContentAction</cstring>

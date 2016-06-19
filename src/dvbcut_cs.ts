@@ -356,16 +356,8 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>&amp;Otevřít</translation>
     </message>
     <message>
-        <source>O</source>
-        <translation>O</translation>
-    </message>
-    <message>
         <source>&amp;Save</source>
         <translation>&amp;Uložit</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Save &amp;As...</source>
@@ -376,176 +368,88 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>Uložit snímek</translation>
     </message>
     <message>
-        <source>G</source>
-        <translation>G</translation>
-    </message>
-    <message>
         <source>Save Chapter Snapshots</source>
         <translation>Uložit snímky kapitol</translation>
-    </message>
-    <message>
-        <source>Ctrl+G</source>
-        <translation>Ctrl+G</translation>
     </message>
     <message>
         <source>Export video...</source>
         <translation>Exportovat video...</translation>
     </message>
     <message>
-        <source>E</source>
-        <translation>E</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Zavřít</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>Set start marker</source>
         <translation>Vložit značku start</translation>
     </message>
     <message>
-        <source>A</source>
-        <translation>A</translation>
-    </message>
-    <message>
         <source>Set stop marker</source>
         <translation>Vložit značku stop</translation>
-    </message>
-    <message>
-        <source>N</source>
-        <translation>N</translation>
     </message>
     <message>
         <source>Set chapter marker</source>
         <translation>Vložit značku kapitoly</translation>
     </message>
     <message>
-        <source>C</source>
-        <translation>C</translation>
-    </message>
-    <message>
         <source>Set bookmark</source>
         <translation>Vložit záložku</translation>
-    </message>
-    <message>
-        <source>B</source>
-        <translation>B</translation>
     </message>
     <message>
         <source>Auto chapters</source>
         <translation>Automaticky vygenerovat kapitoly</translation>
     </message>
     <message>
-        <source>Ctrl+C</source>
-        <translation>Ctrl+C</translation>
-    </message>
-    <message>
         <source>Suggest bookmarks</source>
         <translation>Doporučit záložky</translation>
-    </message>
-    <message>
-        <source>M</source>
-        <translation>M</translation>
     </message>
     <message>
         <source>Import bookmarks</source>
         <translation>Importovat záložky</translation>
     </message>
     <message>
-        <source>I</source>
-        <translation>I</translation>
-    </message>
-    <message>
         <source>Normal</source>
         <translation>Normální</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
     </message>
     <message>
         <source>Unscaled</source>
         <translation>Neškálované</translation>
     </message>
     <message>
-        <source>Ctrl+U</source>
-        <translation>Ctrl+U</translation>
-    </message>
-    <message>
         <source>Show difference to current picture</source>
         <translation>Zobrazit rozdíl proti aktuálnímu snímku</translation>
-    </message>
-    <message>
-        <source>Ctrl+D</source>
-        <translation>Ctrl+D</translation>
     </message>
     <message>
         <source>Zoom in</source>
         <translation>Zvětšit</translation>
     </message>
     <message>
-        <source>Ctrl++</source>
-        <translation>Ctrl++</translation>
-    </message>
-    <message>
         <source>Zoom out</source>
         <translation>Zmenšit</translation>
-    </message>
-    <message>
-        <source>Ctrl+-</source>
-        <translation>Ctrl+-</translation>
     </message>
     <message>
         <source>Full size</source>
         <translation>Plná velikost</translation>
     </message>
     <message>
-        <source>Ctrl+1</source>
-        <translation>Ctrl+1</translation>
-    </message>
-    <message>
         <source>Half size</source>
         <translation>Poloviční velikost</translation>
-    </message>
-    <message>
-        <source>Ctrl+2</source>
-        <translation>Ctrl+2</translation>
     </message>
     <message>
         <source>Quarter size</source>
         <translation>Čtvrtinová velikost</translation>
     </message>
     <message>
-        <source>Ctrl+4</source>
-        <translation>Ctrl+4</translation>
-    </message>
-    <message>
         <source>Custom size</source>
         <translation>Uživatelská velikost</translation>
-    </message>
-    <message>
-        <source>Ctrl+3</source>
-        <translation>Ctrl+3</translation>
     </message>
     <message>
         <source>Play</source>
         <translation>Přehrát</translation>
     </message>
     <message>
-        <source>P</source>
-        <translation>P</translation>
-    </message>
-    <message>
         <source>Stop</source>
         <translation>Zastavit</translation>
-    </message>
-    <message>
-        <source>Q</source>
-        <translation>Q</translation>
     </message>
     <message>
         <source>Play audio: last 2 seconds</source>
@@ -556,10 +460,6 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>Zvuk -&gt;|</translation>
     </message>
     <message>
-        <source>&gt;</source>
-        <translation>&gt;</translation>
-    </message>
-    <message>
         <source>Play audio: next 2 seconds</source>
         <translation>Přehrát zvuk: následující 2 sekundy</translation>
     </message>
@@ -568,20 +468,12 @@ vrátil nenulový návratový kód: %1</translation>
         <translation>Audio |-&gt;</translation>
     </message>
     <message>
-        <source>&lt;</source>
-        <translation>&lt;</translation>
-    </message>
-    <message>
         <source>&amp;About</source>
         <translation>O &amp;aplikaci</translation>
     </message>
     <message>
         <source>&amp;Contents</source>
         <translation>&amp;Obsah</translation>
-    </message>
-    <message>
-        <source>F1</source>
-        <translation>F1</translation>
     </message>
     <message>
         <source>START / STOP</source>
