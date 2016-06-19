@@ -729,8 +729,13 @@ void mpgfile::savempg(muxer &mux, int start, int stop, int savedpics, int savepi
 
 void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int savedpics,int savepics, logoutput *log)
 {
-  if (log)
-    log->printinfo(QCoreApplication::translate("mpgfile", "Recoding %n pictures", "", QCoreApplication::CodecForTr, stop-start));
+  if (log) {
+#if QT_VERSION >= 0x050000
+      log->printinfo(QCoreApplication::translate("mpgfile", "Recoding %n pictures", "", stop-start));
+#else
+      log->printinfo(QCoreApplication::translate("mpgfile", "Recoding %n pictures", "", QCoreApplication::CodecForTr, stop-start));
+#endif
+  }
 
   std::list<avframe*> framelist;
   decodegop(start,stop,framelist);
