@@ -25,6 +25,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cstdlib>
+#include <QString>
 #include "logoutput.h"
 
 void
@@ -84,4 +85,34 @@ logoutput::printwarning(const char *fmt, ...) {
   va_start(ap,fmt);
   vprintmsg(fmt, ap, "WARNING: ", 0);
   va_end(ap);
+}
+
+/*virtual*/
+void logoutput::print(const QString &str)
+{
+    print("%s", str.toLatin1().data());
+}
+
+/*virtual*/
+void logoutput::printheading(const QString &str)
+{
+    printheading("%s", str.toLatin1().data());
+}
+
+/*virtual*/
+void logoutput::printinfo(const QString &str)
+{
+    printinfo("%s", str.toLatin1().data());
+}
+
+/*virtual*/
+void logoutput::printerror(const QString &str)
+{
+    printerror("%s", str.toLatin1().data());
+}
+
+/*virtual*/
+void logoutput::printwarning(const QString &str)
+{
+    printwarning("%s", str.toLatin1().data());
 }

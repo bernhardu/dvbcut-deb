@@ -21,6 +21,8 @@
 #ifndef _DVBCUT_LOGOUTPUT_H
 #define _DVBCUT_LOGOUTPUT_H
 
+class QString;
+
 /**
 @author Sven Over
 */
@@ -40,11 +42,19 @@ public:
     return currentprogress;
     }
   virtual void setprogress(int permille);
+
   virtual void print(const char *fmt, ...);
   virtual void printheading(const char *fmt, ...);
   virtual void printinfo(const char *fmt, ...);
   virtual void printerror(const char *fmt, ...);
   virtual void printwarning(const char *fmt, ...);
+
+  virtual void print(const QString &str);
+  virtual void printheading(const QString &str);
+  virtual void printinfo(const QString &str);
+  virtual void printerror(const QString &str);
+  virtual void printwarning(const QString &str);
+
   virtual bool cancelled()
     {
     return false;
