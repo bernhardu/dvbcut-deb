@@ -2572,7 +2572,7 @@ void dvbcut::helpContentAction_activated()
 #ifndef __WIN32__
   // Unix/Linux: search in the associated share subdirectory
   if (!QFile::exists(helpFile)) {
-    helpFile = appDir.absolutePath() + "/share/help/dvbcut_en.html";
+    helpFile = appDir.absolutePath() + "/share/dvbcut/dvbcut_en.html";
   }
 #endif
   if (QFile::exists(helpFile)) {
