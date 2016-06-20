@@ -77,6 +77,17 @@ TRANSLATIONS += \
     dvbcut_cs.ts \
     dvbcut_de.ts
 
+
+qtPrepareTool(LRELEASE, lrelease)
+
+l10n.commands = $$LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_OUT}
+l10n.input = TRANSLATIONS
+l10n.output = ${QMAKE_FILE_BASE}.qm
+l10n.CONFIG += no_link target_predeps
+l10n.variable_out = l10ninst.files
+QMAKE_EXTRA_COMPILERS += l10n
+
+
 CONFIG += link_pkgconfig
 
 
