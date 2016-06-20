@@ -733,12 +733,6 @@ void dvbcut::fileExport()
       break;
   }
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
-  if (expfmt == 2 || expfmt == 3) {
-    log->printwarning(tr("With this libav version the lavfmuxer is broken. Probably you want to use the DVBcut muxer instead."));
-  }
-#endif
-
   if (!mux->ready()) {
 #ifndef __WIN32__
     if (child_pid > 0) {

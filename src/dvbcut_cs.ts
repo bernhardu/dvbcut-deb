@@ -322,10 +322,6 @@ vrátil nenulový návratový kód: %1</translation>
         <source>Audio track</source>
         <translation>Zvuková stopa</translation>
     </message>
-    <message>
-        <source>With this libav version the lavfmuxer is broken. Probably you want to use the DVBcut muxer instead.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>dvbcutbase</name>

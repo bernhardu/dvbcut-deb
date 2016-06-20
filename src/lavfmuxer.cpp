@@ -21,6 +21,7 @@
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
+#include <libavutil/opt.h>
 }
 #include <cstring>
 #include <utility>
@@ -44,10 +45,8 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
     return;
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
-// todo: what here ?
-//  maybe: AVFormatContext::audio_preload but no direct access.
-//    AVOptions
-//    iformat
+  av_opt_set_int(avfc, "preload", (int)(.5 * AV_TIME_BASE), AV_OPT_SEARCH_CHILDREN);
+  av_opt_set_int(avfc, "muxrate", 10080000, AV_OPT_SEARCH_CHILDREN);
 #else
   avfc->preload= (int)(.5*AV_TIME_BASE);
   avfc->mux_rate=10080000;
@@ -61,6 +60,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 
   st[VIDEOSTREAM].stream_index=id;
   AVStream *s=st[VIDEOSTREAM].avstr=avformat_new_stream(avfc, NULL);
+  s->id = id++;
   strpres[VIDEOSTREAM]=true;
   av_free(s->codec);
   mpg.setvideoencodingparameters();
@@ -75,6 +75,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
       int astr=audiostream(i);
       st[astr].stream_index=id;
       s=st[astr].avstr=avformat_new_stream(avfc, NULL);
+      s->id = id++;
       strpres[astr]=true;
       if (s->codec)
         av_free(s->codec);
@@ -125,10 +126,8 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
     return;
     }
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
-// todo: what here ?
-//  maybe: AVFormatContext::audio_preload but no direct access.
-//    AVOptions
-//    iformat
+  av_opt_set_int(avfc, "preload", (int)(.5 * AV_TIME_BASE), AV_OPT_SEARCH_CHILDREN);
+  av_opt_set_int(avfc, "muxrate", 10080000, AV_OPT_SEARCH_CHILDREN);
 #else
   avfc->preload= (int)(.5*AV_TIME_BASE);
   avfc->mux_rate=10080000;
@@ -137,13 +136,13 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
   av_dump_format(avfc, 0, filename, 1);
-  fileopened=true;
   avformat_write_header(avfc, NULL);
 #else
   dump_format(avfc, 0, filename, 1);
-  fileopened=true;
   av_write_header(avfc);
 #endif
+
+  fileopened = true;
   }
 
 
