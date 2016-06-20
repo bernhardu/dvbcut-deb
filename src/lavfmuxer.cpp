@@ -119,7 +119,11 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   avfc->max_delay= (int)(.7*AV_TIME_BASE);
 
   av_dump_format(avfc, 0, filename, 1);
-  avformat_write_header(avfc, NULL);
+  int ret = avformat_write_header(avfc, NULL);
+  if (ret < 0) {
+      fprintf(stderr, "avformat_write_header failed ret[%d]\n", ret);
+      return;
+  }
 
   fileopened = true;
   }
