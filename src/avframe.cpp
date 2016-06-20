@@ -21,6 +21,9 @@
 #include <qimage.h>
 #include <cstdlib>
 #include <cstdio>
+extern "C" {
+#include <libavutil/imgutils.h>
+}
 #include "avframe.h"
 
 #ifdef HAVE_LIB_SWSCALE
@@ -35,7 +38,18 @@ avframe::avframe() : tobefreed(0),w(0),h(0),dw(0),pix_fmt()
 avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
   {
   f=av_frame_alloc();
-  tobefreed=malloc(avpicture_get_size(ctx->pix_fmt, ctx->width, ctx->height));
+
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
+  tobefreed = (uint8_t *)malloc(av_image_get_buffer_size(ctx->pix_fmt, ctx->width, ctx->height, 1));
+
+  av_image_fill_arrays(f->data, f->linesize,
+                       tobefreed,
+                       ctx->pix_fmt, ctx->width, ctx->height, 1);
+
+  av_image_copy(f->data, f->linesize, (const uint8_t**)src->data, src->linesize,
+                ctx->pix_fmt, ctx->width, ctx->height);
+#else
+  tobefreed = (uint8_t *)malloc(avpicture_get_size(ctx->pix_fmt, ctx->width, ctx->height));
 
   avpicture_fill((AVPicture *)f,
                  (u_int8_t*)tobefreed,
@@ -43,6 +57,7 @@ avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
 
   av_picture_copy((AVPicture *)f, (const AVPicture *) src,
                   ctx->pix_fmt, ctx->width, ctx->height);
+#endif
 
   f->pict_type              = src->pict_type;
   f->quality                = src->quality;
@@ -86,14 +101,25 @@ QImage avframe::getqimage(bool scaled, double viewscalefactor)
 #endif
     return QImage();
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
+  uint8_t *rgbbuffer = (uint8_t*)malloc(av_image_get_buffer_size(AV_PIX_FMT_RGB24, w, h, 1) + 64);
+#else
   uint8_t *rgbbuffer=(uint8_t*)malloc(avpicture_get_size(AV_PIX_FMT_RGB24, w, h)+64);
+#endif
+
   int headerlen=sprintf((char *) rgbbuffer, "P6\n%d %d\n255\n", w, h);
 
   AVFrame *avframergb=av_frame_alloc();
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
+  av_image_fill_arrays(avframergb->data, avframergb->linesize,
+                       rgbbuffer + headerlen,
+                       AV_PIX_FMT_RGB24, w, h, 1);
+#else
   avpicture_fill((AVPicture*)avframergb,
                  rgbbuffer+headerlen,
                  AV_PIX_FMT_RGB24,w,h);
+#endif
 
 #ifdef HAVE_LIB_SWSCALE
   sws_scale(img_convert_ctx, f->data, f->linesize, 0, h, 

@@ -38,7 +38,7 @@ class avframe
   {
 protected:
   AVFrame *f;
-  void *tobefreed;
+  uint8_t *tobefreed;
   int w,h,dw;
   enum AVPixelFormat pix_fmt;
 #ifdef HAVE_LIB_SWSCALE
