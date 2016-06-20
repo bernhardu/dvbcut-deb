@@ -25,6 +25,7 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavutil/opt.h>
 #include <libavutil/mem.h>
 }
 
@@ -62,11 +63,16 @@ protected:
     avcc->rc_min_rate=9500000;
     avcc->rc_max_rate=9500000;
     avcc->rc_buffer_size=224*1024*8;
-    avcc->rc_buffer_aggressivity=1.0;
     avcc->rc_initial_buffer_occupancy = avcc->rc_buffer_size*3/4;
     avcc->qmax=2;
     avcc->mb_lmax= FF_QP2LAMBDA * 2;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
+    av_opt_set_double(avcc, "rc_buffer_aggressivity", 1.0, AV_OPT_SEARCH_CHILDREN);
+    av_opt_set_int(avcc, "lmax", FF_QP2LAMBDA * 2, AV_OPT_SEARCH_CHILDREN);
+#else
+    avcc->rc_buffer_aggressivity=1.0;
     avcc->lmax= FF_QP2LAMBDA * 2;
+#endif
     if (interlaced)
       avcc->flags |= CODEC_FLAG_INTERLACED_DCT|CODEC_FLAG_INTERLACED_ME;
     }
