@@ -62,6 +62,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   s->codec=mpg.getavcc(VIDEOSTREAM);
   s->codec->rc_buffer_size = 224*1024*8;
   s->sample_aspect_ratio = s->codec->sample_aspect_ratio;
+  s->time_base = s->codec->time_base;
 
   for (int i=0;i<mpg.getaudiostreams();++i)
     if (audiostreammask & (1u<<i)) {
@@ -106,6 +107,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 	  break;
 	}
       }
+      s->time_base = s->codec->time_base;
     }
 
   if (!(fmt->flags & AVFMT_NOFILE)&&(avio_open(&avfc->pb, filename, AVIO_FLAG_WRITE) < 0)) {
