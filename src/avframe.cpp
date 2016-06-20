@@ -68,6 +68,9 @@ avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
   f->top_field_first        = src->top_field_first;
   f->repeat_pict            = src->repeat_pict;
   f->quality                = src->quality;
+  f->format                 = src->format;
+  f->width                  = src->width;
+  f->height                 = src->height;
 
   w=ctx->width;
   h=ctx->height;
