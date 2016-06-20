@@ -44,13 +44,8 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   if (!avfc)
     return;
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
   av_opt_set_int(avfc, "preload", (int)(.5 * AV_TIME_BASE), AV_OPT_SEARCH_CHILDREN);
   av_opt_set_int(avfc, "muxrate", 10080000, AV_OPT_SEARCH_CHILDREN);
-#else
-  avfc->preload= (int)(.5*AV_TIME_BASE);
-  avfc->mux_rate=10080000;
-#endif
   avfc->max_delay= (int)(.7*AV_TIME_BASE);
 
   avfc->oformat=fmt;
@@ -66,9 +61,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   mpg.setvideoencodingparameters();
   s->codec=mpg.getavcc(VIDEOSTREAM);
   s->codec->rc_buffer_size = 224*1024*8;
-#if LIBAVFORMAT_VERSION_INT >= ((52<<16)+(21<<8)+0)
   s->sample_aspect_ratio = s->codec->sample_aspect_ratio;
-#endif
 
   for (int i=0;i<mpg.getaudiostreams();++i)
     if (audiostreammask & (1u<<i)) {
@@ -115,32 +108,18 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
       }
     }
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
-  // error: 'av_set_parameters' was not declared in this scope
   if (!(fmt->flags & AVFMT_NOFILE)&&(avio_open(&avfc->pb, filename, AVIO_FLAG_WRITE) < 0)) {
-#else
-  if ((av_set_parameters(avfc, NULL) < 0) || (!(fmt->flags & AVFMT_NOFILE)&&(url_fopen(&avfc->pb, filename, URL_WRONLY) < 0))) {
-#endif  
     av_free(avfc);
     avfc=0;
     return;
     }
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
+
   av_opt_set_int(avfc, "preload", (int)(.5 * AV_TIME_BASE), AV_OPT_SEARCH_CHILDREN);
   av_opt_set_int(avfc, "muxrate", 10080000, AV_OPT_SEARCH_CHILDREN);
-#else
-  avfc->preload= (int)(.5*AV_TIME_BASE);
-  avfc->mux_rate=10080000;
-#endif
   avfc->max_delay= (int)(.7*AV_TIME_BASE);
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
   av_dump_format(avfc, 0, filename, 1);
   avformat_write_header(avfc, NULL);
-#else
-  dump_format(avfc, 0, filename, 1);
-  av_write_header(avfc);
-#endif
 
   fileopened = true;
   }
@@ -152,13 +131,7 @@ lavfmuxer::~lavfmuxer()
     if (fileopened) {
       av_write_trailer(avfc);
       if (!(fmt->flags & AVFMT_NOFILE))
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)
         avio_close(avfc->pb);
-#elif LIBAVFORMAT_VERSION_INT >= ((52<<16)+(0<<8)+0)
-        url_fclose(avfc->pb);
-#else
-        url_fclose(&avfc->pb);
-#endif
       }
 
     av_free(avfc);

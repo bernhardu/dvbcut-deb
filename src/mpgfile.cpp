@@ -162,17 +162,14 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
       while (decodebytes>0)
       {
         frameFinished=0;
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,23,0)
+
         AVPacket pkt;
         av_init_packet( &pkt );
         pkt.data = (uint8_t*) data;
         pkt.size = decodebytes;
         int bytesDecoded=avcodec_decode_video2( S->avcc, avf,
                                         &frameFinished, &pkt );
-#else
-        int bytesDecoded=avcodec_decode_video(S->avcc, avf, &frameFinished,
-                                              (uint8_t*) data, decodebytes);
-#endif
+
         if (bytesDecoded<0)
         {
           fprintf(stderr,"libavcodec error while decoding frame #%d\n",pic);
@@ -211,16 +208,14 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
   if (pic < stop)
   {
     int frameFinished=0;
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,23,0)
+
     AVPacket pkt;
     av_init_packet( &pkt );
     pkt.data = NULL;
     pkt.size = 0;
     avcodec_decode_video2( S->avcc, avf,
                                         &frameFinished, &pkt );
-#else
-    avcodec_decode_video(S->avcc, avf, &frameFinished, NULL, 0);
-#endif
+
     if (frameFinished)
     {
       if (last_cpn!=avf->coded_picture_number)
@@ -776,11 +771,7 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
       f->pts=idx[idx.indexnr(start+p)].getpts()-startpts;
       f->coded_picture_number=f->display_picture_number=p;
       f->key_frame=(p==0)?1:0;
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53, 35, 0)      
       f->pict_type=(p==0)?AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
-#else
-      f->pict_type=(p==0)?FF_I_TYPE:FF_P_TYPE;
-#endif
       ret = avcodec_encode_video2(avcc, &pkt, f, &got_output);
 
       delete framelist.front();
