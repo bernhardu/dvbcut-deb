@@ -6,42 +6,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = dvbcut
 TEMPLATE = app
 
-
-QMAKE_CXXFLAGS += \
-    -DHAVE_LIB_SWSCALE=1 \
-    -DHAVE_LIB_MAD=1 \
-    -DHAVE_LIB_A52=1 \
-    -DHAVE_LIB_AO=1 \
-    -DSTDC_HEADERS=1 \
-    -DHAVE_AO_AO_H=1 \
-    -DHAVE_MAD_H=1 \
-    -DHAVE_STDINT_H=1 \
-    -DHAVE_A52DEC_A52_H=1 \
-    -DHAVE_UNISTD_H=1 \
-    -DHAVE_GETPAGESIZE=1 \
-    -DHAVE_MMAP=1 \
-    -D__STDC_LIMIT_MACROS=1 \
-    -D__STDC_CONSTANT_MACROS=1 \
-    -D_FILE_OFFSET_BITS=64 \
-    -D_FORTIFY_SOURCE=2 \
-    -DQT_SHARED
-
-QMAKE_CXXFLAGS += \
-    -I/usr/include \
-    -I/usr/include/libavcodec \
-    -I/usr/include/libavformat \
-    -I/usr/include/libswscale \
-    -I/include
-
-LIBS += \
-    -lavcodec \
-    -lavformat \
-    -lswscale \
-    -lavutil \
-    -lao \
-    -la52 \
-    -lmad
-
 SOURCES += \
     avframe.cpp \
     buffer.cpp \
@@ -112,3 +76,35 @@ TRANSLATIONS += \
     dvbcut.ts \
     dvbcut_cs.ts \
     dvbcut_de.ts
+
+CONFIG += link_pkgconfig
+
+
+system(pkg-config --exists libavformat) {
+    PKGCONFIG += libavformat
+} else { error(Please install development package libavformat-dev) }
+
+system(pkg-config --exists libavcodec) {
+    PKGCONFIG += libavcodec
+} else { error(Please install development package libavcodec-dev) }
+
+system(pkg-config --exists libavutil) {
+    PKGCONFIG += libavutil
+} else { error(Please install development package libavutil-dev) }
+
+system(pkg-config --exists libswscale) {
+    QMAKE_CXXFLAGS += -DHAVE_LIB_SWSCALE
+    PKGCONFIG += libswscale
+} else { error(Please install development package libswscale-dev) }
+
+system(pkg-config --exists ao) {
+    QMAKE_CXXFLAGS += -DHAVE_LIB_AO
+    PKGCONFIG += ao
+} else { error(Please install development package libao-dev) }
+
+system(pkg-config --exists mad) {
+    QMAKE_CXXFLAGS += -DHAVE_LIB_MAD
+    PKGCONFIG += mad
+} else { error(Please install development package libmad0-dev) }
+
+QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -D_FILE_OFFSET_BITS=64
