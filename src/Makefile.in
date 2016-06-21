@@ -63,6 +63,9 @@ uic_%.cpp: %.h
 moc_%.cpp: %.h
 	moc -o $@ $<
 
+%.qm: %.ts
+	lrelease $< -qm $@
+
 MOC = \
 	moc_dvbcut.cpp \
 	moc_exportdialog.cpp \
@@ -76,8 +79,14 @@ UIC = \
 	ui_mplayererrorbase.h \
 	ui_progresswindowbase.h
 
+QM = \
+	dvbcut.qm \
+	dvbcut_cs.qm \
+	dvbcut_de.qm
+
 QRC = \
 	qrc_icons.cpp
+
 SRCS = \
 	avframe.cpp differenceimageprovider.cpp buffer.cpp \
 	dvbcut.cpp eventlistitem.cpp exception.cpp exportdialog.cpp \
@@ -89,7 +98,7 @@ SRCS = \
 
 OBJS = $(SRCS:.cpp=.$(OBJEXT))
 
-all: $(topdir)/bin $(topdir)/bin/dvbcut$(EXEEXT)
+all: $(topdir)/bin $(topdir)/bin/dvbcut$(EXEEXT) $(QM)
 
 check:
 
@@ -121,8 +130,7 @@ clean:
 	-rm -f *.$(OBJEXT)
 
 distclean: clean
-        # remove moc/uic generated files
-	-rm -f $(MOC) $(UIC)
+	-rm -f $(MOC) $(UIC) $(QM)
 	-rm -f .depend stamp-depend
 
 maintainer-clean: distclean
