@@ -69,13 +69,13 @@ OBJS = $(SRCS:.cpp=.o)
 
 CXX = g++
 CXXFLAGS = -O2 -Wall -g
-CPPFLAGS = -I../ffmpeg/include/ffmpeg -I../import -I/usr/local/include \
+CPPFLAGS = -I../import -I/usr/local/include \
 	-I. -DQT3_SUPPORT -DHAVE_LIB_MAD -DHAVE_LIB_A52 -DHAVE_LIB_AO \
 	-D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS \
 	-I$(QTDIR)/include/Qt -I$(QTDIR)/include/QtCore \
 	-I$(QTDIR)/include/QtGui -I$(QTDIR)/include/Qt3Support \
 	-I$(QTDIR)/include
-LDFLAGS = -L$(QTDIR)/lib -L../ffmpeg/lib -L/usr/local/lib
+LDFLAGS = -L$(QTDIR)/lib -L/usr/local/lib
 LDLIBS = -lavformat -lavcodec -lavutil -lqt-mt -lmad -la52 -lao -lwinmm -lmpeg2
 
 all: ../bin/dvbcut.exe
@@ -85,47 +85,15 @@ all: ../bin/dvbcut.exe
 	cp dvbcut.exe $@
 	strip $@
 
-dvbcut.exe: ../ffmpeg/lib/libavcodec.a $(SRCS) $(OBJS)
+dvbcut.exe: $(SRCS) $(OBJS)
 	$(CXX) -o $@ $(LDFLAGS) $(OBJS) $(LDLIBS)
 
-OPT.ffmpeg = \
-	--prefix=$(TOP)/ffmpeg \
-	--enable-mingw32 \
-	--enable-gpl \
-	--disable-decoders \
-	--enable-memalign-hack \
-	--disable-encoders \
-	--disable-ffplay \
-	--disable-ffserver \
-	--disable-vhook \
-	--disable-zlib \
-	--disable-network \
-	--disable-dv1394 \
-	--disable-bktr \
-	--disable-v4l \
-	--disable-audio-beos \
-	--disable-audio-oss \
-	--enable-codec=mpeg2encoder \
-	--enable-codec=mp2_encoder \
-	--enable-codec=ac3_decoder \
-	--enable-codec=ac3_encoder \
-	--enable-a52 \
-	--disable-mmx \
-	--disable-debug
-
-../ffmpeg/lib/libavcodec.a:
-	if cd ../ffmpeg.src; then \
-	  ./configure $(OPT.ffmpeg) || exit 1; \
-	  $(MAKE) installlib || exit 1; \
-	fi
 clean:
 	-rm -f *.o
-	-cd ../ffmpeg.src && $(MAKE) clean
 
 distclean: clean
-	# remove moc/uic generated files and ffmpeg as well
+        # remove moc/uic generated files
 	-rm -f $(MOC) $(UIC)
-	-rm -rf ../ffmpeg/lib ../ffmpeg/include
 	-rm -f .depend stamp-depend
 
 dep: stamp-depend

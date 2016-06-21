@@ -4,12 +4,6 @@ exit
 # original version (included for reference only):
 TOP=$(pwd)
 which gcc
-if true; then
-echo "*** Building FFMPEG..."
-(cd ffmpeg.src;./configure --prefix=$TOP/ffmpeg --enable-mingw32 --enable-gpl --disable-decoders --enable-memalign-hack --disable-encoders --disable-ffplay --disable-ffserver --disable-vhook	--disable-zlib --disable-network --disable-dv1394 --disable-bktr --disable-v4l --disable-audio-beos --disable-audio-oss --enable-codec=mpeg2encoder --enable-codec=mp2_encoder  --enable-codec=ac3_decoder  --enable-codec=ac3_encoder --enable-a52 --disable-mmx --disable-debug)
-make -C ffmpeg.src installlib
-make -C ffmpeg.src clean
-fi
 cd src
 #qt3to4.exe *.cpp *.h
 
@@ -34,7 +28,7 @@ OPT=-O2
 for i in $SOURCES; do
 OBJ=$(basename $i .cpp).o
 echo "*** Compiling $i..."
-if ! g++ $OPT -I ../ffmpeg/include -I ../import -I /usr/local/include -I . -DQT3_SUPPORT -DHAVE_LIB_MAD -DHAVE_LIB_A52 -DHAVE_LIB_AO -I $MQT/include/Qt -I $MQT/include/QtCore -I $MQT/include/QtGui  -I $MQT/include/Qt3Support -I $MQT/include $i  -c  ; then
+if ! g++ $OPT -I ../import -I /usr/local/include -I . -DQT3_SUPPORT -DHAVE_LIB_MAD -DHAVE_LIB_A52 -DHAVE_LIB_AO -I $MQT/include/Qt -I $MQT/include/QtCore -I $MQT/include/QtGui  -I $MQT/include/Qt3Support -I $MQT/include $i  -c  ; then
 exit 1;
 fi
 
@@ -43,7 +37,7 @@ done
 fi
 
 echo "*** Linking..."
-g++  $OPT *.o -o ../bin/dvbcut.exe -L $MQT/lib -L../ffmpeg/lib -L/usr/local/lib -lavformat -lavcodec -lavutil -lqt-mt -lmad -la52 -lao -lwinmm -lmpeg2
+g++  $OPT *.o -o ../bin/dvbcut.exe -L $MQT/lib -L/usr/local/lib -lavformat -lavcodec -lavutil -lqt-mt -lmad -la52 -lao -lwinmm -lmpeg2
 
 # make clean...(someone should write a real Makefile)
 rm *.o

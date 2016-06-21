@@ -18,8 +18,6 @@ override_dh_auto_configure:
 	dh_auto_configure -- --with-ffmpeg=/usr
 
 override_dh_auto_clean:
-	rm -rf ffmpeg.src
-	rm -rf ffmpeg-patches
 	[ ! -f makefile ] || make -f makefile distclean
 	dh_clean bin/dvbcut dvbcut.desktop src/Makefile src/dvbcut src/qrc_icons.cpp
 	dh_clean
@@ -31,7 +29,5 @@ get-orig-source:
 	TMPDIR=`mktemp -d` && \
 	trap 'rm -rf $${TMPDIR}' EXIT && \
 	svn export -r$(SVN_VERSION) $(SVN_URL) $${TMPDIR}/dvbcut && \
-	rm -rf $${TMPDIR}/dvbcut/ffmpeg.src && \
-	rm -rf $${TMPDIR}/dvbcut/ffmpeg-patches && \
 	rm -rf $${TMPDIR}/dvbcut/debian && \
 	tar czvf $(ORIG_TAR_GZ) -C $${TMPDIR} dvbcut

@@ -41,9 +41,8 @@ for ac_dir; do
   esac
 done
 
-ffmpeg_prefix=`pwd`/ffmpeg
-ffmpeg_lib=$ffmpeg_prefix/lib	# internally, use lib regardless of architecture
-ffmpeg_internal=ffmpeg_internal
+ffmpeg_prefix=
+ffmpeg_lib=
 AC_ARG_WITH(ffmpeg,
   [  --with-ffmpeg=DIR       use installed ffmpeg in DIR],
   [case $withval in
@@ -55,11 +54,9 @@ AC_ARG_WITH(ffmpeg,
     *)
       ffmpeg_prefix=$withval
       ffmpeg_lib=$ffmpeg_prefix/$mr_libdirname
-      ffmpeg_internal=
       ;;
   esac])
 AC_SUBST(ffmpeg_prefix)
-AC_SUBST(ffmpeg_internal)
 
 ffmpeg_include=$ffmpeg_prefix/include
 
@@ -83,11 +80,9 @@ dnl Checks for libraries.
 FFMPEG_LIBS='-lavformat -lavcodec -lavutil'
 AC_SUBST(FFMPEG_LIBS)
 
-if test x$ffmpeg_internal != xffmpeg_internal; then
-  AC_CHECK_LIB(swscale, main,
-    [AC_DEFINE(HAVE_LIB_SWSCALE, 1, [Define this if you have libswscale.])
-    FFMPEG_LIBS="$FFMPEG_LIBS -lswscale"])
-fi
+AC_CHECK_LIB(swscale, main,
+  [AC_DEFINE(HAVE_LIB_SWSCALE, 1, [Define this if you have libswscale.])
+  FFMPEG_LIBS="$FFMPEG_LIBS -lswscale"])
 
 AC_CHECK_LIB(mad, mad_decoder_init,
   [AC_DEFINE(HAVE_LIB_MAD, 1, [Define this if you have libmad.])
