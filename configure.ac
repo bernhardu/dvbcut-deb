@@ -140,21 +140,21 @@ dnl Checks for library functions.
 AC_FUNC_MMAP
 
 dnl external stuff
-AC_ARG_WITH(qt4, [  --with-qt4=DIR          path to qt4 (default: QTDIR)],
+AC_ARG_WITH(qt5, [  --with-qt5=DIR          path to qt5 (default: QTDIR)],
   [case $withval in
-    no) AC_MSG_ERROR([dvbcut requires Qt4]);;
+    no) AC_MSG_ERROR([dvbcut requires Qt5]);;
     yes) ;;
     *) QTDIR=$withval;;
   esac])
 AC_SUBST(QTDIR)
 QTINC=$QTDIR/include
 QTLIB=$QTDIR/$mr_libdirname
-AC_ARG_WITH(qt4-include, [  --with-qt4-include=DIR  path to qt4 include files],
+AC_ARG_WITH(qt5-include, [  --with-qt5-include=DIR  path to qt5 include files],
   [case $withval in
     yes|no) ;;
     *) QTINC=$withval;;
   esac])
-AC_ARG_WITH(qt4-lib, [  --with-qt4-lib=DIR      path to qt4 libraries],
+AC_ARG_WITH(qt5-lib, [  --with-qt5-lib=DIR      path to qt5 libraries],
   [case $withval in
     yes|no) ;;
     *) QTLIB=$withval;;
@@ -163,25 +163,29 @@ AC_ARG_WITH(qt4-lib, [  --with-qt4-lib=DIR      path to qt4 libraries],
 CPPFLAGS="$CPPFLAGS -I$QTINC"
 LDFLAGS="$LDFLAGS -L$QTLIB"
 
-AC_CHECK_LIB(QtCore, main,
-  [HAVE_QT4="yes"],
-  [AC_MSG_ERROR([QtCore library not found])])
+AC_CHECK_LIB(Qt5Core, main,
+  [HAVE_QT5="yes"],
+  [AC_MSG_ERROR([Qt5Core library not found])])
 
-AC_CHECK_LIB(QtGui, main,
-  [HAVE_QT4="yes"],
-  [AC_MSG_ERROR([QtGui library not found])])
+AC_CHECK_LIB(Qt5Gui, main,
+  [HAVE_QT5="yes"],
+  [AC_MSG_ERROR([Qt5Gui library not found])])
 
-AC_CHECK_LIB(QtXml, main,
-  [HAVE_QT4="yes"],
-  [AC_MSG_ERROR([QtXml library not found])])
+AC_CHECK_LIB(Qt5Xml, main,
+  [HAVE_QT5="yes"],
+  [AC_MSG_ERROR([Qt5Xml library not found])])
 
-if test "x$HAVE_QT4" = "xyes"; then 
-   QT_CXXFLAGS=`$PKG_CONFIG --cflags QtCore QtGui QtXml`
-   QT_LIBS=`$PKG_CONFIG --libs QtCore QtGui QtXml`
+AC_CHECK_LIB(Qt5Widgets, main,
+  [HAVE_QT5="yes"],
+  [AC_MSG_ERROR([Qt5Widgets library not found])])
+
+if test "x$HAVE_QT5" = "xyes"; then
+   QT_CXXFLAGS=`$PKG_CONFIG --cflags Qt5Core Qt5Gui Qt5Xml Qt5Widgets`
+   QT_LIBS=`$PKG_CONFIG --libs Qt5Core Qt5Gui Qt5Xml Qt5Widgets`
    CPPFLAGS="$CPPFLAGS $QT_CXXFLAGS"
    LIBS="$LIBS $QT_LIBS"
 else
-   AC_MSG_ERROR([cannot find Qt4 library >= 4.2])
+   AC_MSG_ERROR([cannot find Qt5 library >= 5.3])
 fi
 
 AC_DEFINE(__STDC_LIMIT_MACROS, 1, [Required for C++])

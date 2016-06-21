@@ -13,16 +13,21 @@ Build-Depends:
  libavutil-dev (>> 6:10~),
  libmad0-dev,
  libpostproc-dev,
- libqt4-dev,
  libswscale-dev (>> 6:10~),
  pkg-config,
- qt4-dev-tools
+ qt5-qmake,
+ qtbase5-dev,
+ qtbase5-dev-tools,
+ qttools5-dev-tools
 Homepage: http://dvbcut.sourceforge.net/
 Standards-Version: 3.9.8
 
 Package: dvbcut
 Architecture: any
 Depends:
+ libqt5gui5,
+ libqt5widgets5,
+ libqt5core5a,
  ${misc:Depends},
  ${shlibs:Depends}
 Recommends:

@@ -55,13 +55,13 @@ QTDIR = @QTDIR@
 PATH := $(QTDIR)/bin:$(PATH)
 
 ui_%.h: %.ui
-	uic-qt4 -o $@ $<
+	uic -o $@ $<
 
 uic_%.cpp: %.h
-	uic-qt4 -o $@ $<
+	uic -o $@ $<
 
 moc_%.cpp: %.h
-	moc-qt4 -o $@ $<
+	moc -o $@ $<
 
 MOC = \
 	moc_dvbcut.cpp \
