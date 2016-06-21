@@ -386,7 +386,7 @@ inbuffer::providedata(unsigned int amount, long long position) {
     }
 #endif
     size_t len = mmapsize;
-    if (newpos + len > i->end)
+    if (newpos + dvbcut_off_t(len) > i->end)
       len = i->end - newpos;
     void *ptr = ::mmap(0, len, PROT_READ, MAP_SHARED, i->fd, relpos);
     if (ptr != MAP_FAILED) {
@@ -452,7 +452,7 @@ inbuffer::providedata(unsigned int amount, long long position) {
       needseek = false;
     }
     size_t len = size - writepos;
-    if (len > i->end - seekpos)
+    if (dvbcut_off_t(len) > i->end - seekpos)
       len = i->end - seekpos;
     assert(len > 0);
     ssize_t n = ::read(i->fd, (char*)d + writepos, len);
