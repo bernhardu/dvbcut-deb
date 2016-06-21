@@ -1935,7 +1935,8 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
 	  u.setScheme("file");
 	  u.setPath(QString::fromStdString(idxfilename));
 	  if (chdir(QFileInfo(u.path()).absolutePath().toLatin1()) == -1)
-	      chdir("/");
+	      if (chdir("/") == -1)
+		  fprintf(stderr, "chdir(\"/\") failed\n");
 	  QString relname = QFileInfo(u.path()).fileName();
 	  QString s=QFileDialog::getSaveFileName(
 		  this,
