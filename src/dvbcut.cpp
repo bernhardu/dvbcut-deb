@@ -282,6 +282,10 @@ void dvbcut::fileSave()
     return;
   }
 
+  std::list<std::string> dummy_list;
+  dummy_list.push_back(prjfilen);
+  addtorecentfiles(dummy_list);
+
   QFile outfile(QString::fromStdString(prjfilen));
   if (!outfile.open(QIODevice::WriteOnly)) {
     critical(tr("Failed to write project file - dvbcut"),
