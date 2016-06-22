@@ -12,7 +12,6 @@ Build-Depends:
  libavformat-dev (>> 6:11~),
  libavutil-dev (>> 6:11~),
  libmad0-dev,
- libpostproc-dev,
  libswscale-dev (>> 6:11~),
  pkg-config,
  qt5-qmake,
