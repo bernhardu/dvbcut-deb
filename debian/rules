@@ -16,7 +16,7 @@ export CPPFLAGS += -DDVBCUT_VERSION=\"$(DVBCUT_VERSION)\"
 
 override_dh_auto_clean:
 	[ ! -f Makefile ] || make -f Makefile distclean
-	dh_clean dvbcut.desktop src/Makefile
+	dh_clean dvbcut.desktop src/Makefile configure
 	dh_clean
 	dh_auto_clean
 
