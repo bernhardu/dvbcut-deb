@@ -1,6 +1,9 @@
 #!/usr/bin/make -f
 
 export QT_SELECT := qt5
+
+export DEB_CONFIGURE_EXTRA_FLAGS += --with-ffmpeg=/usr
+
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/buildflags.mk
@@ -14,9 +17,6 @@ ORIG_TAR_GZ := ../$(DEB_SOURCE)_$(UPSTREAM_VERSION)+svn$(SVN_VERSION).orig.tar.g
 
 %:
 	dh $@ --buildsystem=autoconf --with=autoreconf,autotools-dev --parallel
-
-override_dh_auto_configure:
-	dh_auto_configure -- --with-ffmpeg=/usr
 
 override_dh_auto_clean:
 	[ ! -f Makefile ] || make -f Makefile distclean
