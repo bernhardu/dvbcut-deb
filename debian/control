@@ -18,6 +18,8 @@ Build-Depends:
  qtbase5-dev,
  qtbase5-dev-tools,
  qttools5-dev-tools
+Vcs-Git: https://github.com/bernhardu/dvbcut-deb.git
+Vcs-Browser: https://github.com/bernhardu/dvbcut-deb
 Homepage: http://dvbcut.sourceforge.net/
 Standards-Version: 3.9.8
 
