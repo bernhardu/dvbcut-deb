@@ -1,4 +1,4 @@
-# makefile.in - top-level makefile template for Linux/Unix
+# Makefile.in - top-level Makefile template for Linux/Unix
 # Copyright (c) 2008 - 2011 Michael Riepe
 #  
 # This program is free software; you can redistribute it and/or modify
@@ -59,7 +59,7 @@ mostlyclean-local:
 clean-local: mostlyclean-local
 	rm -f config.log
 distclean-local: clean-local
-	rm -f makefile config.cache config.status
+	rm -f Makefile config.cache config.status
 maintainer-clean-local: distclean-local
 	rm -f configure
 

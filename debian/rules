@@ -19,7 +19,7 @@ override_dh_auto_configure:
 	dh_auto_configure -- --with-ffmpeg=/usr
 
 override_dh_auto_clean:
-	[ ! -f makefile ] || make -f makefile distclean
+	[ ! -f Makefile ] || make -f Makefile distclean
 	dh_clean bin/dvbcut dvbcut.desktop src/Makefile src/dvbcut src/qrc_icons.cpp
 	dh_clean
 	dh_auto_clean

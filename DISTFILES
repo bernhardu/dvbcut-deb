@@ -3,6 +3,7 @@ CREDITS
 ChangeLog
 DISTFILES
 INSTALL
+Makefile.in
 README
 README.icons
 VERSION
@@ -43,7 +44,6 @@ import/stdlib.cpp
 import/stdlib.h
 import/sys/mman.h
 install-sh
-makefile.in
 mkinstalldirs
 setversion.sh
 src/Makefile.in
