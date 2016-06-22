@@ -1,9 +1,24 @@
-DVBCUT CREDITS -- last edited 2005-11-14
+DVBCUT CREDITS -- last edited 2016-06-22
 
-Authors of DVBCUT:
-  Sven Over <svenover@svenover.de>
+Authors and Contributors (in alphabetical order):
 
-Thanks to the following people for supplying patches and good ideas (in order of
-appearance):
+  Alessio Treglia
+  Andreas Cadhalpun
+  Anton Khirnov
+  Bernhard Übelacker
+  Christian Marillat
+  David Timms
+  Fabrice Coutadeur
+  Martin Doucha
   Michael "Tired" Riepe
+  Raik Bieniek
+  Reinhard Tartler
+  Roland Lagarden
+  Sean Gallagher
+  Sebastian Ramacher
+  Sven Over
+  Tim Riemenschneider
   Wolfram Gloger
+
+And possibly others not mentioned in git log.
+Thanks to all for supplying patches and good ideas.
