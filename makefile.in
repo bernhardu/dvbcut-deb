@@ -64,7 +64,7 @@ maintainer-clean-local: distclean-local
 	rm -f configure
 
 distfiles-local: configure
-configure: configure.in
+configure: configure.ac
 	autoconf
 
 VERSION := $(shell cat VERSION)

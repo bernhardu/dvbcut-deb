@@ -1,4 +1,4 @@
-# configure.in - Configure template for dvbcut.
+# configure.ac - Configure template for dvbcut.
 # Process this file with autoconf to produce a configure script.
 # Copyright (C) 2007 - 2009 Michael Riepe
 

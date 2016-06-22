@@ -8,7 +8,7 @@ README.icons
 VERSION
 config.guess
 config.sub
-configure.in
+configure.ac
 contrib/AR_to_169
 contrib/AR_to_43
 debian/changelog
