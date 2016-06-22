@@ -60,8 +60,7 @@ HEADERS += \
     stream.h \
     streamhandle.h \
     tsfile.h \
-    types.h \
-    version.h
+    types.h
 
 FORMS += \
     dvbcutbase.ui \

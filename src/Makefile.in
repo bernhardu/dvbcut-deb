@@ -159,8 +159,6 @@ exportdialogbase.h: exportdialogbase.ui
 mplayererrorbase.h: mplayererrorbase.ui
 progresswindowbase.h: progresswindowbase.ui
 
-dvbcut.$(OBJEXT): version.h
-
 distfiles: \
 	dvbcutbase.h \
 	exportdialogbase.h \
@@ -177,5 +175,4 @@ distfiles: \
 	uic_exportdialogbase.cpp \
 	uic_mplayererrorbase.cpp \
 	uic_progresswindowbase.cpp \
-	qrc_icons.cpp \
-	version.h
+        qrc_icons.cpp

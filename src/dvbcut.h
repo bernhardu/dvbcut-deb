@@ -21,6 +21,14 @@
 #ifndef _DVBCUT_DVBCUT_H
 #define _DVBCUT_DVBCUT_H
 
+#if !defined(DVBCUT_VERSION)
+#define DVBCUT_VERSION "git"
+#endif
+
+#ifndef VERSION_STRING
+#define VERSION_STRING "dvbcut-" DVBCUT_VERSION
+#endif
+
 #include <string>
 #include <vector>
 #include <list>

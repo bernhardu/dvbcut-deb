@@ -72,10 +72,6 @@
 #include "settings.h"
 #include "exception.h"
 
-#include "version.h"
-
-#define VERSION_STRING	"dvbcut " VERSION "/" REVISION
-
 #define DVBCUT_LOADFILTER \
         QT_TRANSLATE_NOOP("dvbcut", "Recognized files (*.dvbcut *.m2t *.mpg *.rec* *.ts *.tts* *.trp *.vdr);;" \
         "dvbcut project files (*.dvbcut);;" \
@@ -2493,7 +2489,7 @@ void dvbcut::helpAboutAction_activated()
 {
   QMessageBox::about(this, tr("dvbcut"), 
     tr("<head></head><body><span style=\"font-family: Helvetica,Arial,sans-serif;\">"
-      "<p>dvbcut Version %1</p>"
+      "<p>Version %1</p>"
       "eMail: <a href=\"mailto:dvbcut-user@lists.sourceforge.net?subject=Comment%20about%20dvbcut\">"
       "dvbcut-user@lists.sourceforge.net</a></p>"
       "<p>This program is free software; you can redistribute it and/or "

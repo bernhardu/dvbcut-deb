@@ -45,7 +45,6 @@ import/stdlib.h
 import/sys/mman.h
 install-sh
 mkinstalldirs
-setversion.sh
 src/Makefile.in
 src/avframe.cpp
 src/avframe.h
@@ -110,4 +109,3 @@ src/streamhandle.h
 src/tsfile.cpp
 src/tsfile.h
 src/types.h
-src/version.h

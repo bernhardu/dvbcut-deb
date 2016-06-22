@@ -70,9 +70,6 @@ configure: configure.ac
 VERSION := $(shell cat VERSION)
 DISTFILES := $(shell cat DISTFILES)
 
-src/version.h: $(DISTFILES)
-	$(SHELL) ./setversion.sh $(DISTFILES)
-
 distdir = dvbcut-$(VERSION)
 dist: distfiles ./stamp-dist
 ./stamp-dist: $(DISTFILES)
@@ -83,7 +80,6 @@ dist: distfiles ./stamp-dist
 		test -d $(distdir)/$$d || mkdir -p $(distdir)/$$d || exit 1; \
 		ln $$file $(distdir)/$$file || exit 1; \
 	done
-	cd $(distdir) && $(SHELL) ./setversion.sh $(DISTFILES)
 	cd $(distdir) && \
 		find . -type f ! -name MANIFEST -exec wc -c {} \; | \
 		sort -k 2 >MANIFEST

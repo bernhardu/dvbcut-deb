@@ -47,10 +47,6 @@ extern "C" {
 #include "mpgfile.h"
 #include "index.h"
 
-#include "version.h"
-
-#define VERSION_STRING	"dvbcut " VERSION "/" REVISION
-
 static char *argv0;
 
 void
