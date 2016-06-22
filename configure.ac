@@ -181,6 +181,15 @@ AC_CHECK_LIB(Qt5Widgets, main,
 
 if test "x$HAVE_QT5" = "xyes"; then
    QT_CXXFLAGS=`$PKG_CONFIG --cflags Qt5Core Qt5Gui Qt5Xml Qt5Widgets`
+
+      #error "You must build your code with position independent code if Qt was built with -reduce-relocations. " \
+      #      "Compile your code with -fPIC (-fPIE is not enough)."
+      #
+      # https://bugreports.qt.io/browse/QTBUG-50156
+      # With Qt5 pkg-config reports no '-fPIC', but header file complains that it is needed.
+      #
+   QT_CXXFLAGS="-fPIC $QT_CXXFLAGS"
+
    QT_LIBS=`$PKG_CONFIG --libs Qt5Core Qt5Gui Qt5Xml Qt5Widgets`
    CPPFLAGS="$CPPFLAGS $QT_CXXFLAGS"
    LIBS="$LIBS $QT_LIBS"
