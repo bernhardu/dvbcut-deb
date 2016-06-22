@@ -20,7 +20,7 @@ override_dh_auto_configure:
 
 override_dh_auto_clean:
 	[ ! -f Makefile ] || make -f Makefile distclean
-	dh_clean bin/dvbcut dvbcut.desktop src/Makefile src/dvbcut src/qrc_icons.cpp
+	dh_clean dvbcut.desktop src/Makefile
 	dh_clean
 	dh_auto_clean
 

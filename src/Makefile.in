@@ -130,7 +130,8 @@ clean:
 	-rm -f *.$(OBJEXT)
 
 distclean: clean
-	-rm -f $(MOC) $(UIC) $(QM)
+	-rm -f $(MOC) $(UIC) $(QM) $(QRC) $(topdir)/bin/dvbcut$(EXEEXT) dvbcut$(EXEEXT)
+	-rmdir $(topdir)/bin
 	-rm -f .depend stamp-depend
 
 maintainer-clean: distclean
