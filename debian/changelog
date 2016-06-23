@@ -1,12 +1,18 @@
-dvbcut (0.5.4+svn178-13) unstable; urgency=medium
+dvbcut (0.7.0-1) unstable; urgency=low
 
+  * New version 0.7.0
+     * Add translations (from dvbcut-qt4)
+     * Switched to Qt5.
+     * Fix export with lavf muxer.
+     * Prepare for new ffmpeg version.
+  * Switch upstream repo from Sourceforge to Github.
   * Add fallback to Qt internal icons if themes
       are not available. (Closes: #822609)
   * Changed maintainer email.
   * Push standards version to 3.9.8.
-  * Enable hardening flags (Lintian warnings).
+  * Enable hardening flags (Lintian warning).
 
- -- Bernhard Übelacker <bernhardu@mailbox.org>  Thu, 09 Jun 2016 20:09:38 +0200
+ -- Bernhard Übelacker <bernhardu@mailbox.org>  Tue, 21 Jun 2016 16:51:07 +0200
 
 dvbcut (0.5.4+svn178-12) unstable; urgency=medium
 
