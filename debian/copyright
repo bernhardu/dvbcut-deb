@@ -1,6 +1,18 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: dvbcut
-Source: https://dvbcut.svn.sourceforge.net/svnroot/dvbcut
+Source: https://github.com/bernhardu/dvbcut-deb
+Comment:
+ Original Source: https://dvbcut.svn.sourceforge.net/svnroot/dvbcut
+ The original upstream author could not be reached in the last
+ 3 years by different Debian maintainer leaving this
+ repository abandoned.
+ Therefore no one can take over the sourceforge site too.
+ For this reason this "temporary" github repository got created
+ that include the history of the sourceforge repo, integrate
+ to some extend the releases done in Debian git
+ http://anonscm.debian.org/cgit/pkg-multimedia/dvbcut.git/
+ and some patches taken from the repository
+ https://github.com/nextghost/dvbcut-qt4 .
 
 Files: *
 Copyright:

@@ -2490,8 +2490,7 @@ void dvbcut::helpAboutAction_activated()
   QMessageBox::about(this, tr("dvbcut"), 
     tr("<head></head><body><span style=\"font-family: Helvetica,Arial,sans-serif;\">"
       "<p>Version %1</p>"
-      "eMail: <a href=\"mailto:dvbcut-user@lists.sourceforge.net?subject=Comment%20about%20dvbcut\">"
-      "dvbcut-user@lists.sourceforge.net</a></p>"
+      "<a href=\"https://github.com/bernhardu/dvbcut-deb\">Git source repository.</a></p>"
       "<p>This program is free software; you can redistribute it and/or "
       "modify it under the terms of the GNU General Public License as "
       "published by the Free Software Foundation; either version 2 of "

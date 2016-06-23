@@ -20,7 +20,7 @@ Build-Depends:
  qttools5-dev-tools
 Vcs-Git: https://github.com/bernhardu/dvbcut-deb.git
 Vcs-Browser: https://github.com/bernhardu/dvbcut-deb
-Homepage: http://dvbcut.sourceforge.net/
+Homepage: https://github.com/bernhardu/dvbcut-deb
 Standards-Version: 3.9.8
 
 Package: dvbcut

@@ -1,2 +1,4 @@
-version=2
-http://sf.net/dvbcut/dvbcut_(.+)\.tar\.bz2
+version=3
+
+opts=filenamemangle=s/.+\/v?(\d\S*)\.tar\.gz/dvbcut-$1\.tar\.gz/ \
+  https://github.com/bernhardu/dvbcut-deb/tags .*/v?(\d\S*)\.tar\.gz
