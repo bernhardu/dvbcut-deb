@@ -1292,14 +1292,22 @@ void dvbcut::playAudio2()
 
 void dvbcut::linslidervalue(int newpic)
 {
+  ui->linslider->setTracking(false);
+
   if (!mpg || newpic==curpic)
+  {
+    ui->linslider->setTracking(true);
     return;
+  }
   if (!fine)
     newpic=mpg->lastiframe(newpic);
   if (!jogsliding)
     jogmiddlepic=newpic;
   if (newpic==curpic)
+  {
+    ui->linslider->setTracking(true);
     return;
+  }
 
   curpic=newpic;
   if (!jogsliding)
@@ -1307,6 +1315,8 @@ void dvbcut::linslidervalue(int newpic)
   
   update_time_display();
   updateimagedisplay();
+
+  ui->linslider->setTracking(true);
 }
   
 void dvbcut::jogsliderreleased()
@@ -1318,8 +1328,13 @@ void dvbcut::jogsliderreleased()
 
 void dvbcut::jogslidervalue(int v)
 {
+  ui->jogslider->setTracking(false);
+
   if (!mpg || (v==0 && curpic==jogmiddlepic))
+  {
+    ui->jogslider->setTracking(true);
     return;
+  }
   jogsliding=true;
 
   int relpic=0;
@@ -1363,6 +1378,8 @@ void dvbcut::jogslidervalue(int v)
     ui->linslider->setValue(newpic);
 
     fine=false;
+
+  ui->jogslider->setTracking(true);
 }
 
 void dvbcut::doubleclickedeventlist(QListWidgetItem *lbi)
