@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="cs_CZ">
+<TS version="2.1" language="cs_CZ">
 <context>
     <name>dvbcut</name>
     <message>
@@ -322,6 +322,15 @@ vrátil nenulový návratový kód: %1</translation>
         <source>Audio track</source>
         <translation>Zvuková stopa</translation>
     </message>
+    <message>
+        <source>Searching ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please set a stop marker for the picture to be searched.
+Then go where the picture is expected to appear the next time e.g. the end of the commercial break.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>dvbcutbase</name>
@@ -492,6 +501,14 @@ vrátil nenulový návratový kód: %1</translation>
     <message>
         <source>&amp;Contents</source>
         <translation>&amp;Obsah</translation>
+    </message>
+    <message>
+        <source>Search duplicate of last stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search duplicate of last stop event from current picture</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

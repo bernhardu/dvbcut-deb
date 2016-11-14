@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de_DE">
+<TS version="2.1" language="de_DE">
 <context>
     <name>dvbcut</name>
     <message>
@@ -323,6 +323,16 @@ Konnte Datei nicht öffnen</translation>
         <source>Audio track</source>
         <translation>Audiospur</translation>
     </message>
+    <message>
+        <source>Searching ...</source>
+        <translation>Suche ...</translation>
+    </message>
+    <message>
+        <source>Please set a stop marker for the picture to be searched.
+Then go where the picture is expected to appear the next time e.g. the end of the commercial break.</source>
+        <translation>Bitte einen STOPP-Marker für das zu suchende Bild setzen.
+Danach bitte in den Bereich gehen, in dem das zu suchende Bild demnächst erwartet wird z.B. am Ende der Werbepause.</translation>
+    </message>
 </context>
 <context>
     <name>dvbcutbase</name>
@@ -493,6 +503,14 @@ Konnte Datei nicht öffnen</translation>
     <message>
         <source>&amp;Contents</source>
         <translation>&amp;Inhalt</translation>
+    </message>
+    <message>
+        <source>Search duplicate of last stop</source>
+        <translation>Suche Duplikat des letzten Stopps</translation>
+    </message>
+    <message>
+        <source>Search duplicate of last stop event from current picture</source>
+        <translation>Suche Duplikat des Bildes des letzten Stopps beginnend mit dem aktuellen Bild</translation>
     </message>
 </context>
 <context>
