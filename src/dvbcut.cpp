@@ -1458,7 +1458,7 @@ void dvbcut::jogslidervalue(int v)
   if (curpic!=newpic)
     ui->linslider->setValue(newpic);
 
-    fine=false;
+  fine=false;
 
   ui->jogslider->setTracking(true);
 }
