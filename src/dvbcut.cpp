@@ -1146,33 +1146,44 @@ unsigned long calc_distance(QImage baseimg, QImage im)
     return distance;
 }
 
-int dvbcut::getNextEvent(int picture)
+int dvbcut::getPreviousStopEvent(int picture)
 {
+    int previous = 0;
+
     for (int i = 0; i < ui->eventlist->count(); i++) {
         EventListItem *eli = dynamic_cast<EventListItem *>(ui->eventlist->item(i));
-        if (eli->getpicture() > picture)
-            return eli->getpicture();
+        if (eli->geteventtype() == EventListItem::stop && eli->getpicture() < picture)
+            previous = eli->getpicture();
     }
 
-    return picture + 1;
+    if (previous)
+        return previous;
+    else
+        critical(tr("Searching ..."), tr("Please set a stop marker for the picture to be searched.\nThen go where the picture is expected to appear the next time e.g. the end of the commercial break."));
+
+    return picture;
 }
 
 void dvbcut::searchDuplicate()
 {
+    ui->searchDuplicateAction->setEnabled(false);
+
     progressstatusbar psb(statusBar());
-    psb.print("Searching ...");
+    psb.print(tr("Searching ..."));
     psb.setprogress(0);
     imageprovider imgp(*mpg);
-    QImage baseimg = imgp.getimage(curpic);
-    int pic = getNextEvent(curpic);
-    gotoFrame(pic);
-    unsigned long min = calc_distance(baseimg, imgp.getimage(pic, true));
+
+    int search_start_pic = curpic;
+    QImage last_stop_img = imgp.getimage(getPreviousStopEvent(search_start_pic));
+
+    unsigned long min = calc_distance(last_stop_img, imgp.getimage(search_start_pic, true));
     static const long n = settings().search_dups_range;
+
     for (long i = 0; i < n; ++i) {
-        unsigned long d = calc_distance(baseimg, imgp.getimage(++pic, true));
+        unsigned long d = calc_distance(last_stop_img, imgp.getimage(search_start_pic + i, true));
         if (d < min) {
             min = d;
-            gotoFrame(pic);
+            gotoFrame(search_start_pic + i);
         }
 
         psb.setprogress(i * 1000 / n);
@@ -1182,10 +1193,7 @@ void dvbcut::searchDuplicate()
         }
     }
 
-    if (psb.cancelled()) {
-        // FIXME
-        return;
-    }
+    ui->searchDuplicateAction->setEnabled(true);
 }
 
 

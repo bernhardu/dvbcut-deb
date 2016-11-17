@@ -860,7 +860,10 @@
     <string notr="true">F3</string>
    </property>
    <property name="text">
-    <string>Search duplicate of current picture</string>
+    <string>Search duplicate of last stop</string>
+   </property>
+   <property name="toolTip">
+    <string>Search duplicate of last stop event from current picture</string>
    </property>
   </action>
   <action name="viewFullSizeAction">

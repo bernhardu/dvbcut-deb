@@ -141,7 +141,7 @@ protected:
   int chooseBestPicture(int startpic, int range, int smaples);
 
   void gotoFrame(int frameno);
-  int getNextEvent(int picture);
+  int getPreviousStopEvent(int picture);
 
 protected slots:
   virtual void helpAboutAction_activated();
