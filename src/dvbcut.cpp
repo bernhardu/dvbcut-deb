@@ -139,6 +139,23 @@ public:
     }
 };
 
+static QString get_resource(QString file)
+{
+    QFileInfo appDir(qApp->applicationDirPath());
+
+    // first search in the directory containing dvbcut
+    QString resFile = appDir.absoluteFilePath() + file;
+
+  #ifndef __WIN32__
+    // Unix/Linux: search in the associated share subdirectory
+    if (!QFile::exists(resFile)) {
+      resFile = appDir.absolutePath() + "/share/dvbcut" + file;
+    }
+  #endif
+
+    return resFile;
+}
+
 // **************************************************************************
 // ***  dvbcut::dvbcut (private constructor)
 
@@ -196,6 +213,7 @@ dvbcut::dvbcut()
 
   // set caption
   setWindowTitle(QString(VERSION_STRING));
+  setWindowIcon(QIcon(get_resource("/icons/dvbcut.svg")));
 }
 
 // **************************************************************************
@@ -2662,23 +2680,11 @@ private:
   QPushButton *prev, *next, *home, *close;
 };
 
-QString get_help_file(QString locale)
+static QString get_help_file(QString locale)
 {
-  QString file = QString("/dvbcut_%1.html").arg(locale);
+    QString file = QString("/dvbcut_%1.html").arg(locale);
 
-  QFileInfo appDir(qApp->applicationDirPath());
-
-  // first search in the directory containing dvbcut
-  QString helpFile = appDir.absoluteFilePath() + file;
-
-#ifndef __WIN32__
-  // Unix/Linux: search in the associated share subdirectory
-  if (!QFile::exists(helpFile)) {
-    helpFile = appDir.absolutePath() + "/share/dvbcut" + file;
-  }
-#endif
-
-  return helpFile;
+    return get_resource(file);
 }
 
 void dvbcut::helpContentAction_activated()
