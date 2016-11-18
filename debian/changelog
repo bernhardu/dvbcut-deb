@@ -1,3 +1,15 @@
+dvbcut (0.7.1-1) unstable; urgency=low
+
+  [ Bernhard Übelacker ]
+  * Avoid redraw of intermediate steps while
+    dragging sliders with the mouse.
+  * Remove outdated Recommends mplayer2 and unused mpv.
+    (Closes: #841183) Thanks to James Cowgill.
+  * Add facility to search for duplicate frames (Thanks to Olaf Dietsche).
+  * Remove some gcc 6 warnings.
+
+ -- Bernhard Übelacker <bernhardu@mailbox.org>  Fri, 18 Nov 2016 14:31:12 +0100
+
 dvbcut (0.7.0-1) unstable; urgency=low
 
   * New version 0.7.0
