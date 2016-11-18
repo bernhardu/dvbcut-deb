@@ -11,6 +11,6 @@ Icon=@prefix@/share/dvbcut/icons/dvbcut.svg
 TryExec=@prefix@/bin/dvbcut
 Exec=@prefix@/bin/dvbcut %F
 Terminal=false
-MimeType=application/x-dvbcut;
+MimeType=application/x-dvbcut;video/mp2t;
 Categories=AudioVideo;AudioVideoEditing;Qt;
 StartupWMClass=Dvbcut
