@@ -6,7 +6,8 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/buildflags.mk
 
-DVBCUT_VERSION := $(shell dpkg-parsechangelog | sed -n 's/^Version: //p')
+include /usr/share/dpkg/pkg-info.mk
+DVBCUT_VERSION := $(DEB_VERSION)
 export CPPFLAGS += -DDVBCUT_VERSION=\"$(DVBCUT_VERSION)\"
 
 %:
