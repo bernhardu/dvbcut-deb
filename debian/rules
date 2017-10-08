@@ -12,13 +12,7 @@ DVBCUT_VERSION := $(shell dpkg-parsechangelog | sed -n 's/^Version: //p')
 export CPPFLAGS += -DDVBCUT_VERSION=\"$(DVBCUT_VERSION)\"
 
 %:
-	dh $@ --buildsystem=autoconf --with=autoreconf,autotools-dev --parallel
-
-override_dh_auto_clean:
-	[ ! -f Makefile ] || make -f Makefile distclean
-	dh_clean dvbcut.desktop src/Makefile configure
-	dh_clean
-	dh_auto_clean
+	dh $@
 
 override_dh_auto_install:
 

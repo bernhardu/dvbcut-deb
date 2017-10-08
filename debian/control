@@ -3,9 +3,7 @@ Section: graphics
 Priority: optional
 Maintainer: Bernhard Übelacker <bernhardu@mailbox.org>
 Build-Depends:
- debhelper (>= 9),
- autotools-dev,
- dh-autoreconf,
+ debhelper (>= 10),
  liba52-0.7.4-dev,
  libao-dev,
  libavcodec-dev (>> 6:11~),
@@ -26,9 +24,6 @@ Standards-Version: 3.9.8
 Package: dvbcut
 Architecture: any
 Depends:
- libqt5gui5,
- libqt5widgets5,
- libqt5core5a,
  ${misc:Depends},
  ${shlibs:Depends}
 Recommends:
