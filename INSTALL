@@ -21,6 +21,6 @@ If you have MPlayer installed on your machine (and it is accessible as
 How to compile DVBCUT:
 
 * Unpack the dvbcut source archive and enter the dvbcut directory.
-* Type 'autoconf && ./configure --with-ffmpeg=/usr && make'.
+* Type 'autoconf && ./configure && make'.
   If everything works well, you can run DVBCUT with 'src/dvbcut'.
   To install it, run 'make install' (as root).

@@ -41,40 +41,6 @@ for ac_dir; do
   esac
 done
 
-ffmpeg_prefix=
-ffmpeg_lib=
-AC_ARG_WITH(ffmpeg,
-  [  --with-ffmpeg=DIR       use installed ffmpeg in DIR],
-  [case $withval in
-    no)
-      ;;
-    ''|yes)
-      AC_MSG_ERROR([You MUST specify a directory for ffmpeg.])
-      ;;
-    *)
-      ffmpeg_prefix=$withval
-      ffmpeg_lib=$ffmpeg_prefix/$mr_libdirname
-      ;;
-  esac])
-AC_SUBST(ffmpeg_prefix)
-
-ffmpeg_include=$ffmpeg_prefix/include
-
-AC_ARG_WITH(ffmpeg-include,
-  [  --with-ffmpeg-include=DIR   set ffmpeg include directory],
-  [case $withval in
-    ''|yes|no) AC_MSG_ERROR([You MUST specify a directory for ffmpeg-include.]);;
-    *) ffmpeg_include=$withval;;
-  esac])
-AC_ARG_WITH(ffmpeg-lib,
-  [  --with-ffmpeg-lib=DIR   set ffmpeg library directory],
-  [case $withval in
-    ''|yes|no) AC_MSG_ERROR([You MUST specify a directory for ffmpeg-lib.]);;
-    *) ffmpeg_lib=$withval;;
-  esac])
-
-LDFLAGS="-L$ffmpeg_lib $LDFLAGS"
-
 dnl Checks for libraries.
 
 FFMPEG_LIBS='-lavformat -lavcodec -lavutil'
@@ -119,18 +85,6 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(ao/ao.h mad.h stdint.h a52dec/a52.h)
 
-CPPFLAGS="$CPPFLAGS -I$ffmpeg_include"
-
-if test -f $ffmpeg_include/libavcodec/avcodec.h; then
-  # newer ffmpeg versions
-  CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/libavcodec"
-  CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/libavformat"
-  CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/libswscale"
-else
-  # older ffmpeg versions
-  CPPFLAGS="$CPPFLAGS -I$ffmpeg_include/ffmpeg"
-fi
-
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_OFF_T
@@ -140,29 +94,6 @@ dnl Checks for library functions.
 AC_FUNC_MMAP
 
 dnl external stuff
-AC_ARG_WITH(qt5, [  --with-qt5=DIR          path to qt5 (default: QTDIR)],
-  [case $withval in
-    no) AC_MSG_ERROR([dvbcut requires Qt5]);;
-    yes) ;;
-    *) QTDIR=$withval;;
-  esac])
-AC_SUBST(QTDIR)
-QTINC=$QTDIR/include
-QTLIB=$QTDIR/$mr_libdirname
-AC_ARG_WITH(qt5-include, [  --with-qt5-include=DIR  path to qt5 include files],
-  [case $withval in
-    yes|no) ;;
-    *) QTINC=$withval;;
-  esac])
-AC_ARG_WITH(qt5-lib, [  --with-qt5-lib=DIR      path to qt5 libraries],
-  [case $withval in
-    yes|no) ;;
-    *) QTLIB=$withval;;
-  esac])
-
-CPPFLAGS="$CPPFLAGS -I$QTINC"
-LDFLAGS="$LDFLAGS -L$QTLIB"
-
 AC_CHECK_LIB(Qt5Core, main,
   [HAVE_QT5="yes"],
   [AC_MSG_ERROR([Qt5Core library not found])])
