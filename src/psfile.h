@@ -35,7 +35,7 @@ public:
   psfile(inbuffer &b, int initial_offset);
 
   ~psfile();
-  int streamreader(class streamhandle &s);
+  int streamreader(struct streamhandle &s);
   static int probe(inbuffer &buf);
   virtual int mplayeraudioid(int astr)
     {

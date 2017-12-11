@@ -284,8 +284,8 @@ public:
     return *i;
     }
 
-  friend int tsfile::streamreader(class streamhandle &s);
-  friend int psfile::streamreader(class streamhandle &s);
+  friend int tsfile::streamreader(streamhandle &s);
+  friend int psfile::streamreader(streamhandle &s);
   };
 
 #endif

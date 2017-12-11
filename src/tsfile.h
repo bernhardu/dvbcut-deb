@@ -120,7 +120,7 @@ public:
   tsfile(inbuffer &b, int initial_offset, int stride);
 
   ~tsfile();
-  int streamreader(class streamhandle &s);
+  int streamreader(struct streamhandle &s);
   static int probe(inbuffer &buf, int stride);
   virtual int mplayeraudioid(int astr) {
     return s[audiostream(astr)].id;

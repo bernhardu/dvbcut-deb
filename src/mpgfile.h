@@ -59,7 +59,7 @@ public:
   virtual ~mpgfile();
 
   static mpgfile *open(inbuffer &b, std::string *errormessage = 0);
-  virtual int streamreader(class streamhandle &s)=0;
+  virtual int streamreader(struct streamhandle &s)=0;
   virtual int mplayeraudioid(int audiostream)=0;
   virtual bool istransportstream()
     {
