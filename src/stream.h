@@ -74,7 +74,7 @@ protected:
     avcc->lmax= FF_QP2LAMBDA * 2;
 #endif
     if (interlaced)
-      avcc->flags |= CODEC_FLAG_INTERLACED_DCT|CODEC_FLAG_INTERLACED_ME;
+      avcc->flags |= AV_CODEC_FLAG_INTERLACED_DCT | AV_CODEC_FLAG_INTERLACED_ME;
     }
 
   friend class mpgfile;
