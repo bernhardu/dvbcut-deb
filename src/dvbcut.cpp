@@ -1617,7 +1617,7 @@ void dvbcut::eventlistcontextmenu(const QPoint &point)
 void dvbcut::clickedgo()
 {
   QString text=ui->goinput->text();
-  text.trimmed();
+  text = text.trimmed();
   bool okay=false;
   int inpic;
   if (text.contains(':') || text.contains('.')) {
@@ -1637,7 +1637,7 @@ void dvbcut::clickedgo()
 void dvbcut::clickedgo2()
 {
   QString text=ui->goinput2->text();
-  text.trimmed();
+  text = text.trimmed();
   bool okay=false;
   int inpic, outpic;
   if (text.contains(':') || text.contains('.')) {
