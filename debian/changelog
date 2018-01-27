@@ -1,3 +1,21 @@
+dvbcut (0.7.2-1) unstable; urgency=low
+
+  * New upstream release 0.7.2.
+      Just minor changes for compatibility and to avoid compiler warnings.
+
+  * Packaging changes suggested by Gianfranco Costamagna (in #844734):
+    - Bump debian/compat from 9 to 10.
+    - Remove Depends that get automatically added.
+    - Remove Build-Depends autotools-dev and dh-autoreconf.
+    - Remove unnecessary overrides in debian/rules.
+  * Remove configure options for Qt and ffmpeg that led to wrong link flags.
+      (Closes: #850073) Thanks to John David Anglin.
+  * Avoid dpkg-parsechangelog to avoid Lintian message.
+  * Contains upstream change to compile against FFMPeg 3.5.
+      (Closes: #888351) Thanks to James Cowgill.
+
+ -- Bernhard Übelacker <bernhardu@mailbox.org>  Fri, 26 Jan 2018 23:49:20 +0100
+
 dvbcut (0.7.1-1) unstable; urgency=low
 
   [ Bernhard Übelacker ]
