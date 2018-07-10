@@ -55,16 +55,16 @@ QTDIR = @QTDIR@
 PATH := $(QTDIR)/bin:$(PATH)
 
 ui_%.h: %.ui
-	uic -o $@ $<
+	@UIC@ -o $@ $<
 
 uic_%.cpp: %.h
-	uic -o $@ $<
+	@UIC@ -o $@ $<
 
 moc_%.cpp: %.h
-	moc -o $@ $<
+	@MOC@ -o $@ $<
 
 %.qm: %.ts
-	lrelease $< -qm $@
+	@LRELEASE@ $< -qm $@
 
 MOC = \
 	moc_dvbcut.cpp \
@@ -117,7 +117,7 @@ $(topdir)/bin:
 	mkdir $@
 
 qrc_icons.cpp:
-	rcc -name icons -o $@ ../icons/icons.qrc
+	@RCC@ -name icons -o $@ ../icons/icons.qrc
 
 $(topdir)/bin/dvbcut$(EXEEXT): dvbcut$(EXEEXT)
 	$(INSTALL_PROGRAM) dvbcut$(EXEEXT) $(topdir)/bin/dvbcut$(EXEEXT)
