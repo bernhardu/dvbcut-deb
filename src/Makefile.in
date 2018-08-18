@@ -29,7 +29,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
-helpdir = $(prefix)/share/dvbcut
+helpdir = $(datadir)/dvbcut
 
 installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(helpdir)
 
