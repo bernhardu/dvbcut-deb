@@ -110,6 +110,14 @@ AC_CHECK_LIB(Qt5Widgets, main,
   [HAVE_QT5="yes"],
   [AC_MSG_ERROR([Qt5Widgets library not found])])
 
+AC_CHECK_PROGS(MOC, [moc-qt5 moc])
+AC_CHECK_PROGS(UIC, [uic-qt5 uic])
+AC_CHECK_PROGS(RCC, [rcc-qt5 rcc])
+AC_CHECK_PROGS(LRELEASE, [lrelease-qt5 lrelease])
+if test -z "$MOC" || test -z "$UIC" || test -z "$RCC" || test -z "$LRELEASE"; then
+   AC_MSG_ERROR([Qt utility programs moc, uic, rcc and lrelease are required.])
+fi
+
 if test "x$HAVE_QT5" = "xyes"; then
    QT_CXXFLAGS=`$PKG_CONFIG --cflags Qt5Core Qt5Gui Qt5Xml Qt5Widgets`
 
