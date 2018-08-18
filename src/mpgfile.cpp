@@ -51,7 +51,8 @@ const int mpgfile::frameratescr[16]=
 mpgfile::mpgfile(inbuffer &b, int initial_offset)
     : buf(b),
     videostreams(0),audiostreams(0),
-    initialoffset(initial_offset),idx(*this),pictures(0)
+    initialoffset(initial_offset),idx(*this),pictures(0),
+    time_base_num(1), time_base_den(25)
 {}
 
 mpgfile::~mpgfile()
@@ -182,6 +183,7 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
 
         if (frameFinished)
         {
+          //fprintf(stderr, "* decoded frame %5d ilace:%d typ:%d pts=%f\n", pic, avf->interlaced_frame, avf->pict_type, (double)avf->pts/90000.0);
           if (last_cpn!=avf->coded_picture_number)
           {
             last_cpn=avf->coded_picture_number;
@@ -225,6 +227,13 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
           framelist.push_back(new avframe(avf,S->avcc));
       }
     }
+  }
+
+  time_base_num = S->avcc->time_base.num;
+  time_base_den = S->avcc->time_base.den;
+  if (S->avcc->ticks_per_frame > 0) {
+    //fprintf(stderr, "field rate -> frame rate\n");
+    time_base_num *= S->avcc->ticks_per_frame;
   }
 
   avcodec_close(S->avcc);
@@ -738,7 +747,7 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
   AVCodecContext *avcc=s[VIDEOSTREAM].avcc;
   if (!avcc)
     return;
-  s[VIDEOSTREAM].setvideoencodingparameters();
+  s[VIDEOSTREAM].setvideoencodingparameters(time_base_num, time_base_den, !framelist.empty() ? (*framelist.front())->interlaced_frame : 0);
 
   if (int rv=avcodec_open2(avcc, s[VIDEOSTREAM].enc, NULL))
   {

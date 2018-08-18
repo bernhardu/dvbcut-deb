@@ -51,6 +51,7 @@ protected:
   int initialoffset;
   class index idx;
   int pictures;
+  int time_base_num, time_base_den;
 
   mpgfile(inbuffer &b, int initial_offset);
 
@@ -184,7 +185,7 @@ public:
     }
   void setvideoencodingparameters()
     {
-    s[videostream()].setvideoencodingparameters();
+      s[videostream()].setvideoencodingparameters(time_base_num, time_base_den);
     }
 
   int generateindex(const char *savefilename=0, std::string *errorstring=0, logoutput *log=0)

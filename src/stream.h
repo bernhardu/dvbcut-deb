@@ -57,7 +57,7 @@ protected:
     avcc=avcodec_alloc_context3(NULL);
     avcodec_get_context_defaults3(avcc, NULL);
     }
-  void setvideoencodingparameters(bool interlaced=false)
+  void setvideoencodingparameters(int tb_num, int tb_den, bool interlaced=false)
     {
     avcc->bit_rate=9500000;
     avcc->rc_min_rate=9500000;
@@ -75,6 +75,9 @@ protected:
 #endif
     if (interlaced)
       avcc->flags |= AV_CODEC_FLAG_INTERLACED_DCT | AV_CODEC_FLAG_INTERLACED_ME;
+    avcc->time_base.num = tb_num;
+    avcc->time_base.den = tb_den;
+    //fprintf(stderr, "video %stb=%d/%d\n", (interlaced ? "interlaced " : ""), avcc->time_base.num, avcc->time_base.den);
     }
 
   friend class mpgfile;
