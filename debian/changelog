@@ -1,3 +1,16 @@
+dvbcut (0.7.3-1) unstable; urgency=low
+
+  * New upstream release 0.7.3.
+    - Be able to build with Qt5 utils with -qt5 postfix. (Thanks to Luigi Baldoni)
+    - Fix issue with reencoded frames appear with 50 FPS.
+
+  * Switch copyright-format URL from http to https.
+  * Bump standards version from 3.9.8 to 4.1.4.
+  * Bump debhelper version from 10 to 11.
+  * Remove trailing whitespace from debian files.
+
+ -- Bernhard Übelacker <bernhardu@mailbox.org>  Mon, 20 Aug 2018 01:17:30 +0200
+
 dvbcut (0.7.2-1) unstable; urgency=low
 
   * New upstream release 0.7.2.
