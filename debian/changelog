@@ -166,7 +166,7 @@ dvbcut (0.5.4+svn178-2) unstable; urgency=low
     + port-to-qt4.patch:
       - Drop cmake files from qt4 patch
       - Update configure and src/Makefile.in for qt4
-    + This allows the automatic installation of desktop file and icon 
+    + This allows the automatic installation of desktop file and icon
       (Closes: #660009)
   * Refresh fix-ftbfs-libav0.7 patch to use -pab as quilt arg. This makes futur
     refreshes lighter.

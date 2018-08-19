@@ -14,4 +14,3 @@ export CPPFLAGS += -DDVBCUT_VERSION=\"$(DVBCUT_VERSION)\"
 	dh $@
 
 override_dh_auto_install:
-
