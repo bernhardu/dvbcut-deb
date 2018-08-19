@@ -19,7 +19,7 @@ Build-Depends:
 Vcs-Git: https://github.com/bernhardu/dvbcut-deb.git
 Vcs-Browser: https://github.com/bernhardu/dvbcut-deb
 Homepage: https://github.com/bernhardu/dvbcut-deb
-Standards-Version: 3.9.8
+Standards-Version: 4.1.4
 
 Package: dvbcut
 Architecture: any
