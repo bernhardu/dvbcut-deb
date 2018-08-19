@@ -3,7 +3,7 @@ Section: graphics
 Priority: optional
 Maintainer: Bernhard Übelacker <bernhardu@mailbox.org>
 Build-Depends:
- debhelper (>= 10),
+ debhelper (>= 11),
  liba52-0.7.4-dev,
  libao-dev,
  libavcodec-dev (>> 6:11~),
