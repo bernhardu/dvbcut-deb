@@ -195,6 +195,7 @@ public slots:
   virtual void viewHalfSize();
   virtual void viewQuarterSize();
   virtual void viewCustomSize();
+  virtual void viewMoodbar();
   virtual void playAudio2();
   virtual void playAudio1();
   virtual void playStop();
