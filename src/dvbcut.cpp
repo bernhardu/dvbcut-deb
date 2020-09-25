@@ -157,6 +157,108 @@ static QString get_resource(QString file)
 }
 
 // **************************************************************************
+// ***  Moodbar support
+
+struct RGB {
+    RGB(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) {}
+
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
+struct Moodbar {
+    Moodbar(const char *filename);
+
+    int columns() const { return data.size() / 3; }
+
+    RGB get(size_t pos) const {
+        return RGB(data[pos * 3 + 0], data[pos * 3 + 1], data[pos * 3 + 2]);
+    }
+
+    std::vector<uint8_t> data;
+    bool valid { false };
+};
+
+Moodbar::Moodbar(const char *filename)
+{
+    FILE *fp = fopen(filename, "rb");
+    if (!fp) {
+        return;
+    }
+
+    if (fseek(fp, 0, SEEK_END) != 0) {
+        fclose(fp);
+        return;
+    }
+
+    size_t len = ftell(fp);
+
+    if (fseek(fp, 0, SEEK_SET) != 0) {
+        fclose(fp);
+        return;
+    }
+
+    data.resize(len);
+
+    if (fread(data.data(), 1, len, fp) != len) {
+        valid = false;
+    }
+
+    fclose(fp);
+    valid = true;
+}
+
+static std::unique_ptr<Moodbar>
+g_moodbar;
+
+static void
+updateMoodbar(QLabel *moodbar_widget)
+{
+    if (!g_moodbar) {
+        moodbar_widget->setText("");
+        moodbar_widget->setVisible(false);
+        return;
+    }
+
+    int width = moodbar_widget->size().width();
+    int height = 20;
+    std::vector<uint8_t> pixels(width * height * 4);
+    for (int x=0; x<width; ++x) {
+        for (int y=0; y<height; ++y) {
+            int column = x * g_moodbar->columns() / width;
+
+            auto rgb = g_moodbar->get(column);
+
+            pixels[(y*width+x) * 4 + 0] = rgb.r;
+            pixels[(y*width+x) * 4 + 1] = rgb.g;
+            pixels[(y*width+x) * 4 + 2] = rgb.b;
+            pixels[(y*width+x) * 4 + 3] = 0xFF;
+        }
+    }
+
+    QImage image(pixels.data(), width, 20, width * 4, QImage::Format_ARGB32);
+
+    QPixmap pixmap;
+    pixmap.convertFromImage(image);
+
+    moodbar_widget->setPixmap(pixmap);
+    moodbar_widget->setVisible(true);
+}
+
+class UpdateMoodbarEventFilter : public QObject {
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) {
+        if (event->type() == QEvent::Resize) {
+            updateMoodbar(qobject_cast<QLabel *>(obj));
+        }
+
+        return QObject::eventFilter(obj, event);
+    }
+};
+
+
+// **************************************************************************
 // ***  dvbcut::dvbcut (private constructor)
 
 dvbcut::dvbcut()
@@ -210,6 +312,10 @@ dvbcut::dvbcut()
   // install event handler
   ui->linslider->installEventFilter(this);
   ui->linslider->setStyle(new SliderStyleAbsolute);
+
+  // set up moodbar resize handler
+  ui->moodbar->installEventFilter(new UpdateMoodbarEventFilter());
+  updateMoodbar(ui->moodbar);
 
   // set caption
   setWindowTitle(QString(VERSION_STRING));
@@ -880,6 +986,21 @@ void dvbcut::fileExport()
 void dvbcut::fileClose()
 {
   close();
+}
+
+void dvbcut::viewMoodbar()
+{
+  auto fileName = QFileDialog::getOpenFileName(this,
+      tr("Open moodbar"), QString(), tr("Moodbar Files (*.mood)"));
+
+  if (!fileName.isEmpty()) {
+      g_moodbar = std::make_unique<Moodbar>(qPrintable(fileName));
+      if (!g_moodbar->valid) {
+          g_moodbar.reset();
+      }
+  }
+
+  updateMoodbar(ui->moodbar);
 }
 
 void dvbcut::addEventListItem(int pic, EventListItem::eventtype type)
