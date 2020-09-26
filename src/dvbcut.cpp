@@ -160,7 +160,7 @@ static QString get_resource(QString file)
 // ***  Moodbar support
 
 struct RGB {
-    RGB(uint8_t r, uint8_t g, uint8_t b) : r(r), g(g), b(b) {}
+    RGB(uint8_t r=0, uint8_t g=0, uint8_t b=0) : r(r), g(g), b(b) {}
 
     uint8_t r;
     uint8_t g;
@@ -212,27 +212,83 @@ Moodbar::Moodbar(const char *filename)
 static std::unique_ptr<Moodbar>
 g_moodbar;
 
-static void
-updateMoodbar(QLabel *moodbar_widget)
+struct CutPoint {
+    CutPoint(bool want=false, int picture=0) : want(want), picture(picture) {}
+
+    bool want;
+    int picture;
+};
+
+void
+dvbcut::setSliderPercentage(float percentage)
+{
+    ui->linslider->setValue(pictures * percentage);
+}
+
+void
+dvbcut::updateMoodbar()
 {
     if (!g_moodbar) {
-        moodbar_widget->setText("");
-        moodbar_widget->setVisible(false);
+        ui->moodbar->setText("");
+        ui->moodbar->setVisible(false);
         return;
     }
 
-    int width = moodbar_widget->size().width();
+    std::vector<CutPoint> cutpoints;
+
+    // TODO: Does it depend on the first event list item if it's true or false?
+    cutpoints.emplace_back(false, 0);
+
+    for (int i=0; i<ui->eventlist->count(); ++i) {
+        EventListItem *eli = dynamic_cast<EventListItem *>(ui->eventlist->item(i));
+
+        if (eli->geteventtype() == EventListItem::start) {
+            cutpoints.emplace_back(true, eli->getpicture());
+        } else if (eli->geteventtype() == EventListItem::stop) {
+            cutpoints.emplace_back(false, eli->getpicture());
+        }
+    }
+
+    int width = ui->moodbar->size().width();
     int height = 20;
     std::vector<uint8_t> pixels(width * height * 4);
+
     for (int x=0; x<width; ++x) {
-        for (int y=0; y<height; ++y) {
-            int column = x * g_moodbar->columns() / width;
+        int column = x * g_moodbar->columns() / width;
+        RGB moodbar = g_moodbar->get(column);
 
-            auto rgb = g_moodbar->get(column);
+        int picture = x * pictures / width;
+        int nextpicture = (x + 1) * pictures / width;
 
-            pixels[(y*width+x) * 4 + 0] = rgb.r;
-            pixels[(y*width+x) * 4 + 1] = rgb.g;
-            pixels[(y*width+x) * 4 + 2] = rgb.b;
+        // TODO: Don't go through the cutpoints for every x coordinate change,
+        // but just keep the current index and advance
+        bool want = false;
+        for (size_t p=0; p<cutpoints.size()-1; ++p) {
+            auto &a = cutpoints[p];
+            auto &b = cutpoints[p+1];
+            if (a.picture <= picture && b.picture > picture) {
+                want = a.want;
+                break;
+            }
+        }
+        RGB cutpoint = want ? RGB(0, 255, 0) : RGB(255, 0, 0);
+
+        // TODO: Nice indicator
+        if (curpic >= picture && curpic < nextpicture) {
+            moodbar = cutpoint = RGB(255, 255, 255);
+        }
+
+        for (int y=0; y<height*2/3; ++y) {
+            pixels[(y*width+x) * 4 + 0] = moodbar.b;
+            pixels[(y*width+x) * 4 + 1] = moodbar.g;
+            pixels[(y*width+x) * 4 + 2] = moodbar.r;
+            pixels[(y*width+x) * 4 + 3] = 0xFF;
+        }
+
+        for (int y=height*2/3; y<height; ++y) {
+            pixels[(y*width+x) * 4 + 0] = cutpoint.b;
+            pixels[(y*width+x) * 4 + 1] = cutpoint.g;
+            pixels[(y*width+x) * 4 + 2] = cutpoint.r;
             pixels[(y*width+x) * 4 + 3] = 0xFF;
         }
     }
@@ -242,19 +298,32 @@ updateMoodbar(QLabel *moodbar_widget)
     QPixmap pixmap;
     pixmap.convertFromImage(image);
 
-    moodbar_widget->setPixmap(pixmap);
-    moodbar_widget->setVisible(true);
+    ui->moodbar->setPixmap(pixmap);
+    ui->moodbar->setVisible(true);
 }
 
 class UpdateMoodbarEventFilter : public QObject {
+public:
+    UpdateMoodbarEventFilter(dvbcut *pdvbcut) : pdvbcut(pdvbcut) {}
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event) {
         if (event->type() == QEvent::Resize) {
-            updateMoodbar(qobject_cast<QLabel *>(obj));
+            pdvbcut->updateMoodbar();
+        } else if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseMove) {
+            auto mouse = static_cast<QMouseEvent *>(event);
+
+            if (mouse->buttons() & Qt::LeftButton) {
+                auto widget = qobject_cast<QWidget *>(obj);
+                pdvbcut->setSliderPercentage(mouse->localPos().x() / widget->width());
+            }
         }
 
         return QObject::eventFilter(obj, event);
     }
+
+private:
+    dvbcut *pdvbcut;
 };
 
 
@@ -314,8 +383,8 @@ dvbcut::dvbcut()
   ui->linslider->setStyle(new SliderStyleAbsolute);
 
   // set up moodbar resize handler
-  ui->moodbar->installEventFilter(new UpdateMoodbarEventFilter());
-  updateMoodbar(ui->moodbar);
+  ui->moodbar->installEventFilter(new UpdateMoodbarEventFilter(this));
+  updateMoodbar();
 
   // set caption
   setWindowTitle(QString(VERSION_STRING));
@@ -1000,7 +1069,7 @@ void dvbcut::viewMoodbar()
       }
   }
 
-  updateMoodbar(ui->moodbar);
+  updateMoodbar();
 }
 
 void dvbcut::addEventListItem(int pic, EventListItem::eventtype type)
@@ -1530,6 +1599,8 @@ void dvbcut::linslidervalue(int newpic)
   }
 
   curpic=newpic;
+  updateMoodbar();
+
   if (!jogsliding)
     jogmiddlepic=newpic;
   
