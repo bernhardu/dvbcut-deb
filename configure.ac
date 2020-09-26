@@ -94,21 +94,18 @@ dnl Checks for library functions.
 AC_FUNC_MMAP
 
 dnl external stuff
-AC_CHECK_LIB(Qt5Core, main,
-  [HAVE_QT5="yes"],
-  [AC_MSG_ERROR([Qt5Core library not found])])
+PKG_CHECK_MODULES([QT5], [Qt5Core >= 5.3 Qt5Gui >= 5.3 Qt5Xml >= 5.3 Qt5Widgets >= 5.3])
+AC_SUBST([QT5_CFLAGS])
+AC_SUBST([QT5_LIBS])
 
-AC_CHECK_LIB(Qt5Gui, main,
-  [HAVE_QT5="yes"],
-  [AC_MSG_ERROR([Qt5Gui library not found])])
-
-AC_CHECK_LIB(Qt5Xml, main,
-  [HAVE_QT5="yes"],
-  [AC_MSG_ERROR([Qt5Xml library not found])])
-
-AC_CHECK_LIB(Qt5Widgets, main,
-  [HAVE_QT5="yes"],
-  [AC_MSG_ERROR([Qt5Widgets library not found])])
+#error "You must build your code with position independent code if Qt was built with -reduce-relocations. " \
+#      "Compile your code with -fPIC (-fPIE is not enough)."
+#
+# https://bugreports.qt.io/browse/QTBUG-50156
+# With Qt5 pkg-config reports no '-fPIC', but header file complains that it is needed.
+#
+CPPFLAGS="$CPPFLAGS -fPIC $QT5_CFLAGS"
+LIBS="$LIBS $QT5_LIBS"
 
 AC_CHECK_PROGS(MOC, [moc-qt5 moc])
 AC_CHECK_PROGS(UIC, [uic-qt5 uic])
@@ -116,24 +113,6 @@ AC_CHECK_PROGS(RCC, [rcc-qt5 rcc])
 AC_CHECK_PROGS(LRELEASE, [lrelease-qt5 lrelease])
 if test -z "$MOC" || test -z "$UIC" || test -z "$RCC" || test -z "$LRELEASE"; then
    AC_MSG_ERROR([Qt utility programs moc, uic, rcc and lrelease are required.])
-fi
-
-if test "x$HAVE_QT5" = "xyes"; then
-   QT_CXXFLAGS=`$PKG_CONFIG --cflags Qt5Core Qt5Gui Qt5Xml Qt5Widgets`
-
-      #error "You must build your code with position independent code if Qt was built with -reduce-relocations. " \
-      #      "Compile your code with -fPIC (-fPIE is not enough)."
-      #
-      # https://bugreports.qt.io/browse/QTBUG-50156
-      # With Qt5 pkg-config reports no '-fPIC', but header file complains that it is needed.
-      #
-   QT_CXXFLAGS="-fPIC $QT_CXXFLAGS"
-
-   QT_LIBS=`$PKG_CONFIG --libs Qt5Core Qt5Gui Qt5Xml Qt5Widgets`
-   CPPFLAGS="$CPPFLAGS $QT_CXXFLAGS"
-   LIBS="$LIBS $QT_LIBS"
-else
-   AC_MSG_ERROR([cannot find Qt5 library >= 5.3])
 fi
 
 AC_DEFINE(__STDC_LIMIT_MACROS, 1, [Required for C++])
