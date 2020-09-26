@@ -22,7 +22,6 @@
 #define _DVBCUT_INDEX_H
 
 #include <stdint.h>
-#include <byteswap.h>
 #include <set>
 #include <vector>
 #include "types.h"

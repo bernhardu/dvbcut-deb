@@ -39,7 +39,6 @@ icons/play.png
 icons/play.svgz
 icons/stop.png
 icons/stop.svgz
-import/byteswap.h
 import/stdlib.cpp
 import/stdlib.h
 import/sys/mman.h
