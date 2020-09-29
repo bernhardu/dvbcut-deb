@@ -158,6 +158,8 @@ public:
   // static dvbcut *New(std::string filename=std::string(), std::string idxfilename=std::string());
   void addStartStopItems(std::vector<int>, int option=0);
   int getTimePerFrame() { return timeperframe>0 && timeperframe<5000 ? timeperframe : 3003; };
+  void setSliderPercentage(float percentage);
+  void updateMoodbar();
 
   enum editconvertpop_actions {
       act_start_stop = 0,
@@ -195,6 +197,7 @@ public slots:
   virtual void viewHalfSize();
   virtual void viewQuarterSize();
   virtual void viewCustomSize();
+  virtual void viewMoodbar();
   virtual void playAudio2();
   virtual void playAudio1();
   virtual void playStop();

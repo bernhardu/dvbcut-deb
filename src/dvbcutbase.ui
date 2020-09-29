@@ -355,6 +355,34 @@
      </widget>
     </item>
     <item>
+     <widget class="QLabel" name="moodbar">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QSlider" name="linslider">
       <property name="enabled">
        <bool>false</bool>
@@ -499,6 +527,8 @@
     <addaction name="viewHalfSizeAction"/>
     <addaction name="viewQuarterSizeAction"/>
     <addaction name="viewCustomSizeAction"/>
+    <addaction name="separator"/>
+    <addaction name="viewMoodbarAction"/>
    </widget>
    <widget class="QMenu" name="playMenu">
     <property name="title">
@@ -998,12 +1028,33 @@
     <cstring>helpContentAction</cstring>
    </property>
   </action>
+  <action name="viewMoodbarAction">
+   <property name="text">
+    <string>Open moodbar</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
   <include location="../icons/icons.qrc"/>
  </resources>
  <connections>
+  <connection>
+   <sender>viewMoodbarAction</sender>
+   <signal>triggered()</signal>
+   <receiver>dvbcutbase</receiver>
+   <slot>viewMoodbar()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
   <connection>
    <sender>fileCloseAction</sender>
    <signal>triggered()</signal>
