@@ -992,7 +992,7 @@ void dvbcut::editAutoChapters()
           //fprintf(stderr,"%d, DIST=%f\n",pic,dist); 
           if(dist>settings().chapter_threshold) { 
             inpic=pic;
-            statusBar()->showMessage(QString().sprintf("%d. Scene change @ %d, DIST=%f\n",chapters+1,inpic,dist));   
+            statusBar()->showMessage(QString().asprintf("%d. Scene change @ %d, DIST=%f\n",chapters+1,inpic,dist));
             break;
           }  
         }
@@ -1326,12 +1326,12 @@ void dvbcut::playPlay()
 #ifdef __WIN32__
   arguments << "-vo" << "directx:noaccel";
 #endif
-  arguments << "-wid" << QString().sprintf("0x%x",int(ui->imagedisplay->winId()));
+  arguments << "-wid" << QString().asprintf("0x%x",int(ui->imagedisplay->winId()));
   arguments << "-sb" << QString::number(offset - partoffset);
-  arguments << "-geometry" << QString().sprintf("%dx%d+0+0",int(ui->imagedisplay->width()),int(ui->imagedisplay->height()));
+  arguments << "-geometry" << QString().asprintf("%dx%d+0+0",int(ui->imagedisplay->width()),int(ui->imagedisplay->height()));
 
   if (currentaudiotrack>=0 && currentaudiotrack<mpg->getaudiostreams()) {
-    arguments << "-aid" << QString().sprintf("0x%x", int(mpg->mplayeraudioid(currentaudiotrack)));
+    arguments << "-aid" << QString().asprintf("0x%x", int(mpg->mplayeraudioid(currentaudiotrack)));
   }
     
   // for now, pass all filenames from the current one up to the last one
@@ -2451,7 +2451,7 @@ dvbcut::make_canonical(std::list<std::string> &filenames) {
  
 inline static QString
 timestr(pts_t pts) {
-  return QString().sprintf("%02d:%02d:%02d.%03d",
+  return QString().asprintf("%02d:%02d:%02d.%03d",
     int(pts/(3600*90000)),
     int(pts/(60*90000))%60,
     int(pts/90000)%60,

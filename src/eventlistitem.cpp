@@ -68,7 +68,7 @@ QString EventListItem::getstring() const
             //: Text shown on bookmark markers in the main window marker list
             .arg(QCoreApplication::translate("eventlist", "BOOKMARK"));
 
-  return label + QString().sprintf("<br>%02d:%02d:%02d.%03d<br>%d (%c)",
+  return label + QString().asprintf("<br>%02d:%02d:%02d.%03d<br>%d (%c)",
                            int(pts/(3600*90000)),
                            int(pts/(60*90000))%60,
                            int(pts/90000)%60,
