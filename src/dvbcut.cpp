@@ -2155,7 +2155,7 @@ void dvbcut::open(std::list<std::string> filenames, std::string idxfilename, std
   idxfilen=idxfilename;
   prjfilen=prjfilename;
   expfilen=expfilename;
-  picfilen=QString::null;
+  picfilen=QString();
   if (prjfilen.empty())
     addtorecentfiles(mpgfilen,idxfilen);
   else {
