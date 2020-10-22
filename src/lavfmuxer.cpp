@@ -49,7 +49,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   avfc->max_delay= (int)(.7*AV_TIME_BASE);
 
   avfc->oformat=fmt;
-  strncpy(avfc->filename, filename, sizeof(avfc->filename));
+  avfc->url = av_strdup(filename ? filename : "");
 
   int id=0;
 
