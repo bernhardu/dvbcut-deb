@@ -1,0 +1,42 @@
+# Contributor: sp42b <sp42b|a_t|gmx.net>
+# Contributor: AndyRTR <andreas.radke@freenet.de>
+# Contributor: Bernhard Übelacker <bernhardu@mailbox.org>
+
+pkgname=dvbcut
+pkgver=0.7.3
+pkgrel=1
+pkgdesc='Qt5 application for cutting parts out of DVB streams'
+arch=('i686' 'x86_64')
+url='https://github.com/bernhardu/dvbcut-deb'
+license=('GPL')
+depends=('desktop-file-utils' 'qt5-base' 'libao' 'libmad' 'a52dec')
+optdepends=('mplayer: for video playback inside of DVBCUT')
+install="$pkgname.install"
+source=("https://github.com/bernhardu/dvbcut-deb/archive/v0.7.3.tar.gz")
+sha256sums=('c0397919e89bd3a77f488b8c25d3bad9a11f14cd30d16097c3bf666bc3f56d7b')
+
+build() {
+  cd "$srcdir/dvbcut-deb-$pkgver"
+
+  autoconf
+  ./configure --prefix=/usr
+  make -j1
+}
+
+package() {
+  cd "$srcdir/dvbcut-deb-$pkgver"
+
+  install -Dm755 bin/dvbcut "$pkgdir/usr/bin/dvbcut"
+  install -Dm644 dvbcut.1 "$pkgdir/usr/share/man/man1/dvbcut.1"
+  install -Dm644 dvbcut.desktop "$pkgdir/usr/share/applications/dvbcut.desktop"
+  install -Dm644 dvbcut.svg "$pkgdir/usr/share/dvbcut/icons/dvbcut.svg"
+  install -Dm644 dvbcut.xml "$pkgdir/usr/share/mime/packages/dvbcut.xml"
+  install -Dm644 src/dvbcut_en.html "$pkgdir/usr/share/dvbcut/dvbcut_en.html"
+  install -Dm644 src/dvbcut.qm "$pkgdir/usr/share/dvbcut/dvbcut.qm"
+  install -Dm644 src/dvbcut_cs.html "$pkgdir/usr/share/dvbcut/dvbcut_cs.html"
+  install -Dm644 src/dvbcut_cs.qm "$pkgdir/usr/share/dvbcut/dvbcut_cs.qm"
+  install -Dm644 src/dvbcut_de.html "$pkgdir/usr/share/dvbcut/dvbcut_de.html"
+  install -Dm644 src/dvbcut_de.qm "$pkgdir/usr/share/dvbcut/dvbcut_de.qm"
+}
+
+# vim:set ts=2 sw=2 et:
