@@ -35,21 +35,18 @@ extern "C" {
 lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg, const char *filename)
     : muxer(), avfc(0), fileopened(false)
   {
-  fmt = av_guess_format(format, NULL, NULL);
-  if (!fmt) {
+  auto fmt_ = av_guess_format(format, NULL, NULL);
+  if (!fmt_) {
     return;
     }
+  fmt = fmt_;
 
-  avfc=avformat_alloc_context();
-  if (!avfc)
+  if (avformat_alloc_output_context2(&avfc, fmt_, NULL, av_strdup(filename ? filename : "")) < 0)
     return;
 
   av_opt_set_int(avfc, "preload", (int)(.5 * AV_TIME_BASE), AV_OPT_SEARCH_CHILDREN);
   av_opt_set_int(avfc, "muxrate", 10080000, AV_OPT_SEARCH_CHILDREN);
   avfc->max_delay= (int)(.7*AV_TIME_BASE);
-
-  avfc->oformat=fmt;
-  avfc->url = av_strdup(filename ? filename : "");
 
   int id=0;
 

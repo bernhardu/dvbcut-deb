@@ -48,7 +48,7 @@ protected:
       }
     };
 
-  AVOutputFormat *fmt;
+  const AVOutputFormat *fmt;
   AVFormatContext *avfc;
 
   stream st[MAXAVSTREAMS];
