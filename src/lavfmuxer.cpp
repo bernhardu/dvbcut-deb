@@ -51,30 +51,27 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   int id=0;
 
   st[VIDEOSTREAM].stream_index=id;
-  AVStream *s=st[VIDEOSTREAM].avstr=avformat_new_stream(avfc, NULL);
-  s->id = id++;
+
   strpres[VIDEOSTREAM]=true;
-  av_free(s->codec);
   mpg.setvideoencodingparameters();
-  s->codec=mpg.getavcc(VIDEOSTREAM);
-  s->codec->rc_buffer_size = 224*1024*8;
-  s->sample_aspect_ratio = s->codec->sample_aspect_ratio;
-  s->time_base = s->codec->time_base;
+  AVCodecContext* codec = mpg.getavcc(VIDEOSTREAM);
+  codec->rc_buffer_size = 224*1024*8;
+  AVStream *s = st[VIDEOSTREAM].avstr = avformat_new_stream(avfc, codec->codec);
+  s->id = id++;
+  s->sample_aspect_ratio = codec->sample_aspect_ratio;
+  s->time_base = codec->time_base;
 
   for (int i=0;i<mpg.getaudiostreams();++i)
     if (audiostreammask & (1u<<i)) {
       int astr=audiostream(i);
       st[astr].stream_index=id;
-      s=st[astr].avstr=avformat_new_stream(avfc, NULL);
+      codec = avcodec_alloc_context3(NULL);
+      codec->codec_type = AVMEDIA_TYPE_AUDIO;
+      codec->codec_id = (mpg.getstreamtype(astr)==streamtype::ac3audio) ? AV_CODEC_ID_AC3 : AV_CODEC_ID_MP2;
+      codec->rc_buffer_size = 224*1024*8;
+      s = st[astr].avstr = avformat_new_stream(avfc, codec->codec);
       s->id = id++;
       strpres[astr]=true;
-      if (s->codec)
-        av_free(s->codec);
-      s->codec = avcodec_alloc_context3(NULL);
-      s->codec->codec_type=AVMEDIA_TYPE_AUDIO;
-      s->codec->codec_id = (mpg.getstreamtype(astr)==streamtype::ac3audio) ?
-	AV_CODEC_ID_AC3 : AV_CODEC_ID_MP2;
-      s->codec->rc_buffer_size = 224*1024*8;
 
       // Must read some packets to get codec parameters
       streamhandle sh(mpg.getinitialoffset());
@@ -85,8 +82,8 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 	  break;
 
 	if (sd->getitemlistsize() > 1) {
-	  if (!avcodec_open2(s->codec,
-			     avcodec_find_decoder(s->codec->codec_id), NULL)) {
+	  if (!avcodec_open2(codec,
+			     avcodec_find_decoder(codec->codec_id), NULL)) {
             AVFrame *frame = av_frame_alloc();
 	    AVPacket pkt;
             int got_output;
@@ -95,15 +92,15 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 	    pkt.data = (uint8_t*) sd->getdata();
 	    pkt.size = sd->inbytes();
 
-            avcodec_decode_audio4(s->codec, frame, &got_output, &pkt);
+            avcodec_decode_audio4(codec, frame, &got_output, &pkt);
 
             av_frame_free(&frame);
-	    avcodec_close(s->codec);
+	    avcodec_close(codec);
 	  }
 	  break;
 	}
       }
-      s->time_base = s->codec->time_base;
+      s->time_base = codec->time_base;
     }
 
   if (!(fmt->flags & AVFMT_NOFILE)&&(avio_open(&avfc->pb, filename, AVIO_FLAG_WRITE) < 0)) {
