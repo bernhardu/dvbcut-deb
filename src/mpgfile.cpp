@@ -739,7 +739,6 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
   {
     AVPacket pkt;
     u_int8_t *buf=(u_int8_t*)m2v.writeptr();
-    int ret, got_output;
 
     av_init_packet(&pkt);
     pkt.data = buf;
@@ -753,22 +752,22 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
       f->coded_picture_number=f->display_picture_number=p;
       f->key_frame=(p==0)?1:0;
       f->pict_type=(p==0)?AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
-      ret = avcodec_encode_video2(avcc, &pkt, f, &got_output);
+      avcodec_send_frame(avcc, f);
 
       delete framelist.front();
       framelist.pop_front();
       ++p;
 
-      if (ret < 0 || !got_output)
+      if (avcodec_receive_packet(avcc, &pkt) != 0)
         continue;
     }
     else
     {
       fprintf(stderr,"trying to call avcodec_encode_video with frame=0\n");
-      ret = avcodec_encode_video2(avcc, &pkt, NULL, &got_output);
+      avcodec_send_frame(avcc, NULL);
       fprintf(stderr,"...back I am.\n");
 
-      if (ret < 0 || !got_output)
+      if (avcodec_receive_packet(avcc, &pkt) != 0)
         break;
     }
 
