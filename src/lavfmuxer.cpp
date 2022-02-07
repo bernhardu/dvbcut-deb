@@ -85,15 +85,15 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 	  if (!avcodec_open2(codec,
 			     avcodec_find_decoder(codec->codec_id), NULL)) {
             AVFrame *frame = av_frame_alloc();
-	    AVPacket pkt;
+            AVPacket* pkt = av_packet_alloc();
 
- 	    av_init_packet( &pkt );
-	    pkt.data = (uint8_t*) sd->getdata();
-	    pkt.size = sd->inbytes();
+            pkt->data = (uint8_t*)sd->getdata();
+            pkt->size = sd->inbytes();
 
-            avcodec_send_packet(codec, &pkt);
+            avcodec_send_packet(codec, pkt);
             avcodec_receive_frame(codec, frame);
 
+            av_packet_free(&pkt);
             av_frame_free(&frame);
 	    avcodec_close(codec);
 	  }

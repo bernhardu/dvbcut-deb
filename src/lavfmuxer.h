@@ -65,18 +65,18 @@ public:
     if (len<=0)
       return 0;
 
-    AVPacket avp;
-    av_init_packet(&avp);
-    avp.data=(uint8_t*) data;
-    avp.size=len;
-    avp.pts=pts;
-    avp.dts=dts;
-    avp.stream_index=st[str].stream_index;
+    AVPacket* avp = av_packet_alloc();
+    avp->data = (uint8_t*)data;
+    avp->size = len;
+    avp->pts = pts;
+    avp->dts = dts;
+    avp->stream_index = st[str].stream_index;
     if (flags & MUXER_FLAG_KEY)
-      avp.flags |= AV_PKT_FLAG_KEY;
+      avp->flags |= AV_PKT_FLAG_KEY;
 
-    int rv=av_interleaved_write_frame(avfc,&avp);
+    int rv = av_interleaved_write_frame(avfc, avp);
 
+    av_packet_free(&avp);
     return rv>=0;
     }
 

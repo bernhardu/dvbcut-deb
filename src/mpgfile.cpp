@@ -158,11 +158,10 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
     {
       const uint8_t *data=(const uint8_t*)sd->getdata();
 
-      AVPacket pkt;
-      av_init_packet( &pkt );
-      pkt.data = (uint8_t*) data;
-      pkt.size = bytes;
-      avcodec_send_packet(S->avcc, &pkt);
+      AVPacket* pkt = av_packet_alloc();
+      pkt->data = (uint8_t*) data;
+      pkt->size = bytes;
+      avcodec_send_packet(S->avcc, pkt);
       while (avcodec_receive_frame(S->avcc, avf) == 0)
       {
         //fprintf(stderr, "* decoded frame %5d ilace:%d typ:%d pts=%f\n", pic, avf->interlaced_frame, avf->pict_type, (double)avf->pts/90000.0);
@@ -177,6 +176,7 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
           }
         }
       }
+      av_packet_free(&pkt);
     }
 
     sd->discard(bytes);
@@ -185,11 +185,10 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
 
   if (pic < stop)
   {
-    AVPacket pkt;
-    av_init_packet( &pkt );
-    pkt.data = NULL;
-    pkt.size = 0;
-    avcodec_send_packet(S->avcc, &pkt);
+    AVPacket* pkt = av_packet_alloc();
+    pkt->data = NULL;
+    pkt->size = 0;
+    avcodec_send_packet(S->avcc, pkt);
     while (avcodec_receive_frame(S->avcc, avf) == 0)
     {
       if (last_cpn!=avf->coded_picture_number)
@@ -199,6 +198,7 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
           framelist.push_back(new avframe(avf,S->avcc));
       }
     }
+    av_packet_free(&pkt);
   }
 
   time_base_num = S->avcc->time_base.num;
@@ -737,12 +737,11 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
   pts_t startpts=idx[idx.indexnr(start)].getpts();
   while (outpicture<stop)
   {
-    AVPacket pkt;
+    AVPacket* pkt = av_packet_alloc();
     u_int8_t *buf=(u_int8_t*)m2v.writeptr();
 
-    av_init_packet(&pkt);
-    pkt.data = buf;
-    pkt.size = m2v.getsize();
+    pkt->data = buf;
+    pkt->size = m2v.getsize();
 
     if (!framelist.empty())
     {
@@ -758,8 +757,10 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
       framelist.pop_front();
       ++p;
 
-      if (avcodec_receive_packet(avcc, &pkt) != 0)
+      if (avcodec_receive_packet(avcc, pkt) != 0) {
+        av_packet_free(&pkt);
         continue;
+      }
     }
     else
     {
@@ -767,20 +768,24 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
       avcodec_send_frame(avcc, NULL);
       fprintf(stderr,"...back I am.\n");
 
-      if (avcodec_receive_packet(avcc, &pkt) != 0)
+      if (avcodec_receive_packet(avcc, pkt) != 0) {
+        av_packet_free(&pkt);
         break;
+      }
     }
 
     pts_t vidpts=idx[idx.indexnr(outpicture)].getpts()-offset;
     pts_t viddts=mux.getdts(VIDEOSTREAM);
     mux.setdts(VIDEOSTREAM,vidpts);
-    fixtimecode(pkt.data, pkt.size, vidpts);
-    mux.putpacket(VIDEOSTREAM,pkt.data,pkt.size,vidpts,viddts,
-                  (pkt.flags & AV_PKT_FLAG_KEY)?MUXER_FLAG_KEY:0 );
+    fixtimecode(pkt->data, pkt->size, vidpts);
+    mux.putpacket(VIDEOSTREAM, pkt->data, pkt->size, vidpts, viddts,
+                  (pkt->flags & AV_PKT_FLAG_KEY)?MUXER_FLAG_KEY:0 );
     ++outpicture;
 
     if (log && savepics>0)
       log->setprogress(++savedpics*1000/savepics);
+
+    av_packet_free(&pkt);
   }
 
   for(std::list<avframe*>::iterator fit=framelist.begin();fit!=framelist.end();++fit)
