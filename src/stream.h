@@ -35,7 +35,8 @@ protected:
   int id; //avfid;
   streamtype::type type;
   std::string infostring;
-  AVCodec *dec,*enc;
+  const AVCodec *dec;
+  const AVCodec *enc;
   AVCodecContext *avcc;
   stream() : id(-1),type(streamtype::unknown),dec(0),enc(0),avcc(0)
     {}
