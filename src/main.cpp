@@ -213,8 +213,6 @@ main(int argc, char *argv[]) {
   ao_initialize();
 #endif // HAVE_LIB_AO
 
-  av_register_all();
-
   int rv=1;
   dvbcut *main=new dvbcut;
   main->batchmode(batchmode);
