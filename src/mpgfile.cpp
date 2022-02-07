@@ -157,48 +157,24 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
     if (!firstsequence || idx[streampic].getsequencenumber()>=seqnr)
     {
       const uint8_t *data=(const uint8_t*)sd->getdata();
-      int frameFinished=0;
 
-      int decodebytes=bytes;
-      while (decodebytes>0)
+      AVPacket pkt;
+      av_init_packet( &pkt );
+      pkt.data = (uint8_t*) data;
+      pkt.size = bytes;
+      avcodec_send_packet(S->avcc, &pkt);
+      while (avcodec_receive_frame(S->avcc, avf) == 0)
       {
-        frameFinished=0;
-
-        AVPacket pkt;
-        av_init_packet( &pkt );
-        pkt.data = (uint8_t*) data;
-        pkt.size = decodebytes;
-        int bytesDecoded=avcodec_decode_video2( S->avcc, avf,
-                                        &frameFinished, &pkt );
-
-        if (bytesDecoded<0)
-        {
-          fprintf(stderr,"libavcodec error while decoding frame #%d\n",pic);
-          avcodec_close(S->avcc);
-          return;
-        }
-
-        data+=bytesDecoded;
-        decodebytes-=bytesDecoded;
-
-        if (frameFinished)
-        {
-          //fprintf(stderr, "* decoded frame %5d ilace:%d typ:%d pts=%f\n", pic, avf->interlaced_frame, avf->pict_type, (double)avf->pts/90000.0);
-          if (last_cpn!=avf->coded_picture_number)
-          {
-            last_cpn=avf->coded_picture_number;
-            if (pic>=start)
-              framelist.push_back(new avframe(avf,S->avcc));
-            ++pic;
-            if (pic>=stop)
-            {
-              frameFinished=0;
-              decodebytes=0;
-              break;
-            }
+        //fprintf(stderr, "* decoded frame %5d ilace:%d typ:%d pts=%f\n", pic, avf->interlaced_frame, avf->pict_type, (double)avf->pts/90000.0);
+        if (last_cpn!=avf->coded_picture_number) {
+          last_cpn=avf->coded_picture_number;
+          if (pic>=start) {
+            framelist.push_back(new avframe(avf,S->avcc));
           }
-          else
-            frameFinished=0;
+          ++pic;
+          if (pic>=stop) {
+            break;
+          }
         }
       }
     }
@@ -209,16 +185,12 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
 
   if (pic < stop)
   {
-    int frameFinished=0;
-
     AVPacket pkt;
     av_init_packet( &pkt );
     pkt.data = NULL;
     pkt.size = 0;
-    avcodec_decode_video2( S->avcc, avf,
-                                        &frameFinished, &pkt );
-
-    if (frameFinished)
+    avcodec_send_packet(S->avcc, &pkt);
+    while (avcodec_receive_frame(S->avcc, avf) == 0)
     {
       if (last_cpn!=avf->coded_picture_number)
       {
