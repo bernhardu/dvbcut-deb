@@ -71,7 +71,6 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
       if (s->codec)
         av_free(s->codec);
       s->codec = avcodec_alloc_context3(NULL);
-      avcodec_get_context_defaults3(s->codec, NULL);
       s->codec->codec_type=AVMEDIA_TYPE_AUDIO;
       s->codec->codec_id = (mpg.getstreamtype(astr)==streamtype::ac3audio) ?
 	AV_CODEC_ID_AC3 : AV_CODEC_ID_MP2;

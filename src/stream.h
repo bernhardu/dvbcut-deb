@@ -56,7 +56,6 @@ protected:
     if (avcc)
       av_free(avcc);
     avcc=avcodec_alloc_context3(NULL);
-    avcodec_get_context_defaults3(avcc, NULL);
     }
   void setvideoencodingparameters(int tb_num, int tb_den, bool interlaced=false)
     {
