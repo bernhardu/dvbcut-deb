@@ -2331,7 +2331,7 @@ bool dvbcut::eventFilter(QObject *watched, QEvent *e) {
   if (e->type() == QEvent::Wheel && watched != ui->jogslider) {
     QWheelEvent *we = (QWheelEvent*)e;
     // Note: delta is a multiple of 120 (see Qt documentation)
-    delta = we->delta();
+    delta = we->angleDelta().y();
     mods = we->modifiers();
     if(mods & Qt::AltModifier) {
       incr = WHEEL_INCR_ALT;
