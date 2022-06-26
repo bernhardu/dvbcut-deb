@@ -9,8 +9,8 @@ Comment:
  Therefore no one can take over the sourceforge site too.
  For this reason this "temporary" github repository got created
  that include the history of the sourceforge repo, integrate
- to some extend the releases done in Debian git
- http://anonscm.debian.org/cgit/pkg-multimedia/dvbcut.git/
+ to some extend the releases done in
+ the now retired Debian git at alioth
  and some patches taken from the repository
  https://github.com/nextghost/dvbcut-qt4 .
 
