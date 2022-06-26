@@ -21,15 +21,8 @@ AC_PROG_INSTALL
 AC_CHECK_TOOL(STRIP, strip, :)
 AC_CHECK_TOOL(PKG_CONFIG, pkg-config, :)
 
-AC_CYGWIN
-AC_MINGW32
 AC_EXEEXT
 AC_OBJEXT
-
-if test "$MINGW32" = yes; then
-  CPPFLAGS="$CPPFLAGS -I/usr/local/include"
-  LDFLAGS="$LDFLAGS -L/usr/local/lib"
-fi
 
 dnl check for library dir
 mr_libdirname=lib
@@ -60,29 +53,17 @@ AC_CHECK_LIB(a52, a52_init,
   [AC_MSG_ERROR([Did not find required a52 library])],
   [-lm])
 
-mr_other_libs=
-if test "$MINGW32" = yes; then
-  mr_other_libs=-lwinmm
-fi
-
 AC_CHECK_LIB(ao, ao_initialize,
   [AC_DEFINE(HAVE_LIB_AO, 1, [Define this if you have libao.])
-  LIBS="$LIBS -lao $mr_other_libs"],
-  [AC_MSG_WARN([Did not find libao - dvbcut will not play audio])],
-  [$mr_other_libs])
+  LIBS="$LIBS -lao"],
+  [AC_MSG_WARN([Did not find libao - dvbcut will not play audio])])
 
 STDLIB=
 AC_SUBST(STDLIB)
 
-if test "$MINGW32" = yes; then
-  CPPFLAGS="-I\$(top_srcdir)/import $CPPFLAGS"
-  STDLIB='$(top_srcdir)/import/stdlib.cpp'
-fi
-
 dnl AC_CHECK_LIB(m, sqrt, [LIBS="$LIBS -lm"])
 
 dnl Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS(ao/ao.h mad.h stdint.h a52dec/a52.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
