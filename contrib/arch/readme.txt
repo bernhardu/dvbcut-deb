@@ -23,14 +23,14 @@ makepkg
 
 
 ### Install package:
-# pacman -U /home/user/path/to/dvbcut-0.7.3-1-x86_64.pkg.tar.zst
+# pacman -U /home/user/path/to/dvbcut-0.7.4-1-x86_64.pkg.tar.zst
 
 
 ### Debug
 # uncomment "options=(debug !strip)" in PKGBUILD and rebuild (with a clean directory), reinstall
 
     # Run from the build directory, as somehow the binary in the package still gets stripped.
-$ gdb -q --args ./src/dvbcut-deb-0.7.3/src/dvbcut
+$ gdb -q --args ./src/dvbcut-deb-0.7.4/src/dvbcut
 (gdb) run
 
     # When gdb stopps because of the crash

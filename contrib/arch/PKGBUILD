@@ -3,7 +3,7 @@
 # Contributor: Bernhard Übelacker <bernhardu@mailbox.org>
 
 pkgname=dvbcut
-pkgver=0.7.3
+pkgver=0.7.4
 pkgrel=1
 pkgdesc='Qt5 application for cutting parts out of DVB streams'
 arch=('i686' 'x86_64')
@@ -12,8 +12,8 @@ license=('GPL')
 depends=('desktop-file-utils' 'qt5-base' 'libao' 'libmad' 'a52dec')
 optdepends=('mplayer: for video playback inside of DVBCUT')
 install="$pkgname.install"
-source=("https://github.com/bernhardu/dvbcut-deb/archive/v0.7.3.tar.gz")
-sha256sums=('c0397919e89bd3a77f488b8c25d3bad9a11f14cd30d16097c3bf666bc3f56d7b')
+source=("https://github.com/bernhardu/dvbcut-deb/archive/v0.7.4.tar.gz")
+# update when available. sha256sums=('c0397919e89bd3a77f488b8c25d3bad9a11f14cd30d16097c3bf666bc3f56d7b')
 #options=(debug !strip)
 
 build() {
