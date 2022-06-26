@@ -1,12 +1,20 @@
-dvbcut (0.7.3-2) UNRELEASED; urgency=medium
+dvbcut (0.7.4-1) unstable; urgency=low
 
+  * New upstream release 0.7.4.
+    - Updated autotools files.
+    - Build with ffmpeg 5. (Closes: #1004622)
+
+  [ Debian Janitor ]
   * Wrap long lines in changelog entries: 0.7.3-1.
   * Bump debhelper from old 11 to 12.
   * Set debhelper-compat version in Build-Depends.
   * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
     Repository-Browse.
 
- -- Debian Janitor <janitor@jelmer.uk>  Mon, 24 Feb 2020 08:38:28 +0000
+  [ Bernhard Übelacker ]
+  * Package new release 0.7.4.
+
+ -- Bernhard Übelacker <bernhardu@mailbox.org>  Sun, 26 Jun 2022 19:01:55 +0200
 
 dvbcut (0.7.3-1) unstable; urgency=low
 
