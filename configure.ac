@@ -4,9 +4,10 @@
 
 #@(#) $Id$
 
-AC_INIT(src/dvbcut.cpp)
+AC_INIT
+AC_CONFIG_SRCDIR([src/dvbcut.cpp])
 
-AC_PREREQ(2.13)
+AC_PREREQ([2.71])
 
 AC_CANONICAL_BUILD
 
