@@ -102,6 +102,7 @@ AC_DEFINE(__STDC_CONSTANT_MACROS, 1, [Required for C++])
 AC_DEFINE(_FILE_OFFSET_BITS, 64, [We are always using large files])
 dnl AC_DEFINE(_LARGEFILE_SOURCE)
 
-AC_OUTPUT([Makefile src/Makefile dvbcut.desktop])
+AC_CONFIG_FILES([Makefile src/Makefile dvbcut.desktop])
+AC_OUTPUT
 
 # vi: set ts=8 sw=2 :
