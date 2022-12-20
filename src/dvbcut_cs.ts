@@ -331,6 +331,14 @@ vrátil nenulový návratový kód: %1</translation>
 Then go where the picture is expected to appear the next time e.g. the end of the commercial break.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Open moodbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moodbar Files (*.mood)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>dvbcutbase</name>
@@ -508,6 +516,14 @@ Then go where the picture is expected to appear the next time e.g. the end of th
     </message>
     <message>
         <source>Search duplicate of last stop event from current picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open moodbar</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

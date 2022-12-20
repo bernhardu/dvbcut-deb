@@ -23,7 +23,8 @@
         <extracomment>Question during batch processing - print the prompt and tell the user that you assume the answer is No.</extracomment>
         <translation>%1
 %2
-(vermutlich nicht)</translation>
+(vermutlich nicht)
+</translation>
     </message>
     <message>
         <source>%1
@@ -54,7 +55,7 @@
 already exists. Overwrite?</source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
         <translation>%1
-Vorhandene Datei überschreiben? </translation>
+Vorhandene Datei überschreiben?</translation>
     </message>
     <message>
         <source>dvbcut</source>
@@ -333,6 +334,14 @@ Then go where the picture is expected to appear the next time e.g. the end of th
         <translation>Bitte einen STOPP-Marker für das zu suchende Bild setzen.
 Danach bitte in den Bereich gehen, in dem das zu suchende Bild demnächst erwartet wird z.B. am Ende der Werbepause.</translation>
     </message>
+    <message>
+        <source>Open moodbar</source>
+        <translation>Öffne Moodbar</translation>
+    </message>
+    <message>
+        <source>Moodbar Files (*.mood)</source>
+        <translation>Moodbar Dateien (*.mood)</translation>
+    </message>
 </context>
 <context>
     <name>dvbcutbase</name>
@@ -512,6 +521,14 @@ Danach bitte in den Bereich gehen, in dem das zu suchende Bild demnächst erwart
         <source>Search duplicate of last stop event from current picture</source>
         <translation>Suche Duplikat des Bildes des letzten Stopps beginnend mit dem aktuellen Bild</translation>
     </message>
+    <message>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open moodbar</source>
+        <translation>Öffne Moodbar</translation>
+    </message>
 </context>
 <context>
     <name>eventlist</name>
@@ -607,54 +624,63 @@ Danach bitte in den Bereich gehen, in dem das zu suchende Bild demnächst erwart
         <source>Open (%1): %2
 </source>
         <extracomment>1% will be replaced with filename, %2 with error description</extracomment>
-        <translation>Öffnen (%1): %2</translation>
+        <translation>Öffnen (%1): %2
+</translation>
     </message>
     <message>
         <source>Write (%1): %2
 </source>
         <extracomment>1% will be replaced with filename, %2 with error description</extracomment>
-        <translation>Schreiben (%1): %2</translation>
+        <translation>Schreiben (%1): %2
+</translation>
     </message>
     <message>
         <source>refusing to write index to a tty
 </source>
-        <translation>Schreiben des Index auf tty abgelehnt</translation>
+        <translation>Schreiben des Index auf tty abgelehnt
+</translation>
     </message>
     <message>
         <source>write: %1
 </source>
         <extracomment>Placeholder will be replaced with error description</extracomment>
-        <translation>Schreiben: %1</translation>
+        <translation>Schreiben: %1
+</translation>
     </message>
     <message>
         <source>%1: open: %2
 </source>
         <extracomment>%1 will be replaced with filename, %2 with error description</extracomment>
-        <translation>%1: Öffnen: %2</translation>
+        <translation>%1: Öffnen: %2
+</translation>
     </message>
     <message>
         <source>Read (%1): %2
 </source>
         <extracomment>%1 will be replaced with filename, %2 with error description</extracomment>
-        <translation>Lesen (%1): %2</translation>
+        <translation>Lesen (%1): %2
+</translation>
     </message>
     <message>
         <source>Invalid index file &apos;%1&apos;
 </source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
-        <translation>Ungültige Indexdatei &apos;%1&apos;</translation>
+        <translation>Ungültige Indexdatei &apos;%1&apos;
+</translation>
     </message>
     <message>
         <source>Invalid index file (%1)
 </source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
-        <translation>Ungültige Indexdatei (%1)</translation>
+        <translation>Ungültige Indexdatei (%1)
+</translation>
     </message>
     <message>
         <source>Index file (%1) does not correspond to MPEG file
 </source>
         <extracomment>Placeholder will be replaced with filename</extracomment>
-        <translation>Indexdatei (%1) gehört nicht zur MPEG-Datei</translation>
+        <translation>Indexdatei (%1) gehört nicht zur MPEG-Datei
+</translation>
     </message>
 </context>
 <context>
@@ -670,7 +696,7 @@ Danach bitte in den Bereich gehen, in dem das zu suchende Bild demnächst erwart
     <message>
         <source>Estimated mux rate: %1 MB/s</source>
         <extracomment>Placeholder will be replaced with floating point number</extracomment>
-        <translation>Geschätzte Muxrate:%1 MB/s </translation>
+        <translation>Geschätzte Muxrate:%1 MB/s</translation>
     </message>
     <message>
         <source>putpacket(streampic=%1) returned false</source>
