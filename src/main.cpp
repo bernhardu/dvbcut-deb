@@ -213,6 +213,10 @@ main(int argc, char *argv[]) {
   ao_initialize();
 #endif // HAVE_LIB_AO
 
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 0, 0)
+  av_register_all();
+#endif
+
   int rv=1;
   dvbcut *main=new dvbcut;
   main->batchmode(batchmode);
