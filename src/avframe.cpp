@@ -78,7 +78,7 @@ avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
   dw=w*ctx->sample_aspect_ratio.num/ctx->sample_aspect_ratio.den;
 #ifdef HAVE_LIB_SWSCALE
   img_convert_ctx=sws_getContext(w, h, pix_fmt, 
-                                 w, h, AV_PIX_FMT_RGB24, SWS_BICUBIC,
+                                 w, h, AV_PIX_FMT_BGRA, SWS_BICUBIC,
                                  NULL, NULL, NULL);
 #endif
   }
@@ -105,9 +105,9 @@ QImage avframe::getqimage(bool scaled, double viewscalefactor)
     return QImage();
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
-  uint8_t *rgbbuffer = (uint8_t*)malloc(av_image_get_buffer_size(AV_PIX_FMT_RGB24, w, h, 1));
+  uint8_t *rgbbuffer = (uint8_t*)malloc(av_image_get_buffer_size(AV_PIX_FMT_BGRA, w, h, 1));
 #else
-  uint8_t *rgbbuffer=(uint8_t*)malloc(avpicture_get_size(AV_PIX_FMT_RGB24, w, h));
+  uint8_t *rgbbuffer=(uint8_t*)malloc(avpicture_get_size(AV_PIX_FMT_BGRA, w, h));
 #endif
 
   AVFrame *avframergb=av_frame_alloc();
@@ -115,21 +115,21 @@ QImage avframe::getqimage(bool scaled, double viewscalefactor)
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
   av_image_fill_arrays(avframergb->data, avframergb->linesize,
                        rgbbuffer,
-                       AV_PIX_FMT_RGB24, w, h, 1);
+                       AV_PIX_FMT_BGRA, w, h, 1);
 #else
   avpicture_fill((AVPicture*)avframergb,
                  rgbbuffer,
-                 AV_PIX_FMT_RGB24,w,h);
+                 AV_PIX_FMT_BGRA,w,h);
 #endif
 
 #ifdef HAVE_LIB_SWSCALE
   sws_scale(img_convert_ctx, f->data, f->linesize, 0, h,
               avframergb->data, avframergb->linesize);
 #else
-  img_convert((AVPicture *)avframergb, AV_PIX_FMT_RGB24, (AVPicture*)f, pix_fmt, w, h);
+  img_convert((AVPicture *)avframergb, AV_PIX_FMT_BGRA, (AVPicture*)f, pix_fmt, w, h);
 #endif
 
-  QImage im(rgbbuffer, w, h, 3*w, QImage::Format_RGB888, ::free, rgbbuffer);
+  QImage im(rgbbuffer, w, h, 3*w, QImage::Format_ARGB32, ::free, rgbbuffer);
 
   if ((scaled && w!=dw)||(viewscalefactor!=1.0)) {
 #ifdef SMOOTHSCALE
