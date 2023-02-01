@@ -87,11 +87,30 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
             AVFrame *frame = av_frame_alloc();
             AVPacket* pkt = av_packet_alloc();
 
-            pkt->data = (uint8_t*)sd->getdata();
-            pkt->size = sd->inbytes();
+            // Handle the situation when the first packet does not has a valid header
+            // Message Header missing like for all TS-file streams of the RTL Group
+            // recorded with TVHeadend in Germany
+            // Lead to a crash during export with LIBAV
+            while (codec->sample_rate==0) {
+              pkt->data = (uint8_t*)sd->getdata();
+              pkt->size = sd->inbytes();
 
-            avcodec_send_packet(codec, pkt);
-            avcodec_receive_frame(codec, frame);
+              avcodec_send_packet(codec, pkt);
+              while ((avcodec_receive_frame(codec, frame) == 0) && (codec->sample_rate == 0))
+                  ;
+
+              sd->pop();
+
+              if (codec->sample_rate == 0) {
+                if (mpg.streamreader(sh)<=0) {
+                  break;
+                }
+
+                if (sd->getitemlistsize() <= 1) {
+                  break;
+                }
+              }
+            }
 
             av_packet_free(&pkt);
             av_frame_free(&frame);
