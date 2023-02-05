@@ -129,7 +129,7 @@ QImage avframe::getqimage(bool scaled, double viewscalefactor)
   img_convert((AVPicture *)avframergb, AV_PIX_FMT_BGRA, (AVPicture*)f, pix_fmt, w, h);
 #endif
 
-  QImage im(rgbbuffer, w, h, 3*w, QImage::Format_ARGB32, ::free, rgbbuffer);
+  QImage im(rgbbuffer, w, h, QImage::Format_ARGB32, ::free, rgbbuffer);
 
   if ((scaled && w!=dw)||(viewscalefactor!=1.0)) {
 #ifdef SMOOTHSCALE
