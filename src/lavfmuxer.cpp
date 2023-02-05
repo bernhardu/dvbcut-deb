@@ -61,9 +61,10 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   s->sample_aspect_ratio = codec->sample_aspect_ratio;
   s->time_base = codec->time_base;
 
+  int ret = 0;
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 14, 0)
   // Use Parameters instead of Codec, necessary to get correct results, prevent crash and correct display of the output of av_dump
-  int ret = avcodec_parameters_from_context(s->codecpar, codec);
+  ret = avcodec_parameters_from_context(s->codecpar, codec);
   if (ret < 0) {
     av_log(NULL, AV_LOG_ERROR, "Failed to copy encoder parameters to output stream #%u\n", s->id);
     return;
@@ -117,7 +118,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
         av_log(NULL, AV_LOG_ERROR, "Failed to copy encoder parameters to output stream #%u\n", s->id);
         return;
       }
-#endif      
+#endif
     }
 
   if (!(fmt->flags & AVFMT_NOFILE)&&(avio_open(&avfc->pb, filename, AVIO_FLAG_WRITE) < 0)) {
