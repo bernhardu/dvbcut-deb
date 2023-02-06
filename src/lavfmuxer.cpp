@@ -61,6 +61,8 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   s->sample_aspect_ratio = codec->sample_aspect_ratio;
   s->time_base = codec->time_base;
 
+  int avlogflags = av_log_get_flags();
+
   for (int i=0;i<mpg.getaudiostreams();++i)
     if (audiostreammask & (1u<<i)) {
       int astr=audiostream(i);
@@ -77,7 +79,8 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
       streamhandle sh(mpg.getinitialoffset());
       streamdata *sd=sh.newstream(astr,mpg.getstreamtype(astr),mpg.istransportstream());
 
-      while (sh.fileposition < mpg.getinitialoffset()+(4<<20)) {
+      int srerror = 0;
+      while (sh.fileposition < mpg.getinitialoffset()+(8<<20)) {
 	if (mpg.streamreader(sh)<=0)
 	  break;
 
@@ -95,13 +98,26 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 
             av_packet_free(&pkt);
             av_frame_free(&frame);
-	    avcodec_close(codec);
-	  }
-	  break;
-	}
+            avcodec_close(codec);
+          }
+          if (codec->sample_rate == 0) {
+            ++srerror;
+            if (srerror == 1) {
+              fprintf(stderr,"Error, could not determine sample rate\n");
+              av_log_set_flags(AV_LOG_SKIP_REPEATED);
+            }
+            sd->pop();
+          }
+          else {
+            fprintf(stdout,"Sample rate found after %d errors\n", srerror);
+            break;
+          }
+        }
       }
       s->time_base = codec->time_base;
     }
+
+  av_log_set_flags(avlogflags);
 
   if (!(fmt->flags & AVFMT_NOFILE)&&(avio_open(&avfc->pb, filename, AVIO_FLAG_WRITE) < 0)) {
     av_free(avfc);
