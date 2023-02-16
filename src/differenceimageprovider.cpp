@@ -68,13 +68,16 @@ void differenceimageprovider::decodepicture(int picture, bool decodeallgop)
     if (im.format() == QImage::Format_RGB888 &&
         baseimg.format() == QImage::Format_RGB888)
     {
+      int bytes_per_pixel = baseimg.depth()/8;
+      int bytes_per_line = baseimg.bytesPerLine();
+
       uchar* im_bits = im.bits();
-      const uchar* bim_bits = baseimg.constBits();
+      const uchar* baseimg_bits = baseimg.constBits();
 
       for (int y = 0; y < baseimg.height(); y++) {
         for (int x = 0; x < baseimg.width(); x++) {
-          QRgb *imd = (QRgb*)(im_bits + x*3 + y*im.width()*3);
-          const QRgb *bimd = (const QRgb*)(bim_bits + x*3 + y*im.width()*3);
+          QRgb *imd = (QRgb*)(im_bits + x*bytes_per_pixel + y*bytes_per_line);
+          const QRgb *bimd = (const QRgb*)(baseimg_bits + x*bytes_per_pixel + y*bytes_per_line);
 
           int dist = square(qRed(*imd)-qRed(*bimd)) +
                      square(qGreen(*imd)-qGreen(*bimd)) +
