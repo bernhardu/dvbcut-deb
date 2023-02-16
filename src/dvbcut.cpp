@@ -1163,19 +1163,28 @@ void dvbcut::editAutoChapters()
 
           // calculate color distance between two consecutive frames
           double dist=0.;
-          if (p2.depth()==32 && p1.depth()==32)
-            for (int y=0;y<p1.height();++y) {
-              QRgb *col1=(QRgb*)p1.scanLine(y);
-              QRgb *col2=(QRgb*)p2.scanLine(y);
+          if (p1.format() == QImage::Format_RGB888 &&
+              p2.format() == QImage::Format_RGB888)
+          {
+            int bytes_per_pixel = p1.depth()/8;
+            int bytes_per_line = p1.bytesPerLine();
 
-              for (int x=p1.width();x>0;--x) {
+            const uchar* p1_bits = p1.constBits();
+            const uchar* p2_bits = p2.constBits();
+
+            for (int y = 0; y < p1.height(); y++) {
+              for (int x = 0; x < p1.width(); x++) {
+                const QRgb *col1 = (const QRgb*)(p1_bits + x*bytes_per_pixel + y*bytes_per_line);
+                const QRgb *col2 = (const QRgb*)(p2_bits + x*bytes_per_pixel + y*bytes_per_line);
+
                 dist+=sqrt(pow(qRed(*col1)-qRed(*col2),2)+pow(qGreen(*col1)-qGreen(*col2),2)+pow(qBlue(*col1)-qBlue(*col2),2));
                 // that's a bit faster...   
                 //dist+=(abs(qRed(*col1)-qRed(*col2))+abs(qGreen(*col1)-qGreen(*col2))+abs(qBlue(*col1)-qBlue(*col2)));
-                ++col1;
-                ++col2;
               }
             }
+          } else {
+            fprintf(stderr, "%s: wrong format.\n", __FUNCTION__);
+          }
           dist/=(p1.height()*p1.width());
  
           // 50. seems to be a good measure for the color distance at scene changes (about sqrt(3)*50. if sum of abs values)! 
@@ -1334,21 +1343,28 @@ unsigned long calc_distance(QImage baseimg, QImage im)
         im = im.scaled(baseimg.size());
 
     unsigned long distance = 0;
-    if (im.depth() == 32 && baseimg.depth() == 32) {
-        for (int y = 0; y < baseimg.height(); ++y) {
-            QRgb *imd = (QRgb*) im.scanLine(y);
-            QRgb *bimd = (QRgb*) baseimg.scanLine(y);
+    if (im.format() == QImage::Format_RGB888 &&
+        baseimg.format() == QImage::Format_RGB888)
+    {
+        int bytes_per_pixel = baseimg.depth()/8;
+        int bytes_per_line = baseimg.bytesPerLine();
 
-            for (int x = im.width(); x > 0; --x) {
+        const uchar* im_bits = im.constBits();
+        const uchar* bim_bits = baseimg.constBits();
+
+        for (int y = 0; y < baseimg.height(); y++) {
+            for (int x = 0; x < baseimg.width(); x++) {
+                const QRgb *imd = (const QRgb*)(im_bits + x*bytes_per_pixel + y*bytes_per_line);
+                const QRgb *bimd = (const QRgb*)(bim_bits + x*bytes_per_pixel + y*bytes_per_line);
                 int dist = square(qRed(*imd) - qRed(*bimd)) + square(qGreen(*imd) - qGreen(*bimd)) + square(qBlue(*imd) - qBlue(*bimd));
                 if (dist > 1000)
                     dist = 1000;
 
                 distance += dist;
-                ++imd;
-                ++bimd;
             }
         }
+    } else {
+        fprintf(stderr, "%s: wrong format.\n", __FUNCTION__);
     }
 
     return distance;
