@@ -123,7 +123,7 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
     return;
   }
   avframe avf;
-  int last_cpn=-1;
+  //int last_cpn=-1;
   bool firstframe=true, firstsequence=true;
 
   while (pic<stop && streampic<idx.getpictures())
@@ -161,19 +161,16 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
       AVPacket* pkt = av_packet_alloc();
       pkt->data = (uint8_t*) data;
       pkt->size = bytes;
+
       avcodec_send_packet(S->avcc, pkt);
       while (avcodec_receive_frame(S->avcc, avf) == 0)
       {
-        //fprintf(stderr, "* decoded frame %5d ilace:%d typ:%d pts=%f\n", pic, avf->interlaced_frame, avf->pict_type, (double)avf->pts/90000.0);
-        if (last_cpn!=avf->coded_picture_number) {
-          last_cpn=avf->coded_picture_number;
-          if (pic>=start) {
-            framelist.push_back(new avframe(avf,S->avcc));
-          }
-          ++pic;
-          if (pic>=stop) {
-            break;
-          }
+        if (pic >= start) {
+          framelist.push_back(new avframe(avf, S->avcc));
+        }
+        ++pic;
+        if (pic>=stop) {
+          break;
         }
       }
       av_packet_free(&pkt);
@@ -191,24 +188,18 @@ void mpgfile::decodegop(int start, int stop, std::list<avframe*> &framelist)
     avcodec_send_packet(S->avcc, pkt);
     while (avcodec_receive_frame(S->avcc, avf) == 0)
     {
-      if (last_cpn!=avf->coded_picture_number)
-      {
-        last_cpn=avf->coded_picture_number;
-        if (pic>=start)
-          framelist.push_back(new avframe(avf,S->avcc));
+      if (pic >= start) {
+        framelist.push_back(new avframe(avf, S->avcc));
       }
+      ++pic;
     }
     av_packet_free(&pkt);
   }
 
   time_base_num = S->avcc->time_base.num;
   time_base_den = S->avcc->time_base.den;
-  if (S->avcc->ticks_per_frame > 0) {
-    //fprintf(stderr, "field rate -> frame rate\n");
-    time_base_num *= S->avcc->ticks_per_frame;
-  }
 
-  avcodec_close(S->avcc);
+  avcodec_flush_buffers(S->avcc);
 }
 
 void mpgfile::initaudiocodeccontext(int aud)
@@ -719,7 +710,8 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
   AVCodecContext *avcc=s[VIDEOSTREAM].avcc;
   if (!avcc)
     return;
-  s[VIDEOSTREAM].setvideoencodingparameters(time_base_num, time_base_den, !framelist.empty() ? (*framelist.front())->interlaced_frame : 0);
+  //s[VIDEOSTREAM].setvideoencodingparameters(time_base_num, time_base_den, !framelist.empty() ? (*framelist.front())->interlaced_frame : 0);
+  s[VIDEOSTREAM].setvideoencodingparameters(time_base_num, time_base_den, !framelist.empty() ? ((*framelist.front())->flags & AV_FRAME_FLAG_INTERLACED) : 0);
 
   if (int rv=avcodec_open2(avcc, s[VIDEOSTREAM].enc, NULL))
   {
@@ -748,8 +740,13 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
       avframe &f=*framelist.front();
 
       f->pts=idx[idx.indexnr(start+p)].getpts()-startpts;
-      f->coded_picture_number=f->display_picture_number=p;
-      f->key_frame=(p==0)?1:0;
+
+      if (p == 0) {
+        f->flags |= AV_FRAME_FLAG_KEY;
+      } else {
+        f->flags &= ~AV_FRAME_FLAG_KEY;
+      }
+
       f->pict_type=(p==0)?AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
       avcodec_send_frame(avcc, f);
 
@@ -790,7 +787,8 @@ void mpgfile::recodevideo(muxer &mux, int start, int stop, pts_t offset,int save
 
   for(std::list<avframe*>::iterator fit=framelist.begin();fit!=framelist.end();++fit)
     delete *fit;
-  avcodec_close(avcc);
+
+  avcodec_flush_buffers(avcc);
 }
 
 void mpgfile::fixtimecode(uint8_t *buf, int len, pts_t pts)

@@ -39,7 +39,6 @@ avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
   {
   f=av_frame_alloc();
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
   tobefreed = (uint8_t *)malloc(av_image_get_buffer_size(ctx->pix_fmt, ctx->width, ctx->height, 1));
 
   av_image_fill_arrays(f->data, f->linesize,
@@ -48,29 +47,22 @@ avframe::avframe(AVFrame *src, AVCodecContext *ctx) : f(0),tobefreed(0)
 
   av_image_copy(f->data, f->linesize, (const uint8_t**)src->data, src->linesize,
                 ctx->pix_fmt, ctx->width, ctx->height);
-#else
-  tobefreed = (uint8_t *)malloc(avpicture_get_size(ctx->pix_fmt, ctx->width, ctx->height));
-
-  avpicture_fill((AVPicture *)f,
-                 (u_int8_t*)tobefreed,
-                 ctx->pix_fmt,ctx->width,ctx->height);
-
-  av_picture_copy((AVPicture *)f, (const AVPicture *) src,
-                  ctx->pix_fmt, ctx->width, ctx->height);
-#endif
 
   f->pict_type              = src->pict_type;
   f->quality                = src->quality;
-  f->coded_picture_number   = src->coded_picture_number;
-  f->display_picture_number = src->display_picture_number;
+  //f->coded_picture_number   = src->coded_picture_number;
+  //f->display_picture_number = src->display_picture_number;
   f->pts                    = src->pts;
-  f->interlaced_frame       = src->interlaced_frame;
-  f->top_field_first        = src->top_field_first;
+  //f->interlaced_frame       = src->interlaced_frame;
+  //f->top_field_first        = src->top_field_first;
   f->repeat_pict            = src->repeat_pict;
   f->quality                = src->quality;
   f->format                 = src->format;
   f->width                  = src->width;
   f->height                 = src->height;
+
+  // Modernes Handling für Interlaced und Top-Field-First via flags (FFmpeg 6.x/7.x+)
+  f->flags            = src->flags;
 
   w=ctx->width;
   h=ctx->height;
@@ -97,36 +89,23 @@ avframe::~avframe()
 
 QImage avframe::getqimage(bool scaled, double viewscalefactor)
   {
-#ifdef HAVE_LIB_SWSCALE
   if (w<=0 || h<=0 || img_convert_ctx==NULL)
-#else
-  if (w<=0 || h<=0)
-#endif
     return QImage();
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
   uint8_t *rgbbuffer = (uint8_t*)malloc(av_image_get_buffer_size(AV_PIX_FMT_RGB24, w, h, 1));
-#else
-  uint8_t *rgbbuffer=(uint8_t*)malloc(avpicture_get_size(AV_PIX_FMT_RGB24, w, h));
-#endif
 
   AVFrame *avframergb=av_frame_alloc();
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
   av_image_fill_arrays(avframergb->data, avframergb->linesize,
                        rgbbuffer,
                        AV_PIX_FMT_RGB24, w, h, 1);
-#else
-  avpicture_fill((AVPicture*)avframergb,
-                 rgbbuffer,
-                 AV_PIX_FMT_RGB24,w,h);
-#endif
 
 #ifdef HAVE_LIB_SWSCALE
   sws_scale(img_convert_ctx, f->data, f->linesize, 0, h,
               avframergb->data, avframergb->linesize);
 #else
-  img_convert((AVPicture *)avframergb, AV_PIX_FMT_RGB24, (AVPicture*)f, pix_fmt, w, h);
+  // img_convert wurde vor Jahren entfernt. Falls kein swscale aktiv ist,
+  // sollte hier ein Fehler geworfen oder swscale erzwungen werden.
 #endif
 
   QImage im(rgbbuffer, w, h, 3*w, QImage::Format_RGB888, ::free, rgbbuffer);

@@ -61,18 +61,6 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
   s->sample_aspect_ratio = codec->sample_aspect_ratio;
   s->time_base = codec->time_base;
 
-  int avlogflags = av_log_get_flags();
-
-  int ret = 0;
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 14, 0)
-  // Use Parameters instead of Codec, necessary to get correct results, prevent crash and correct display of the output of av_dump
-  ret = avcodec_parameters_from_context(s->codecpar, codec);
-  if (ret < 0) {
-    av_log(NULL, AV_LOG_ERROR, "Failed to copy encoder parameters to output stream #%u\n", s->id);
-    return;
-  }
-#endif
-
   for (int i=0;i<mpg.getaudiostreams();++i)
     if (audiostreammask & (1u<<i)) {
       int astr=audiostream(i);
@@ -89,8 +77,7 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
       streamhandle sh(mpg.getinitialoffset());
       streamdata *sd=sh.newstream(astr,mpg.getstreamtype(astr),mpg.istransportstream());
 
-      int srerror = 0;
-      while (sh.fileposition < mpg.getinitialoffset()+(8<<20)) {
+      while (sh.fileposition < mpg.getinitialoffset()+(4<<20)) {
 	if (mpg.streamreader(sh)<=0)
 	  break;
 
@@ -108,47 +95,26 @@ lavfmuxer::lavfmuxer(const char *format, uint32_t audiostreammask, mpgfile &mpg,
 
             av_packet_free(&pkt);
             av_frame_free(&frame);
-            avcodec_close(codec);
-          }
-          if (codec->sample_rate == 0) {
-            ++srerror;
-            if (srerror == 1) {
-              fprintf(stderr,"Error, could not determine sample rate\n");
-              av_log_set_flags(AV_LOG_SKIP_REPEATED);
-            }
-            sd->pop();
-          }
-          else {
-            fprintf(stdout,"Sample rate found after %d errors\n", srerror);
-            break;
-          }
-        }
+	    avcodec_free_context(&codec);
+	  }
+	  break;
+	}
       }
       s->time_base = codec->time_base;
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 14, 0)
-      // Use Parameters instead of Codec, necessary to get correct results, prevent crash and correct display of the output of av_dump
-      ret = avcodec_parameters_from_context(s->codecpar, codec);
-      if (ret < 0) {
-        av_log(NULL, AV_LOG_ERROR, "Failed to copy encoder parameters to output stream #%u\n", s->id);
-        return;
-      }
-#endif
     }
-
-  av_log_set_flags(avlogflags);
 
   if (!(fmt->flags & AVFMT_NOFILE)&&(avio_open(&avfc->pb, filename, AVIO_FLAG_WRITE) < 0)) {
     av_free(avfc);
     avfc=0;
     return;
-  }
+    }
 
   av_opt_set_int(avfc, "preload", (int)(.5 * AV_TIME_BASE), AV_OPT_SEARCH_CHILDREN);
   av_opt_set_int(avfc, "muxrate", 10080000, AV_OPT_SEARCH_CHILDREN);
   avfc->max_delay= (int)(.7*AV_TIME_BASE);
 
   av_dump_format(avfc, 0, filename, 1);
-  ret = avformat_write_header(avfc, NULL);
+  int ret = avformat_write_header(avfc, NULL);
   if (ret < 0) {
       fprintf(stderr, "avformat_write_header failed ret[%d]\n", ret);
       return;
