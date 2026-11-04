@@ -11,7 +11,7 @@ Build-Depends:
  libavutil-dev (>> 6:11~),
  libmad0-dev,
  libswscale-dev (>> 6:11~),
- pkg-config,
+ pkgconf,
  qt5-qmake,
  qtbase5-dev,
  qtbase5-dev-tools,
