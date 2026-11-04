@@ -1,3 +1,11 @@
+dvbcut (0.7.5-1) UNRELEASED; urgency=low
+
+  * New upstream release 0.7.5.
+    - Add patch to build with newer ffmpeg version. (Closes: #1072411)
+    - Remove some more generated files in distclean. (Closes: #1044557)
+
+ -- Bernhard Übelacker <bernhardu@mailbox.org>  Wed, 04 Nov 2026 16:52:06 +0100
+
 dvbcut (0.7.4-1) unstable; urgency=low
 
   * New upstream release 0.7.4.
