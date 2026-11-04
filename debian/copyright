@@ -1,5 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: dvbcut
+Upstream-Contact: Bernhard Übelacker <bernhardu@mailbox.org>
 Source: https://github.com/bernhardu/dvbcut-deb
 Comment:
  Original Source: https://dvbcut.svn.sourceforge.net/svnroot/dvbcut
