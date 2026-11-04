@@ -719,7 +719,7 @@ int dvbcut::chooseBestPicture(int startpic, int range, int samples)
         }
       entropy /= log(2.);
 
-      //fprintf(stderr,"frame %7d, sample %4d (%7d): %10d %10.2f\n",startpic,n,pic,colors,entropy);
+      if (0) fprintf(stderr, "frame %7d, sample %4d (%7d): %10d %10.2f\n", startpic, n, pic, colors, entropy);
 
       // largest "information content"?
       if(entropy>bestval) {
