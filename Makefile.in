@@ -58,7 +58,7 @@ mostlyclean-local:
 clean-local: mostlyclean-local
 	rm -f config.log
 distclean-local: clean-local
-	rm -f Makefile config.cache config.status
+	rm -f Makefile src/Makefile config.cache config.status dvbcut.desktop
 maintainer-clean-local: distclean-local
 	rm -f configure
 
