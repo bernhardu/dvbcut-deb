@@ -19,7 +19,7 @@ source=("https://github.com/bernhardu/dvbcut-deb/archive/v0.7.5.tar.gz")
 build() {
   cd "$srcdir/dvbcut-deb-$pkgver"
 
-  autoconf
+  autoreconf --install
   ./configure --prefix=/usr
   make -j1
 }

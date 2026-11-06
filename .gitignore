@@ -1,9 +1,12 @@
 .pc/
+aclocal.m4
 autom4te.cache/
 bin/dvbcut
+config.guess
 config.guess.dh-orig
 config.log
 config.status
+config.sub
 config.sub.dh-orig
 configure
 debian/.debhelper/
@@ -14,6 +17,7 @@ debian/dvbcut.substvars
 debian/dvbcut/
 debian/files
 dvbcut.desktop
+install-sh
 Makefile
 src/*.o
 src/*.qm

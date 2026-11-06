@@ -7,8 +7,6 @@ Makefile.in
 README
 README.icons
 VERSION
-config.guess
-config.sub
 configure.ac
 contrib/AR_to_169
 contrib/AR_to_43
@@ -42,7 +40,6 @@ icons/stop.svgz
 import/stdlib.cpp
 import/stdlib.h
 import/sys/mman.h
-install-sh
 mkinstalldirs
 src/Makefile.in
 src/avframe.cpp
