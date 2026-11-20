@@ -852,7 +852,7 @@ ssize_t mpgfile::readfile(std::string filename, uint8_t **buffer) {
 
   // allocate memory to contain the whole file
   *buffer = (uint8_t*) malloc(sizeof(uint8_t)*lSize);
-  if (buffer == NULL) {
+  if (*buffer == NULL) {
     fclose(pFile);
     return -2;
   }
@@ -861,7 +861,8 @@ ssize_t mpgfile::readfile(std::string filename, uint8_t **buffer) {
   len = fread(*buffer, 1, lSize, pFile);
   if (len != lSize) {
     fclose(pFile);
-    free(buffer);
+    free(*buffer);
+    *buffer = NULL;
     return -3;
   }
   
